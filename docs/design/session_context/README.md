@@ -1,7 +1,7 @@
 # Session Context
 
 - Contract: **v1 frozen for implementation**
-- Implementation: **M0 foundation complete; M1 pending**
+- Implementation: **M1 values and local validation complete; M2 pending**
 - Last design review: **2026-08-27**
 
 Session context is the shared state boundary between query understanding,
@@ -52,3 +52,15 @@ SessionContext
 - Profile-prior weighting
 
 Those components consume this contract but cannot redefine it implicitly.
+
+## Implemented boundary
+
+M1 provides frozen leaf and aggregate values, the closed operation vocabulary,
+stable domain errors, an injected immutable facet registry, and explicit local
+validators. The registry deliberately contains no default production facet
+list and does not derive facets from the official `ask_attribute` protocol.
+
+Validation that needs a current state, prior history, catalog observation, or
+transaction lifecycle remains outside this milestone. In particular, reducer
+semantics and atomic versioned updates begin in M2; belief, history, codec, and
+store validation begin in M3.
