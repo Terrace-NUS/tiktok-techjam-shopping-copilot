@@ -9,7 +9,7 @@
 ## Project Development
 
 The project package uses a Python 3.10+ `src` layout and has no mandatory
-runtime dependencies through M1. Create an isolated development environment and
+runtime dependencies through M3. Create an isolated development environment and
 install the package in editable mode:
 
 ```powershell

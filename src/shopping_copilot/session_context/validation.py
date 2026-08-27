@@ -2,23 +2,31 @@
 
 from __future__ import annotations
 
+import json
 import math
 import re
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from typing import NoReturn, TypeAlias, cast
 
 from .errors import ErrorCode, ErrorPathSegment, SessionContextError
 from .models import (
+    MASS_TOLERANCE,
+    CandidateMode,
+    CertaintyEvidence,
     Commitment,
+    FacetStats,
     IntentState,
     Operator,
     Preference,
     PreferenceDraft,
     PreferenceSource,
     PreferenceValue,
+    ProbeQuality,
     ProfilePrior,
     ScalarValue,
+    SearchBelief,
     SemanticPolarity,
+    ValueMass,
 )
 from .operations import (
     AddPreference,
@@ -37,6 +45,8 @@ _POSITIVE_OPERATORS = frozenset({Operator.EQ, Operator.IN})
 _NEGATIVE_OPERATORS = frozenset({Operator.NEQ, Operator.NOT_IN})
 _LOWER_OPERATORS = frozenset({Operator.GT, Operator.GE})
 _UPPER_OPERATORS = frozenset({Operator.LT, Operator.LE})
+_CANONICAL_IDENTIFIER_PATTERN = re.compile(r"^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$")
+_SCALAR_TYPE_RANK = {bool: 0, int: 1, float: 2, str: 3}
 
 _NumericIdSegment: TypeAlias = tuple[int, str]
 _PreferenceIdKey: TypeAlias = tuple[_NumericIdSegment, _NumericIdSegment, _NumericIdSegment]
@@ -59,6 +69,37 @@ def validate_profile_prior(profile: ProfilePrior) -> None:
         type(tag) is str for tag in profile.preference_tags
     ):
         _fail(ErrorCode.INVALID_PROFILE, path=("preference_tags",))
+
+
+def validate_search_belief(belief: SearchBelief, registry: FacetRegistry) -> None:
+    """Validate one canonical, catalog-independent Probe observation."""
+
+    if type(belief) is not SearchBelief:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE)
+    if type(belief.based_on_intent_version) is not int or belief.based_on_intent_version < 0:
+        _fail(
+            ErrorCode.INVALID_PROBE_EVIDENCE,
+            path=("based_on_intent_version",),
+        )
+    if (
+        type(belief.certainty_method) is not str
+        or _CANONICAL_IDENTIFIER_PATTERN.fullmatch(belief.certainty_method) is None
+    ):
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=("certainty_method",))
+
+    if belief.certainty is not None:
+        _validate_probability(belief.certainty, path=("certainty",))
+    _validate_certainty_evidence(belief.certainty_evidence)
+
+    evidence = belief.certainty_evidence
+    if evidence.quality_status is ProbeQuality.VALID:
+        if belief.certainty is None or evidence.raw_concentration is None:
+            _fail(ErrorCode.CERTAINTY_QUALITY_MISMATCH)
+    elif belief.certainty is not None:
+        _fail(ErrorCode.CERTAINTY_QUALITY_MISMATCH)
+
+    _validate_candidate_modes(belief.candidate_modes)
+    _validate_facet_stats(belief.facet_stats, registry)
 
 
 def validate_preference(preference: Preference, registry: FacetRegistry) -> None:
@@ -599,6 +640,223 @@ def _is_finite_scalar(value: object) -> bool:
     return type(value) in (str, int, float, bool) and not (
         type(value) is float and not math.isfinite(value)
     )
+
+
+def _validate_certainty_evidence(evidence: CertaintyEvidence) -> None:
+    if type(evidence) is not CertaintyEvidence:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=("certainty_evidence",))
+    prefix = ("certainty_evidence",)
+    if type(evidence.probe_id) is not str or not evidence.probe_id.strip():
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=prefix + ("probe_id",))
+    if type(evidence.probe_size) is not int or evidence.probe_size < 0:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=prefix + ("probe_size",))
+    if type(evidence.quality_status) is not ProbeQuality:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=prefix + ("quality_status",))
+    if type(evidence.quality_reasons) is not tuple:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=prefix + ("quality_reasons",))
+
+    reasons = evidence.quality_reasons
+    for index, reason in enumerate(reasons):
+        if type(reason) is not str or _CANONICAL_IDENTIFIER_PATTERN.fullmatch(reason) is None:
+            _fail(
+                ErrorCode.INVALID_PROBE_EVIDENCE,
+                path=prefix + ("quality_reasons", index),
+            )
+    if len(set(reasons)) != len(reasons) or reasons != tuple(sorted(reasons)):
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=prefix + ("quality_reasons",))
+
+    if evidence.raw_concentration is not None:
+        _validate_probability(
+            evidence.raw_concentration,
+            path=prefix + ("raw_concentration",),
+        )
+
+    if evidence.quality_status is ProbeQuality.VALID:
+        if evidence.probe_size == 0 or reasons:
+            _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=prefix)
+    elif not reasons:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=prefix + ("quality_reasons",))
+
+
+def _validate_candidate_modes(candidate_modes: tuple[CandidateMode, ...]) -> None:
+    path = ("candidate_modes",)
+    if type(candidate_modes) is not tuple:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=path)
+
+    ids: set[str] = set()
+    order_keys: list[tuple[float, str]] = []
+    masses: list[float] = []
+    for index, mode in enumerate(candidate_modes):
+        item_path = path + (index,)
+        if type(mode) is not CandidateMode:
+            _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=item_path)
+        if type(mode.id) is not str or not mode.id.strip():
+            _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=item_path + ("id",))
+        if mode.id in ids:
+            _fail(ErrorCode.DUPLICATE_MODE_ID, path=item_path + ("id",))
+        ids.add(mode.id)
+        if type(mode.label) is not str or not mode.label.strip():
+            _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=item_path + ("label",))
+        _validate_probability(mode.mass, path=item_path + ("mass",), positive=True)
+
+        representatives = mode.representative_ids
+        if type(representatives) is not tuple or not representatives:
+            _fail(
+                ErrorCode.INVALID_PROBE_EVIDENCE,
+                path=item_path + ("representative_ids",),
+            )
+        for representative_index, representative_id in enumerate(representatives):
+            if type(representative_id) is not str or not representative_id.strip():
+                _fail(
+                    ErrorCode.INVALID_PROBE_EVIDENCE,
+                    path=item_path + ("representative_ids", representative_index),
+                )
+        if len(set(representatives)) != len(representatives):
+            _fail(
+                ErrorCode.INVALID_PROBE_EVIDENCE,
+                path=item_path + ("representative_ids",),
+            )
+
+        numeric_mass = float(mode.mass)
+        masses.append(numeric_mass)
+        order_keys.append((-numeric_mass, mode.id))
+
+    if order_keys != sorted(order_keys):
+        _fail(ErrorCode.NON_CANONICAL_VALUE, path=path)
+    if math.fsum(masses) > 1 + MASS_TOLERANCE:
+        _fail(ErrorCode.INVALID_MASS_DISTRIBUTION, path=path)
+
+
+def _validate_facet_stats(
+    facet_stats: tuple[FacetStats, ...],
+    registry: FacetRegistry,
+) -> None:
+    path = ("facet_stats",)
+    if type(facet_stats) is not tuple:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=path)
+
+    facets: set[str] = set()
+    facet_order: list[str] = []
+    for index, stats in enumerate(facet_stats):
+        item_path = path + (index,)
+        if type(stats) is not FacetStats:
+            _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=item_path)
+        if type(stats.facet) is not str or not stats.facet.strip():
+            _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=item_path + ("facet",))
+        spec = registry.require(stats.facet, path=item_path + ("facet",))
+        if stats.facet in facets:
+            _fail(ErrorCode.DUPLICATE_FACET_STATS, path=item_path + ("facet",))
+        facets.add(stats.facet)
+        facet_order.append(stats.facet)
+
+        _validate_probability(stats.entropy, path=item_path + ("entropy",))
+        _validate_probability(stats.coverage, path=item_path + ("coverage",), positive=True)
+        _validate_top_values(stats.top_values, spec.normalizer, spec.kind, path=item_path)
+
+    if facet_order != sorted(facet_order):
+        _fail(ErrorCode.NON_CANONICAL_VALUE, path=path)
+
+
+def _validate_top_values(
+    top_values: tuple[ValueMass, ...],
+    normalizer: Callable[[ScalarValue], ScalarValue],
+    facet_kind: FacetKind,
+    *,
+    path: tuple[ErrorPathSegment, ...],
+) -> None:
+    values_path = path + ("top_values",)
+    if type(top_values) is not tuple or not top_values:
+        _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=values_path)
+
+    typed_values: set[object] = set()
+    order_keys: list[tuple[float, tuple[int, str]]] = []
+    masses: list[float] = []
+    for index, value_mass in enumerate(top_values):
+        item_path = values_path + (index,)
+        if type(value_mass) is not ValueMass:
+            _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=item_path)
+        value = value_mass.value
+        if not _is_finite_scalar(value):
+            _fail(ErrorCode.INVALID_PROBE_EVIDENCE, path=item_path + ("value",))
+        normalized = _normalize_belief_scalar(normalizer, value, path=item_path + ("value",))
+        if facet_kind is FacetKind.NUMERIC and type(normalized) not in (int, float):
+            _fail(ErrorCode.NON_CANONICAL_VALUE, path=item_path + ("value",))
+        if not _canonical_equal(value, normalized):
+            _fail(ErrorCode.NON_CANONICAL_VALUE, path=item_path + ("value",))
+
+        typed_value = _typed_value(value)
+        if typed_value in typed_values:
+            _fail(ErrorCode.DUPLICATE_FACET_VALUE, path=item_path + ("value",))
+        typed_values.add(typed_value)
+
+        _validate_probability(value_mass.mass, path=item_path + ("mass",), positive=True)
+        numeric_mass = float(value_mass.mass)
+        masses.append(numeric_mass)
+        order_keys.append((-numeric_mass, _canonical_scalar_wire_key(value)))
+
+    if order_keys != sorted(order_keys):
+        _fail(ErrorCode.NON_CANONICAL_VALUE, path=values_path)
+    if math.fsum(masses) > 1 + MASS_TOLERANCE:
+        _fail(ErrorCode.INVALID_MASS_DISTRIBUTION, path=values_path)
+
+
+def _normalize_belief_scalar(
+    normalizer: Callable[[ScalarValue], ScalarValue],
+    value: ScalarValue,
+    *,
+    path: tuple[ErrorPathSegment, ...],
+) -> ScalarValue:
+    try:
+        normalized = normalizer(value)
+    except (TypeError, ValueError, OverflowError) as error:
+        raise SessionContextError(code=ErrorCode.NON_CANONICAL_VALUE, path=path) from error
+    if not _is_finite_scalar(normalized):
+        _fail(ErrorCode.NON_CANONICAL_VALUE, path=path)
+    return normalized
+
+
+def _validate_probability(
+    value: object,
+    *,
+    path: tuple[ErrorPathSegment, ...],
+    positive: bool = False,
+) -> None:
+    if type(value) not in (int, float):
+        _fail(ErrorCode.INVALID_MASS_DISTRIBUTION, path=path)
+    if type(value) is float and not math.isfinite(value):
+        _fail(ErrorCode.INVALID_MASS_DISTRIBUTION, path=path)
+    numeric_value = cast(int | float, value)
+    if numeric_value < 0 or numeric_value > 1 or (positive and numeric_value == 0):
+        _fail(ErrorCode.INVALID_MASS_DISTRIBUTION, path=path)
+
+
+def _canonical_scalar_wire_key(value: ScalarValue) -> tuple[int, str]:
+    rank = _SCALAR_TYPE_RANK[type(value)]
+    if type(value) is int:
+        encoded = _arbitrary_size_integer_text(value)
+    else:
+        encoded = json.dumps(
+            value,
+            ensure_ascii=False,
+            allow_nan=False,
+            separators=(",", ":"),
+        )
+    return rank, encoded
+
+
+def _arbitrary_size_integer_text(value: int) -> str:
+    """Format a JSON integer without CPython's configurable digit ceiling."""
+
+    if value == 0:
+        return "0"
+    sign = "-" if value < 0 else ""
+    magnitude = -value if value < 0 else value
+    chunks: list[int] = []
+    while magnitude:
+        magnitude, remainder = divmod(magnitude, 1_000_000_000)
+        chunks.append(remainder)
+    digits = str(chunks[-1]) + "".join(f"{chunk:09d}" for chunk in reversed(chunks[:-1]))
+    return sign + digits
 
 
 def _prefixed(

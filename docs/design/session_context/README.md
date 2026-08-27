@@ -1,7 +1,7 @@
 # Session Context
 
 - Contract: **v1 frozen for implementation**
-- Implementation: **M1 values and local validation complete; M2 pending**
+- Implementation: **M3 session-context core complete; M4 adapter integration pending**
 - Last design review: **2026-08-27**
 
 Session context is the shared state boundary between query understanding,
@@ -55,12 +55,14 @@ Those components consume this contract but cannot redefine it implicitly.
 
 ## Implemented boundary
 
-M1 provides frozen leaf and aggregate values, the closed operation vocabulary,
-stable domain errors, an injected immutable facet registry, and explicit local
-validators. The registry deliberately contains no default production facet
-list and does not derive facets from the official `ask_attribute` protocol.
+M1 provides frozen values, the closed operation vocabulary, stable domain
+errors, an injected immutable facet registry, and explicit local validators.
+M2 adds the deterministic, ordered, atomic intent reducer. M3 completes the
+session-context core with belief and replay-aware aggregate validation,
+derived interaction views, a canonical versioned snapshot codec, and a
+copy-on-write in-memory store with per-session transactions.
 
-Validation that needs a current state, prior history, catalog observation, or
-transaction lifecycle remains outside this milestone. In particular, reducer
-semantics and atomic versioned updates begin in M2; belief, history, codec, and
-store validation begin in M3.
+The registry deliberately contains no default production facet list and does
+not derive facets from the official `ask_attribute` protocol. Query
+understanding, Probe production, retrieval, ranking, response normalization,
+and the thin official adapter remain application-layer work beginning in M4.

@@ -1,5 +1,10 @@
 """Public boundary for immutable session-context state and transitions."""
 
+from .aggregate_validation import (
+    validate_session_context,
+    validate_session_transition,
+    validate_turn_record,
+)
 from .aggregates import (
     InteractionContext,
     ProductFeedback,
@@ -44,11 +49,21 @@ from .registry import (
     canonical_number,
     canonical_text,
 )
+from .serialization import SCHEMA_ID, decode_snapshot, encode_snapshot
+from .store import InMemorySessionStore, SessionTransaction
 from .validation import (
     validate_intent_state,
     validate_preference,
     validate_profile_prior,
+    validate_search_belief,
     validate_state_update_batch,
+)
+from .views import (
+    all_shown_product_ids,
+    last_non_empty_shown_products,
+    most_recent_assistant_message,
+    most_recent_question,
+    question_keys_since_goal_switch,
 )
 
 __all__ = (
@@ -66,6 +81,7 @@ __all__ = (
     "FacetStats",
     "FeedbackSignal",
     "IntentState",
+    "InMemorySessionStore",
     "InteractionContext",
     "Operator",
     "Preference",
@@ -76,21 +92,34 @@ __all__ = (
     "ProfilePrior",
     "RemovePreference",
     "ReplaceFacet",
+    "SCHEMA_ID",
     "SearchBelief",
     "SemanticPolarity",
     "SessionContext",
     "SessionContextError",
     "SessionState",
+    "SessionTransaction",
     "SetDontCare",
     "StateUpdateBatch",
     "SwitchGoal",
     "TurnRecord",
     "ValueMass",
+    "all_shown_product_ids",
     "canonical_number",
     "canonical_text",
+    "decode_snapshot",
+    "encode_snapshot",
+    "last_non_empty_shown_products",
+    "most_recent_assistant_message",
+    "most_recent_question",
+    "question_keys_since_goal_switch",
     "reduce_intent",
     "validate_intent_state",
     "validate_preference",
     "validate_profile_prior",
+    "validate_search_belief",
+    "validate_session_context",
+    "validate_session_transition",
     "validate_state_update_batch",
+    "validate_turn_record",
 )
