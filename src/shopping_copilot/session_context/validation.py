@@ -487,6 +487,15 @@ def _preference_id_key(
     )
 
 
+def _preference_id_parts(preference_id: str) -> tuple[str, str, str]:
+    """Return already-validated canonical numeric ID segments."""
+
+    match = _PREFERENCE_ID_PATTERN.fullmatch(preference_id)
+    assert match is not None
+    turn, operation, preference = match.groups()
+    return turn, operation, preference
+
+
 def _logical_preference_key(preference: Preference) -> object:
     return (
         preference.facet,

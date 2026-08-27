@@ -34,6 +34,7 @@ from .operations import (
     StateUpdateBatch,
     SwitchGoal,
 )
+from .reducer import reduce_intent
 from .registry import (
     CATEGORICAL_OPERATORS,
     NUMERIC_OPERATORS,
@@ -87,6 +88,7 @@ __all__ = (
     "ValueMass",
     "canonical_number",
     "canonical_text",
+    "reduce_intent",
     "validate_intent_state",
     "validate_preference",
     "validate_profile_prior",
