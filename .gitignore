@@ -6,9 +6,12 @@ __pycache__/
 .env
 .env.*
 !.env.example
-.venv/
+.venv*/
 venv/
 .idea/
+*.egg-info/
+build/
+dist/
 *.pem
 *.key
 *.p12

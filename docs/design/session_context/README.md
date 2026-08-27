@@ -1,7 +1,7 @@
 # Session Context
 
 - Contract: **v1 frozen for implementation**
-- Implementation: **pending**
+- Implementation: **M0 foundation complete; M1 pending**
 - Last design review: **2026-08-27**
 
 Session context is the shared state boundary between query understanding,

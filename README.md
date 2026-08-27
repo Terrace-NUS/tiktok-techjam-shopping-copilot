@@ -6,6 +6,30 @@
 > Passing the local simulator is a regression requirement, not the definition
 > of the product architecture.
 
+## Project Development
+
+The project package uses a Python 3.10+ `src` layout and has no mandatory
+runtime dependencies at M0. Create an isolated development environment and
+install the package in editable mode:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+```
+
+Run the development quality gates with:
+
+```powershell
+python -m pytest
+python -m ruff check src tests/unit
+python -m ruff format --check src tests/unit
+python -m mypy
+```
+
+The organizer-facing evaluator remains a separate compatibility regression
+and continues to run with `python -m evaluator.local_evaluator`.
+
 Build an AI shopping agent that asks useful follow-up questions and recommends the customer's hidden target product within at most 10 turns.
 
 ## What You Receive
