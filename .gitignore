@@ -1,0 +1,42 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Local environments, credentials, and editor state.
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+.idea/
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+# Machine-local API credential file. Prefer environment variables in code.
+dpskapi
+
+# Test, type-checker, linter, and coverage output.
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+results.json
+
+# Large local catalog artifacts.
+data/catalog.jsonl
+data/releases/
+# Organizer-only code, private evaluation data, manifests, and build reports.
+organizer/
+secure/
+# Internal provenance and release-audit working documents.
+docs/audits/
+docs/data_selection_audit.md
+docs/participant_release_checklist.md
+# Organizer-only pipeline tests.
+tests/test_5core_builder.py
+tests/test_organizer_pipeline.py
+*.log
