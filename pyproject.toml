@@ -8,7 +8,10 @@ version = "0.1.0"
 description = "Conversational shopping copilot for TikTok TechJam 2026."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "pyunormalize==17.0.0",
+    "rfc8785==0.1.4",
+]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Programming Language :: Python :: 3",
@@ -19,11 +22,28 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+[project.scripts]
+catalog-category = "shopping_copilot.catalog.semantic.category.cli:main"
+catalog-facet-gate-a = "shopping_copilot.catalog.semantic.facet.gate_a_cli:main"
+catalog-facet-profile = "shopping_copilot.catalog.semantic.facet.cli:main"
+catalog-facet-resolution = "shopping_copilot.catalog.semantic.facet.resolution_cli:main"
+catalog-facet-gate-b-review = "shopping_copilot.catalog.semantic.facet.gate_b_cli:main"
+catalog-facet-gate-b = "shopping_copilot.catalog.semantic.facet.gate_b_approval_cli:main"
+catalog-runtime-projection = "shopping_copilot.catalog.semantic.runtime.cli:main"
+catalog-semantic-release = "shopping_copilot.catalog.semantic.release.cli:main"
+catalog-profile = "shopping_copilot.catalog.profiling.cli:main"
+retrieval-dense = "shopping_copilot.retrieval.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "mypy>=1.14,<3",
+    "numpy==2.2.6",
     "pytest>=8.3,<10",
     "ruff>=0.9,<1",
+]
+retrieval = [
+    "numpy==2.2.6",
+    "sentence-transformers==5.7.0",
 ]
 
 [tool.setuptools.packages.find]
@@ -33,6 +53,10 @@ namespaces = false
 
 [tool.setuptools.package-data]
 shopping_copilot = ["py.typed"]
+
+[tool.setuptools.data-files]
+"." = ["THIRD_PARTY_NOTICES.md"]
+licenses = ["licenses/UNICODE-3.0.txt"]
 
 [tool.pytest.ini_options]
 minversion = "8.3"

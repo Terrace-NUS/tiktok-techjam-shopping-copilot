@@ -9,6 +9,7 @@ __pycache__/
 .venv*/
 venv/
 .idea/
+.vscode/
 *.egg-info/
 build/
 dist/
@@ -28,6 +29,10 @@ dpskapi
 coverage.xml
 htmlcov/
 results.json
+
+# Reproducible local profiling and build artifacts. Reviewed release inputs
+# belong in source-controlled config; generated reports do not.
+artifacts/
 
 # Large local catalog artifacts.
 data/catalog.jsonl

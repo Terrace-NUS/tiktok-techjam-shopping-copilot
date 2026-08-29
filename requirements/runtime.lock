@@ -1,0 +1,7 @@
+# Hash-locked, universal runtime wheels for deterministic catalog semantics.
+--only-binary=:all:
+
+pyunormalize==17.0.0 \
+    --hash=sha256:f0d93b076f938db2b26d319d04f2b58505d1cd7a80b5b72badbe7d1aa4d2a31c
+rfc8785==0.1.4 \
+    --hash=sha256:520d690b448ecf0703691c76e1a34a24ddcd4fc5bc41d589cb7c58ec651bcd48

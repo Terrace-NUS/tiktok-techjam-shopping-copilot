@@ -1,0 +1,506 @@
+{
+  "schema": "shopping-copilot/clarity-prompt-suite/v0",
+  "language": "en",
+  "authorship": "Hand-authored real-world shopping prompts; no simulator target or product label is used.",
+  "levels": [
+    "vague",
+    "focused",
+    "specific"
+  ],
+  "families": [
+    {
+      "id": "wedding_guest_dress",
+      "domain": "women_dresses",
+      "vague": "I need something to wear to a wedding.",
+      "focused": "I'm looking for a women's dress for an evening wedding.",
+      "specific": "I need a navy knee-length wrap dress for an evening wedding, with sleeves, no sequins, and a budget under $120."
+    },
+    {
+      "id": "office_dress",
+      "domain": "women_dresses",
+      "vague": "Can you help me find something appropriate for work?",
+      "focused": "I want a simple women's office dress that looks professional.",
+      "specific": "Find a charcoal sheath dress for the office, knee length, short sleeved, machine washable, not bodycon, under $90."
+    },
+    {
+      "id": "summer_dress",
+      "domain": "women_dresses",
+      "vague": "I want an easy outfit for hot weather.",
+      "focused": "I'm looking for a casual summer dress for women.",
+      "specific": "Find a loose cotton midi sundress in light blue, with pockets and wide straps, not strapless, under $60."
+    },
+    {
+      "id": "formal_evening_dress",
+      "domain": "women_dresses",
+      "vague": "I need to dress up for a special night out.",
+      "focused": "Show me women's formal evening dresses.",
+      "specific": "I want a floor-length emerald green formal gown with a modest V-neck, long sleeves, no train, and no glitter."
+    },
+    {
+      "id": "office_blouse",
+      "domain": "women_tops_outerwear",
+      "vague": "I could use a nicer top.",
+      "focused": "I'm looking for a women's blouse for the office.",
+      "specific": "Find an ivory silk-look button-front blouse, women's medium, long sleeved, opaque, without ruffles, under $70."
+    },
+    {
+      "id": "casual_cardigan",
+      "domain": "women_tops_outerwear",
+      "vague": "I need another layer for chilly rooms.",
+      "focused": "Show me women's casual cardigans.",
+      "specific": "I want a soft gray open-front cardigan, women's large, hip length, lightweight knit, with pockets and no wool."
+    },
+    {
+      "id": "winter_coat",
+      "domain": "women_tops_outerwear",
+      "vague": "I need something warm for winter.",
+      "focused": "I'm shopping for a women's insulated winter coat.",
+      "specific": "Find a women's black hooded down-alternative parka, water resistant, thigh length, size medium, rated for cold weather, under $180."
+    },
+    {
+      "id": "rain_jacket",
+      "domain": "women_tops_outerwear",
+      "vague": "I need something for wet weather.",
+      "focused": "Show me a lightweight women's rain jacket.",
+      "specific": "Find a packable yellow waterproof rain shell for women, size small, with a hood and zip pockets, no insulated lining."
+    },
+    {
+      "id": "running_leggings",
+      "domain": "women_active_swim",
+      "vague": "I need some new workout clothes.",
+      "focused": "I'm looking for women's leggings for running.",
+      "specific": "Find black high-waisted full-length running leggings, women's medium, with side phone pockets, moisture-wicking fabric, and no mesh panels."
+    },
+    {
+      "id": "yoga_top",
+      "domain": "women_active_swim",
+      "vague": "I want a comfortable top for exercise.",
+      "focused": "Show me women's tops for yoga practice.",
+      "specific": "I need a fitted sage green sleeveless yoga tank, women's small, breathable and long enough to stay tucked, without a built-in bra."
+    },
+    {
+      "id": "lap_swimsuit",
+      "domain": "women_active_swim",
+      "vague": "I need something for the pool.",
+      "focused": "I'm looking for a women's one-piece swimsuit for lap swimming.",
+      "specific": "Find a navy chlorine-resistant one-piece lap swimsuit, women's size 10, racerback, full coverage, with no padding or decorative cutouts."
+    },
+    {
+      "id": "cycling_jersey",
+      "domain": "women_active_swim",
+      "vague": "I want better clothes for bike rides.",
+      "focused": "Show me a women's cycling jersey.",
+      "specific": "Find a bright orange short-sleeve women's cycling jersey, size medium, full front zip, three rear pockets, reflective details, under $80."
+    },
+    {
+      "id": "women_running_shoes",
+      "domain": "women_shoes",
+      "vague": "I need some shoes for getting more active.",
+      "focused": "I'm looking for women's road running shoes.",
+      "specific": "Find women's neutral road running shoes in size 8 wide, lightweight, breathable, with moderate cushioning, mostly white, under $130."
+    },
+    {
+      "id": "wedding_heels",
+      "domain": "women_shoes",
+      "vague": "I need nicer shoes for an event.",
+      "focused": "Show me women's heels for a wedding.",
+      "specific": "Find nude block-heel pumps for a wedding, women's size 7.5, heel under three inches, closed toe, no ankle strap, under $100."
+    },
+    {
+      "id": "travel_sandals",
+      "domain": "women_shoes",
+      "vague": "I want comfortable shoes for vacation.",
+      "focused": "I'm looking for women's walking sandals for travel.",
+      "specific": "Find women's black walking sandals in size 9, adjustable straps, cushioned footbed, lightweight, water friendly, and no toe post."
+    },
+    {
+      "id": "winter_boots",
+      "domain": "women_shoes",
+      "vague": "I need boots for bad weather.",
+      "focused": "Show me warm women's winter boots.",
+      "specific": "Find waterproof women's winter boots, size 8, black, mid-calf, insulated, flat or low heel, with a side zipper and good traction."
+    },
+    {
+      "id": "interview_shirt",
+      "domain": "men_clothing",
+      "vague": "I need to look professional for an interview.",
+      "focused": "I'm looking for a men's dress shirt for an interview.",
+      "specific": "Find a men's white slim-fit dress shirt, 16-inch neck and 34-inch sleeve, wrinkle resistant, spread collar, no chest pocket, under $70."
+    },
+    {
+      "id": "casual_overshirt",
+      "domain": "men_clothing",
+      "vague": "I want something casual to wear on weekends.",
+      "focused": "Show me a men's casual button-up shirt.",
+      "specific": "Find a men's navy cotton flannel button-up, size large, regular fit, long sleeved, subtle plaid, and not heavyweight."
+    },
+    {
+      "id": "men_winter_jacket",
+      "domain": "men_clothing",
+      "vague": "I need a jacket for colder days.",
+      "focused": "I'm shopping for a men's insulated winter jacket.",
+      "specific": "Find a men's dark green hooded puffer jacket, size XL, water resistant, hip length, synthetic insulation, no large logo, under $160."
+    },
+    {
+      "id": "gym_shorts",
+      "domain": "men_clothing",
+      "vague": "I need something better to work out in.",
+      "focused": "I'm looking for men's shorts for the gym.",
+      "specific": "Find men's black seven-inch training shorts, size medium, lightweight stretch fabric, zip pockets, built-in liner, and no bold graphics."
+    },
+    {
+      "id": "office_oxfords",
+      "domain": "men_shoes",
+      "vague": "I need shoes that look right at the office.",
+      "focused": "Show me men's leather Oxford dress shoes.",
+      "specific": "Find men's black leather cap-toe Oxfords, size 10.5 wide, lace-up, cushioned insole, rubber sole, and under $150."
+    },
+    {
+      "id": "trail_running_shoes",
+      "domain": "men_shoes",
+      "vague": "I need shoes for running outside.",
+      "focused": "I'm looking for men's trail running shoes.",
+      "specific": "Find men's trail running shoes, size 11, dark gray, wide toe box, aggressive grip, rock protection, non-waterproof, under $140."
+    },
+    {
+      "id": "casual_sneakers",
+      "domain": "men_shoes",
+      "vague": "I want everyday shoes that go with most things.",
+      "focused": "Show me men's casual low-top sneakers.",
+      "specific": "Find men's white leather low-top sneakers, size 10, minimal branding, gum rubber sole, no high top, and under $110."
+    },
+    {
+      "id": "work_boots",
+      "domain": "men_shoes",
+      "vague": "I need tougher shoes for work.",
+      "focused": "I'm looking for men's safety work boots.",
+      "specific": "Find men's brown waterproof work boots, size 12 wide, composite toe, slip-resistant sole, electrical hazard rated, six-inch height."
+    },
+    {
+      "id": "anniversary_necklace",
+      "domain": "jewelry",
+      "vague": "I need a meaningful anniversary gift.",
+      "focused": "I'm looking for a women's pendant necklace as an anniversary gift.",
+      "specific": "Find a sterling silver heart pendant necklace with a small blue stone, 18-inch chain, nickel free, understated, under $100."
+    },
+    {
+      "id": "everyday_earrings",
+      "domain": "jewelry",
+      "vague": "I want some jewelry I can wear every day.",
+      "focused": "Show me simple women's stud earrings for daily wear.",
+      "specific": "Find small round sterling silver stud earrings with clear cubic zirconia, hypoallergenic posts, under 6 mm, and under $40."
+    },
+    {
+      "id": "gift_bracelet",
+      "domain": "jewelry",
+      "vague": "I'm trying to choose a nice birthday present.",
+      "focused": "I'm looking for a delicate women's bracelet as a birthday gift.",
+      "specific": "Find a rose-gold-tone adjustable chain bracelet with a small initial charm, nickel free, minimalist, and under $50."
+    },
+    {
+      "id": "minimalist_ring",
+      "domain": "jewelry",
+      "vague": "I'd like a new piece of jewelry for myself.",
+      "focused": "Show me a simple women's ring for everyday wear.",
+      "specific": "Find a thin sterling silver stacking ring, size 7, plain polished band, no stones, nickel free, and under $35."
+    },
+    {
+      "id": "work_tote",
+      "domain": "bags_travel",
+      "vague": "I need a bag for my daily commute.",
+      "focused": "I'm looking for a women's tote bag for work.",
+      "specific": "Find a structured black work tote with a zip top, padded 15-inch laptop compartment, shoulder straps, water-resistant material, under $120."
+    },
+    {
+      "id": "evening_clutch",
+      "domain": "bags_travel",
+      "vague": "I need a small bag for a night out.",
+      "focused": "Show me women's evening clutch bags.",
+      "specific": "Find a champagne satin evening clutch with a removable chain strap, room for a phone, magnetic closure, no rhinestones, under $60."
+    },
+    {
+      "id": "carry_on_luggage",
+      "domain": "bags_travel",
+      "vague": "I need luggage for an upcoming trip.",
+      "focused": "I'm looking for a carry-on spinner suitcase.",
+      "specific": "Find a 20-inch navy hard-shell carry-on with four spinner wheels, TSA lock, expandable body, under seven pounds, under $140."
+    },
+    {
+      "id": "packing_organizers",
+      "domain": "bags_travel",
+      "vague": "I want my suitcase to be less messy.",
+      "focused": "Show me packing cubes for travel.",
+      "specific": "Find a lightweight six-piece set of compression packing cubes in different sizes, with mesh panels and sturdy zippers, under $45."
+    },
+    {
+      "id": "daily_watch",
+      "domain": "watches_accessories",
+      "vague": "I want a watch I can wear most days.",
+      "focused": "Show me a simple men's analog watch for everyday wear.",
+      "specific": "Find a men's analog watch with a white dial, black leather band, case under 40 mm, date window, water resistance, under $150."
+    },
+    {
+      "id": "sport_watch",
+      "domain": "watches_accessories",
+      "vague": "I need a watch for workouts and outdoor use.",
+      "focused": "I'm looking for a durable digital sports watch.",
+      "specific": "Find a black digital sports watch with stopwatch, countdown timer, backlight, alarm, and at least 100-meter water resistance, under $80."
+    },
+    {
+      "id": "leather_belt",
+      "domain": "watches_accessories",
+      "vague": "I need an accessory to finish work outfits.",
+      "focused": "Show me a men's leather belt for dress pants.",
+      "specific": "Find a men's black genuine leather dress belt, 34-inch waist, 1.25 inches wide, brushed silver buckle, no large logo, under $50."
+    },
+    {
+      "id": "wedding_tie",
+      "domain": "watches_accessories",
+      "vague": "I need something to make my suit work for a wedding.",
+      "focused": "I'm looking for a men's necktie for a spring wedding.",
+      "specific": "Find a men's sage green silk-look necktie, standard width, subtle texture, no pattern, with a matching pocket square, under $45."
+    },
+    {
+      "id": "school_shoes",
+      "domain": "kids_work_costume",
+      "vague": "My child needs new shoes for school.",
+      "focused": "I'm looking for black school shoes for a boy.",
+      "specific": "Find boys' black leather-look school shoes, youth size 3, hook-and-loop closure, non-marking sole, cushioned footbed, no laces."
+    },
+    {
+      "id": "baby_sleepwear",
+      "domain": "kids_work_costume",
+      "vague": "I need something comfortable for the baby at night.",
+      "focused": "Show me baby sleepwear for cool nights.",
+      "specific": "Find a cotton footed sleeper for a 6-9 month baby, two-way zipper, long sleeves, no hood, neutral print, machine washable."
+    },
+    {
+      "id": "medical_scrubs",
+      "domain": "kids_work_costume",
+      "vague": "I need better clothes for long shifts at work.",
+      "focused": "I'm looking for women's medical scrub pants.",
+      "specific": "Find women's navy straight-leg scrub pants, size medium petite, stretch fabric, elastic waist, at least five pockets, under $45."
+    },
+    {
+      "id": "cosplay_costume",
+      "domain": "kids_work_costume",
+      "vague": "I need something fun to wear to a convention.",
+      "focused": "Show me an adult fantasy cosplay costume.",
+      "specific": "Find an adult women's medieval-style green hooded cloak, ankle length, machine washable, no glitter, suitable for an outdoor convention."
+    }
+  ],
+  "length_controls": [
+    {
+      "id": "dress_length_control",
+      "domain": "women_dresses",
+      "lower_label": "long_vague",
+      "lower_query": "I've been looking around for a while and I know I want to update my wardrobe for going out, but I honestly haven't decided what shape, color, fabric, or kind of occasion I should shop for yet.",
+      "higher_label": "short_specific",
+      "higher_query": "Navy knee-length wrap dress, sleeves, no sequins, under $120."
+    },
+    {
+      "id": "running_shoe_length_control",
+      "domain": "women_shoes",
+      "lower_label": "long_vague",
+      "lower_query": "I want to start exercising more and probably need different shoes, although I might walk, run, use the gym, or just wear them casually, and I don't know what style I like.",
+      "higher_label": "short_specific",
+      "higher_query": "Women's size 8 wide neutral road runner, moderate cushion, under $130."
+    },
+    {
+      "id": "jewelry_length_control",
+      "domain": "jewelry",
+      "lower_label": "long_vague",
+      "lower_query": "I'd like to buy some jewelry as a gift, but I haven't chosen whether it should be a necklace, earrings, a ring, or a bracelet, and I don't know the metal or style yet.",
+      "higher_label": "short_specific",
+      "higher_query": "Sterling silver heart pendant, blue stone, 18-inch chain, under $100."
+    },
+    {
+      "id": "coat_length_control",
+      "domain": "women_tops_outerwear",
+      "lower_label": "long_vague",
+      "lower_query": "The weather is changing and I probably need another outer layer, but it could be a coat, jacket, vest, rain shell, or something lighter, and I am open to any color.",
+      "higher_label": "short_specific",
+      "higher_query": "Women's black hooded mid-thigh parka, medium, synthetic insulation, under $180."
+    },
+    {
+      "id": "bag_length_control",
+      "domain": "bags_travel",
+      "lower_label": "long_vague",
+      "lower_query": "I need some kind of bag because carrying my things has become inconvenient, but I haven't decided whether it is mainly for work, travel, evenings, or everyday errands.",
+      "higher_label": "short_specific",
+      "higher_query": "Black zip-top work tote with padded 15-inch laptop sleeve, under $120."
+    },
+    {
+      "id": "watch_length_control",
+      "domain": "watches_accessories",
+      "lower_label": "long_vague",
+      "lower_query": "I've thought about getting a watch, though I don't know whether I want something sporty, formal, digital, analog, modern, vintage, inexpensive, or something I would keep for years.",
+      "higher_label": "short_specific",
+      "higher_query": "Men's white-dial analog watch, black leather band, under 40 mm, under $150."
+    },
+    {
+      "id": "shirt_length_control",
+      "domain": "men_clothing",
+      "lower_label": "long_vague",
+      "lower_query": "I want to get a new shirt because my current wardrobe feels repetitive, but I haven't settled on whether it is for work or weekends and I'm open to every fit, fabric, and color.",
+      "higher_label": "short_specific",
+      "higher_query": "Men's white slim dress shirt, 16 neck, 34 sleeve, spread collar."
+    },
+    {
+      "id": "sandal_length_control",
+      "domain": "women_shoes",
+      "lower_label": "long_vague",
+      "lower_query": "I'm planning a trip somewhere warm and need footwear, but I could choose sneakers, sandals, flats, or something dressier because I haven't planned the activities yet.",
+      "higher_label": "short_specific",
+      "higher_query": "Women's black size 9 walking sandal, adjustable straps, no toe post."
+    },
+    {
+      "id": "scrub_length_control",
+      "domain": "kids_work_costume",
+      "lower_label": "long_vague",
+      "lower_query": "My work clothes are not very comfortable during long shifts and I want to replace some of them, but I haven't decided whether to start with tops, pants, jackets, or a whole set.",
+      "higher_label": "short_specific",
+      "higher_query": "Women's navy medium-petite straight-leg scrub pants, stretch, five pockets."
+    },
+    {
+      "id": "luggage_length_control",
+      "domain": "bags_travel",
+      "lower_label": "long_vague",
+      "lower_query": "I have a trip coming up and need something to carry my belongings, though the trip length and airline are not settled and I might want a suitcase, duffel, backpack, or organizers.",
+      "higher_label": "short_specific",
+      "higher_query": "Navy 20-inch hard-shell spinner carry-on, TSA lock, under seven pounds."
+    }
+  ],
+  "invariance_controls": [
+    {
+      "id": "wedding_dress_paraphrase",
+      "domain": "women_dresses",
+      "role": "calibration",
+      "left_query": "Navy knee-length wrap dress with sleeves, no sequins, under $120.",
+      "right_query": "Under $120, show me a sleeved navy wrap dress that reaches the knee and has no sequins.",
+      "reason": "Equivalent constraints with different word order."
+    },
+    {
+      "id": "running_shoe_paraphrase",
+      "domain": "women_shoes",
+      "role": "calibration",
+      "left_query": "Women's size 8 wide neutral road running shoes with moderate cushioning.",
+      "right_query": "Moderately cushioned neutral road runners for a woman who wears a wide size 8.",
+      "reason": "Natural paraphrase of the same footwear region."
+    },
+    {
+      "id": "buying_browsing_invariance",
+      "domain": "men_shoes",
+      "role": "calibration",
+      "left_query": "I'm ready to buy men's black leather cap-toe Oxfords in size 10.5 wide.",
+      "right_query": "I'm just browsing men's black leather cap-toe Oxfords in size 10.5 wide.",
+      "reason": "Buying language must not replace catalog-space clarity."
+    },
+    {
+      "id": "politeness_invariance",
+      "domain": "jewelry",
+      "role": "calibration",
+      "left_query": "Sterling silver heart pendant with a blue stone and an 18-inch chain.",
+      "right_query": "Could you please help me find a sterling silver heart pendant with a blue stone and an 18-inch chain? Thank you.",
+      "reason": "Polite filler adds no product constraint."
+    },
+    {
+      "id": "budget_paraphrase",
+      "domain": "bags_travel",
+      "role": "calibration",
+      "left_query": "A navy 20-inch hard-shell spinner carry-on costing no more than $140.",
+      "right_query": "My maximum budget is $140 for a navy hard-shell 20-inch spinner carry-on.",
+      "reason": "Equivalent budget phrasing."
+    },
+    {
+      "id": "jewelry_order_invariance",
+      "domain": "jewelry",
+      "role": "audit",
+      "left_query": "Small hypoallergenic sterling silver stud earrings with clear cubic zirconia.",
+      "right_query": "Clear cubic zirconia, small studs, sterling silver, hypoallergenic.",
+      "reason": "Sentence versus attribute-list style."
+    },
+    {
+      "id": "diversity_instruction_invariance",
+      "domain": "women_tops_outerwear",
+      "role": "audit",
+      "left_query": "Women's gray lightweight open-front cardigan with pockets and no wool.",
+      "right_query": "Show me a diverse selection of women's gray lightweight open-front cardigans with pockets and no wool.",
+      "reason": "An explicit diversity request changes presentation policy, not underlying intent clarity."
+    },
+    {
+      "id": "exclusion_paraphrase",
+      "domain": "women_shoes",
+      "role": "audit",
+      "left_query": "Women's black size 9 walking sandals with adjustable straps and no toe post.",
+      "right_query": "Black adjustable walking sandals for women, size 9; exclude thong-style toe posts.",
+      "reason": "Equivalent negative constraint phrasing."
+    },
+    {
+      "id": "scrub_paraphrase",
+      "domain": "kids_work_costume",
+      "role": "audit",
+      "left_query": "Women's navy medium-petite straight-leg scrub pants with stretch and five pockets.",
+      "right_query": "Navy scrub trousers for women, medium petite, straight leg, stretchy, at least five pockets.",
+      "reason": "Equivalent professional-apparel constraints."
+    },
+    {
+      "id": "watch_paraphrase",
+      "domain": "watches_accessories",
+      "role": "audit",
+      "left_query": "Men's analog watch, white dial, black leather band, case under 40 mm, below $150.",
+      "right_query": "Under $150, I want a sub-40-mm men's analog watch with a white face and black leather strap.",
+      "reason": "Equivalent watch constraints with lexical variation."
+    }
+  ],
+  "diagnostics": [
+    {
+      "id": "contradictory_color",
+      "kind": "contradiction",
+      "query": "I want a black evening dress, but it must not be black or any dark color.",
+      "interpretation": "A high clarity value would be unsafe without contradiction diagnostics."
+    },
+    {
+      "id": "contradictory_size",
+      "kind": "contradiction",
+      "query": "Find men's work boots that are exactly size 8 and exactly size 12 at the same time.",
+      "interpretation": "Specific wording is not equivalent to a coherent feasible intent."
+    },
+    {
+      "id": "negative_only_shoes",
+      "kind": "negative_only",
+      "query": "I need shoes, but not black, not brown, not leather, not sneakers, and not boots.",
+      "interpretation": "Many exclusions can still leave the positive intent under-specified."
+    },
+    {
+      "id": "multi_item_outfit",
+      "kind": "multi_intent",
+      "query": "Help me choose a dress, shoes, jewelry, and a bag for a wedding outfit.",
+      "interpretation": "Several individually clear product intents should not look like one compact result cluster."
+    },
+    {
+      "id": "subjective_jacket",
+      "kind": "subjective_vague",
+      "query": "Show me a really cool jacket that feels unique and somehow fits my personality.",
+      "interpretation": "Fluent adjectives do not necessarily make an intent operationally specific."
+    },
+    {
+      "id": "unsupported_technology",
+      "kind": "out_of_catalog",
+      "query": "Find self-cleaning holographic running shoes with active temperature control and a built-in GPS display.",
+      "interpretation": "Very detailed but unsupported requirements need feasibility diagnostics, not blind high clarity."
+    },
+    {
+      "id": "browsing_inspiration",
+      "kind": "open_ended_browsing",
+      "query": "Show me unusual earrings for inspiration; I am open to different materials, colors, and styles.",
+      "interpretation": "The category is known while the desired semantic region is intentionally diverse."
+    },
+    {
+      "id": "short_specific_boot",
+      "kind": "short_specific",
+      "query": "Women's waterproof black winter boot, size 8, flat heel, side zip.",
+      "interpretation": "A concise query can still express a tightly constrained intent."
+    }
+  ]
+}

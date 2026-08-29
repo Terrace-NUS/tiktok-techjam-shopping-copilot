@@ -1,0 +1,132 @@
+{
+  "schema": "shopping-copilot/category-scope-selection/v0",
+  "catalog_id": "sha256:da979b05a68af864cb0dcf9ee6a81c010c7e66a57978ad286c7a2e005fc69a67",
+  "category_graph_id": "sha256:04dd760c60a5035cb5a461a52af381d2eabe66477da3f734a4c47ce02323a8e9",
+  "builder_version": "catalog_semantic_v0_ucd17_0",
+  "scopes": [
+    {
+      "label": "All catalog products",
+      "root_node_ids": [
+        "cn_01bc531e85fd528c140c624798ed93acc35720920e7d72502d79e42625d0d8ce",
+        "cn_9781010ced8f3b392ba08bd6ccf3de30c8d0855a0c80b7e119867c226106a470"
+      ]
+    },
+    {
+      "label": "General apparel",
+      "root_node_ids": [
+        "cn_4ff181c58ce31c449925d489bed6571e455ed95e481bb42ab6b134919b5acc49",
+        "cn_5555dd658a6591949e0fe4f81a7ffe6c50b9e19985c6f91afa81ac7d6515dbb2",
+        "cn_b0a84933e1ddc9bfc6a4aaa4c9244d7a8212cc98cf6b8306c5b9f8272530ae8b",
+        "cn_cc4a8a6cc0d70751fdac67695ef97b77aff5ec72bfcece518e2d80b0e6f7bcb1",
+        "cn_dc4526ab97661f8069cb42250a279feecf68f6a4722cc548f5744e584b5a638e",
+        "cn_e31f699ecf5021ebaf8e28f124eaeda9d50a351a676c1eb05661dfe1986d5950",
+        "cn_f799d04c2d7977d906b105a37b0ef4a33a49233e700c75a0f5a0dcbdd6832c35"
+      ]
+    },
+    {
+      "label": "Sport-specific apparel & gear",
+      "root_node_ids": [
+        "cn_cfc9841c68e67dff000803a235bcb1d73fc989e870a6cbbaaf9828efbe440b87"
+      ]
+    },
+    {
+      "label": "General footwear",
+      "root_node_ids": [
+        "cn_08de88cce690f4b176f8ba975ebfd5c1686c6f4e02cb3a5b03b2449ff07c3b69",
+        "cn_2e6c232d37002cdf4ca6d9f6d6d188c30b2eaa751404db37a6a51b6e13889325",
+        "cn_3c42a9bc5715ad7e1f1c6eaef8ee4dfa698656b451eb02ac75826ac56a893cae",
+        "cn_3e073316c971d022a13d004190b3c87045d61441b64457e6eabeff1c55216f45",
+        "cn_5b29504715c9d82f72ce78da333f086fe307e56bf7dcf3a72d0090b42aadb7ce",
+        "cn_b03068fdb3039ae1d174de93fc34ed3c50e565a32ec24c012cacb23180be8b64",
+        "cn_d641e43cfbfdc61d5a00e0cf1ef14ca96f86b2ced3ac94f8b9b7b0f504f50a13",
+        "cn_f6bf4945a931bfd6f2f9ee5eb1e43d262275d1da0b6bb9b778c75f3f351bf787"
+      ]
+    },
+    {
+      "label": "Jewelry",
+      "root_node_ids": [
+        "cn_512829f38d5cc08aa6ddb266f36765fc015f4d10b15831ae1e9c81a68ae44f84",
+        "cn_5980e9bc30d0fc38411e94e205434badf9b6b8d24c612eee7744a6ad97a770a7",
+        "cn_82ea89ffe7735575558ac64c135be2e4027678e1f223d11fbc013256d7e019a6",
+        "cn_fb7fba794d800fc3cc9f3cc2eb79754ff8fbce9938ccfab74b17258fb7bd0f5c"
+      ]
+    },
+    {
+      "label": "Watches",
+      "root_node_ids": [
+        "cn_210887a8a59b9a4b31b1332cae83696c99d1567c34ed4b8edebcbbbcab70317c",
+        "cn_2c5a192efb02e35aba0a60412a2a3c9d272b3a6e1d72899636c708a206f6d108",
+        "cn_36d2bebd7b0c347d158337f0ecbcb1da58d30367b0ec42e204b9d7cf62566386",
+        "cn_6df7f88458ada09502015dd0c65ecb08665c80ddbdebc04d5bdcce8d52219ac1",
+        "cn_7dc650496848780c78c36e5f09f054cc4694b5d6f3f80c2f51402b4130232f31",
+        "cn_82e4f736e075486c2ec6fd4004388aa528011fef9d9be61ad8d0f7c89a8349a3",
+        "cn_d2961a758c7c9eec8f893bb239691abee98c1219dcb890d34bdbaab565cde461",
+        "cn_ffd1a6e749651974d6e2f05c3c726b2655cdf62e99f944586084bce88a009395"
+      ]
+    },
+    {
+      "label": "Watch bands & accessories",
+      "root_node_ids": [
+        "cn_0d2d0f4b9747acb72d8f0e4ae96b9964554d4cd09e8fcb7f80f1410c34362656",
+        "cn_fd1931dd3ba8eb14c34f02d10c9de8f864ad97ee6d59b371c689b374b9488863",
+        "cn_ff6e2645002bd6c3ed6f0e3b74f565ff6ec00dcd0bbc37f701c1bf81c205f8d2"
+      ]
+    },
+    {
+      "label": "Women's handbags & wallets",
+      "root_node_ids": [
+        "cn_8ea6e74a394f19f20256f05a77457901da26366eff51fa48e28273639f53b036"
+      ]
+    },
+    {
+      "label": "Luggage & travel gear",
+      "root_node_ids": [
+        "cn_3fa43dd5d91303bf0b3a690a8b6a749d500f6cdde403d0db3f2c6e2a37e38014"
+      ]
+    },
+    {
+      "label": "Fashion accessories",
+      "root_node_ids": [
+        "cn_2b48bf9a1d0f681d88f9a05125fea4f6ce9bd6a3b1eaa4aa987836035ca3b1f2",
+        "cn_42e586e69e067d1b2b20f7b8e7af2f32a915c670b3b6afcdbf574b1b74cb2a19",
+        "cn_5f3b858eeda7b7dd92ff2403827771e1ede17b8f75ac758439d35959f18d248e",
+        "cn_67ff460a20c8f2006f73195676df42e095d73be3ba859c208f69f589d527c7e7",
+        "cn_c4517735c3be0d53b2b44c355c59e7ca6e16996c34c5aab8ae3fd1b9c8343494",
+        "cn_e05738e07ea133049d12bb6a1b443494d12f531921a83ea6f218a47a17539ab3"
+      ]
+    },
+    {
+      "label": "Costumes & costume accessories",
+      "root_node_ids": [
+        "cn_7b464183f0f00d12098a61f98dce12027f7635703e87b2d6773ebe9c652f00a4"
+      ]
+    },
+    {
+      "label": "Shoe care & accessories",
+      "root_node_ids": [
+        "cn_927dc94a1f9c7629ff3def5febbbace2e829515f587a20a3977dec33a7841e4b",
+        "cn_fd39c274a4c304280b15d325cc6ddc6660d930eea7750ca8f274008abca3ac9f"
+      ]
+    },
+    {
+      "label": "Jewelry accessories, storage & loose stones",
+      "root_node_ids": [
+        "cn_cd6a3f41bb52261fb94012535be596684dffb75aa57bd913e3ff7efbc921d99c"
+      ]
+    },
+    {
+      "label": "Novelty & themed fashion",
+      "root_node_ids": [
+        "cn_57a258c97ae886d56f8e8dd84b074fc6499e89b032ca6de5e4342c65bc6dd308"
+      ]
+    },
+    {
+      "label": "Workwear & uniforms",
+      "root_node_ids": [
+        "cn_b40e9babb56b5d872e191a9ba0e6f0bd1af999f6d579f2d7a4f0c84ebe141650",
+        "cn_d40d9f086bde915b0bc00681763a6155e15158134a739696592e664a36c8b94e",
+        "cn_e23233d2d8ad463be9c51299f2e74d0e9d5cac88d96841f222a80901c36a1da5"
+      ]
+    }
+  ]
+}

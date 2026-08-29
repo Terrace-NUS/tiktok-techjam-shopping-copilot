@@ -25,6 +25,13 @@ benchmark.
 - Locally decompressed catalog SHA-256:
   `da979b05a68af864cb0dcf9ee6a81c010c7e66a57978ad286c7a2e005fc69a67`
 
+The formal public Track 4 document still names this repository and frozen
+`participant-kit` release. The repository's `main` branch later added two
+documentation-only clarifications (`9a35be5` and `3407835`): participants pay
+for optional model APIs themselves, and `TechnicalScore` is one objective input
+to the broader `Technical Execution` assessment. Those clarifications are
+adopted by this repository without replacing the frozen API/data harness.
+
 The release ZIP omits `.gitignore` and `tests/`. Those files were restored
 from the same frozen Git tag. At initial reproduction time, all official
 tracked files were semantically identical to the tagged versions; byte-level

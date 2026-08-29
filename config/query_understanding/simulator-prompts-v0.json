@@ -1,0 +1,1439 @@
+{
+  "schema": "shopping-copilot/query-understanding-simulator-suite/v0",
+  "suite_id": "official-simulator-prompts-v0",
+  "source": "official_toy_simulator",
+  "description": "Participant-visible user messages captured by running the official toy simulator; all evaluator-only state is excluded.",
+  "generator": {
+    "script": "scripts/query_understanding/generate_simulator_prompts.py",
+    "suite_version": "v0",
+    "dataset_sha256": "857259f7a438e6188ac63e18995b6ff4489bfcfc4a716a798b9a2aa0ee8f7579",
+    "catalog_sha256": "da979b05a68af864cb0dcf9ee6a81c010c7e66a57978ad286c7a2e005fc69a67",
+    "evaluator_sha256": "79a5ea06f9a1b8c5036f30efa85dc1f36b8f6b06eb8feb8f545dfa767bc45564",
+    "selection_method": "lowest sha256(sample_id + suite_version), eight per scenario",
+    "selected_per_scenario": 8,
+    "visible_turns_per_conversation": 4,
+    "base_ask_schedule": [
+      "category",
+      "material",
+      "color",
+      "size",
+      "style",
+      "brand",
+      "budget",
+      "feature",
+      "use_case",
+      "other",
+      null
+    ]
+  },
+  "conversations": [
+    {
+      "id": "official_simulator_buying_01",
+      "tier": "smoke",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Tees & Blouses Blouses & Button-Down Shirts. A key requirement is: polyester.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_requirement",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for color.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for size.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "style"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for style.",
+          "last_assistant_message": "What is your preference for style?",
+          "last_question": "What is your preference for style?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "brand"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0083",
+        "scenario_type": "buying",
+        "difficulty_bucket": "easy",
+        "source_ordinal": 83
+      }
+    },
+    {
+      "id": "official_simulator_buying_02",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Watches Wrist Watches. A key requirement is: Imported.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_requirement",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for budget.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 3,
+          "user_message": "For that, what matters is: 100-hour chronograph with lap & split times; month, day & date calendar.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for use_case.",
+          "last_assistant_message": "What is your preference for use_case?",
+          "last_question": "What is your preference for use_case?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "other"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0042",
+        "scenario_type": "buying",
+        "difficulty_bucket": "easy",
+        "source_ordinal": 42
+      }
+    },
+    {
+      "id": "official_simulator_buying_03",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Handbags & Wallets Crossbody Bags. A key requirement is: leather.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_requirement",
+          "ask_attribute": "use_case"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for use_case.",
+          "last_assistant_message": "What is your preference for use_case?",
+          "last_question": "What is your preference for use_case?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "other"
+        },
+        {
+          "turn": 3,
+          "user_message": "For that, what matters is: Artificial Leather,Leather,Pu Leather; Imported.",
+          "last_assistant_message": "What is your preference for other?",
+          "last_question": "What is your preference for other?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": null
+        },
+        {
+          "turn": 4,
+          "user_message": "Those options are not quite right yet. Ask me about one specific attribute.",
+          "last_assistant_message": "I'll keep refining the options.",
+          "last_question": null,
+          "response_shape": "negative_feedback",
+          "ask_attribute": "category"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0188",
+        "scenario_type": "buying",
+        "difficulty_bucket": "easy",
+        "source_ordinal": 188
+      }
+    },
+    {
+      "id": "official_simulator_buying_04",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Panties Bikinis. A key requirement is: cotton.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_requirement",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for brand.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for budget.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: Imported; Machine Wash.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0088",
+        "scenario_type": "buying",
+        "difficulty_bucket": "easy",
+        "source_ordinal": 88
+      }
+    },
+    {
+      "id": "official_simulator_buying_05",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Card Cases & Money Organizers Wallets. A key requirement is: leather.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_requirement",
+          "ask_attribute": "other"
+        },
+        {
+          "turn": 2,
+          "user_message": "For that, what matters is: color: red; Leather.",
+          "last_assistant_message": "What is your preference for other?",
+          "last_question": "What is your preference for other?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": null
+        },
+        {
+          "turn": 3,
+          "user_message": "Those options are not quite right yet. Ask me about one specific attribute.",
+          "last_assistant_message": "I'll keep refining the options.",
+          "last_question": null,
+          "response_shape": "negative_feedback",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for category.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "material"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0017",
+        "scenario_type": "buying",
+        "difficulty_bucket": "easy",
+        "source_ordinal": 17
+      }
+    },
+    {
+      "id": "official_simulator_buying_06",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Shoes Slippers. A key requirement is: Synthetic Rubber sole.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_requirement",
+          "ask_attribute": "style"
+        },
+        {
+          "turn": 2,
+          "user_message": "For that, what matters is: Mule-style slipper, adjustable strap with hook-and-loop closure, silvertone button detail.",
+          "last_assistant_message": "What is your preference for style?",
+          "last_question": "What is your preference for style?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for brand.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for budget.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "feature"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0117",
+        "scenario_type": "buying",
+        "difficulty_bucket": "easy",
+        "source_ordinal": 117
+      }
+    },
+    {
+      "id": "official_simulator_buying_07",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Necklaces & Pendants Pendants. A key requirement is: Mother Daughter Bracelets - Heart bracelet on card meaning “Never Truly Part,Maybe in Distance,But Never in Heart”. All daughters love their mom, but sometimes we just forget to sa.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_requirement",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for brand.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for budget.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: Daughter Gifts from Mom - This mother bracelet suitable Christmas Day, Mothers Day, Birthday, Thanksgiving, as a gift for mom, daughter, stepdaughter,daughter in law or for yoursel; Classical Design - Our product comes with a beautiful box, it is packed with 4 message cards and 4 bracelets, the bracelet uses a heart-to-heart design, it is meaningful & practica.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0168",
+        "scenario_type": "buying",
+        "difficulty_bucket": "easy",
+        "source_ordinal": 168
+      }
+    },
+    {
+      "id": "official_simulator_buying_08",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Running Trail Running. A key requirement is: 100% Synthetic.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_requirement",
+          "ask_attribute": null
+        },
+        {
+          "turn": 2,
+          "user_message": "Those options are not quite right yet. Ask me about one specific attribute.",
+          "last_assistant_message": "I'll keep refining the options.",
+          "last_question": null,
+          "response_shape": "negative_feedback",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for category.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for material.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "color"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0026",
+        "scenario_type": "buying",
+        "difficulty_bucket": "easy",
+        "source_ordinal": 26
+      }
+    },
+    {
+      "id": "official_simulator_browsing_01",
+      "tier": "smoke",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Sleep & Lounge Sleep Bottoms, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for brand.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for budget.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: Imported; Drawstring Waist closure.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0060",
+        "scenario_type": "browsing",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 60
+      }
+    },
+    {
+      "id": "official_simulator_browsing_02",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Tees & Blouses Tunics, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 2,
+          "user_message": "For that, what matters is: Standard US Size: S(US 4-6), M(US 8-10), L(US 12-14), XL(US 16-18), XXL(US 20-22), 3XL(US 24-26). This women's casual loose dress is available in a variety of solid colors and prin.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for size.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "style"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for style.",
+          "last_assistant_message": "What is your preference for style?",
+          "last_question": "What is your preference for style?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "brand"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0138",
+        "scenario_type": "browsing",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 138
+      }
+    },
+    {
+      "id": "official_simulator_browsing_03",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Medical Scrub Jackets, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": null
+        },
+        {
+          "turn": 2,
+          "user_message": "Those options are not quite right yet. Ask me about one specific attribute.",
+          "last_assistant_message": "I'll keep refining the options.",
+          "last_question": null,
+          "response_shape": "negative_feedback",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for category.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: polyester; 65% Polyester, 35% Cotton.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "color"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0150",
+        "scenario_type": "browsing",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 150
+      }
+    },
+    {
+      "id": "official_simulator_browsing_04",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Women Jerseys, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for category.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 3,
+          "user_message": "For that, what matters is: polyester; 80% Polyester, 20% Spandex.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for color.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "size"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0039",
+        "scenario_type": "browsing",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 39
+      }
+    },
+    {
+      "id": "official_simulator_browsing_05",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Underwear Undershirts, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 2,
+          "user_message": "For that, what matters is: cotton; 100% Cotton.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for color.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for size.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "style"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0081",
+        "scenario_type": "browsing",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 81
+      }
+    },
+    {
+      "id": "official_simulator_browsing_06",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Underwear Briefs, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for brand.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for budget.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: Imported; Pull On closure.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0014",
+        "scenario_type": "browsing",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 14
+      }
+    },
+    {
+      "id": "official_simulator_browsing_07",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Active Pants Sweatpants, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for budget.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 3,
+          "user_message": "For that, what matters is: Imported; Drawstring closure.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for use_case.",
+          "last_assistant_message": "What is your preference for use_case?",
+          "last_question": "What is your preference for use_case?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "other"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0099",
+        "scenario_type": "browsing",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 99
+      }
+    },
+    {
+      "id": "official_simulator_browsing_08",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Accessories Bandanas, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "other"
+        },
+        {
+          "turn": 2,
+          "user_message": "For that, what matters is: polyester; color: pink.",
+          "last_assistant_message": "What is your preference for other?",
+          "last_question": "What is your preference for other?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": null
+        },
+        {
+          "turn": 3,
+          "user_message": "Those options are not quite right yet. Ask me about one specific attribute.",
+          "last_assistant_message": "I'll keep refining the options.",
+          "last_question": null,
+          "response_shape": "negative_feedback",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for category.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "material"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0047",
+        "scenario_type": "browsing",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 47
+      }
+    },
+    {
+      "id": "official_simulator_intent_override_01",
+      "tier": "smoke",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Shoes Fashion Sneakers. Lace Slip On Sneaker",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_preference",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for material.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for color.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 4,
+          "user_message": "Actually, ignore my earlier preference. What I need is: Textile.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "explicit_override",
+          "ask_attribute": "style"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0038",
+        "scenario_type": "intent_override",
+        "difficulty_bucket": "hard",
+        "source_ordinal": 38
+      }
+    },
+    {
+      "id": "official_simulator_intent_override_02",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Tops & Tees Tanks & Camis. Long torso camisole for extra coverage with spagetti adjustable strap for perfect fit",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_preference",
+          "ask_attribute": null
+        },
+        {
+          "turn": 2,
+          "user_message": "Those options are not quite right yet. Ask me about one specific attribute.",
+          "last_assistant_message": "I'll keep refining the options.",
+          "last_question": null,
+          "response_shape": "negative_feedback",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 3,
+          "user_message": "Actually, ignore my earlier preference. What I need is: polyester.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "explicit_override",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: Polyester,Cotton,Spandex; Quality soft cottonblend camisole, 95% cotton, 5% spandex, Neon Colors 57% cotton 38% polyester 5% spandex.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "color"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0004",
+        "scenario_type": "intent_override",
+        "difficulty_bucket": "hard",
+        "source_ordinal": 4
+      }
+    },
+    {
+      "id": "official_simulator_intent_override_03",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Socks No Show & Liner Socks. Pull On closure",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_preference",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for category.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 3,
+          "user_message": "Actually, ignore my earlier preference. What I need is: cotton.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "explicit_override",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for color.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "size"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0078",
+        "scenario_type": "intent_override",
+        "difficulty_bucket": "hard",
+        "source_ordinal": 78
+      }
+    },
+    {
+      "id": "official_simulator_intent_override_04",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Shoes Slippers. YOUR NEW FAVORITE SLIPPERS: Slip into divine comfort with Gemma, a plush mule-style spa slipper with an adjustable hook-and-loop closure across the vamp",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 2,
+          "user_message": "For that, what matters is: Rubber sole; Received APMA (American Podiatric Medical Association) Seal of Acceptance.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for use_case.",
+          "last_assistant_message": "What is your preference for use_case?",
+          "last_question": "What is your preference for use_case?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "other"
+        },
+        {
+          "turn": 4,
+          "user_message": "Actually, ignore my earlier preference. What I need is: Rubber sole.",
+          "last_assistant_message": "What is your preference for other?",
+          "last_question": "What is your preference for other?",
+          "response_shape": "explicit_override",
+          "ask_attribute": null
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0013",
+        "scenario_type": "intent_override",
+        "difficulty_bucket": "hard",
+        "source_ordinal": 13
+      }
+    },
+    {
+      "id": "official_simulator_intent_override_05",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Bracelets Link. Bracelet Size: Length-8.34 inch, width-0.4 inch, weight: 54g. smooth chain, lightweight and comfortable to wear, perfect for bike enthusiasts etc",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_preference",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 2,
+          "user_message": "For that, what matters is: Bracelet Size: Length-8.34 inch, width-0.4 inch, weight: 54g. smooth chain, lightweight and comfortable to wear, perfect for bike enthusiasts etc.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "style"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for style.",
+          "last_assistant_message": "What is your preference for style?",
+          "last_question": "What is your preference for style?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 4,
+          "user_message": "Actually, ignore my earlier preference. What I need is: Stainless Steel Bike Bracelet: Handcrafted with high quality material, 100% HYPOALLERGENIC, Lead & Nickel Free, Stronger and very LOW MAINTENANCE Metal, long lasting IP vacuum Plat.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "explicit_override",
+          "ask_attribute": "budget"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0142",
+        "scenario_type": "intent_override",
+        "difficulty_bucket": "hard",
+        "source_ordinal": 142
+      }
+    },
+    {
+      "id": "official_simulator_intent_override_06",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Tees & Blouses T-Shirts. Pull On closure",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_preference",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have an additional preference for size.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "style"
+        },
+        {
+          "turn": 3,
+          "user_message": "Actually, ignore my earlier preference. What I need is: polyester.",
+          "last_assistant_message": "What is your preference for style?",
+          "last_question": "What is your preference for style?",
+          "response_shape": "explicit_override",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for brand.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "budget"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0096",
+        "scenario_type": "intent_override",
+        "difficulty_bucket": "hard",
+        "source_ordinal": 96
+      }
+    },
+    {
+      "id": "official_simulator_intent_override_07",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Hats & Caps Fedoras. Buckle closure",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_preference",
+          "ask_attribute": null
+        },
+        {
+          "turn": 2,
+          "user_message": "Those options are not quite right yet. Ask me about one specific attribute.",
+          "last_assistant_message": "I'll keep refining the options.",
+          "last_question": null,
+          "response_shape": "negative_feedback",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 3,
+          "user_message": "Actually, ignore my earlier preference. What I need is: wool.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "explicit_override",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: 65% Polyester, 35% Wool.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "color"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0123",
+        "scenario_type": "intent_override",
+        "difficulty_bucket": "hard",
+        "source_ordinal": 123
+      }
+    },
+    {
+      "id": "official_simulator_intent_override_08",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Watch Accessories Repair Tools & Kits. VALUE KIT FOR MONEY SAVING - This watch band link remover is great for removing and inserting spring bars straps, and widely used in up to 30mm wide watch band replace, watch repai",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 2,
+          "user_message": "For that, what matters is: What is in the package?EFIXTK watch band tool kit comes with a watch band link pin remover with 6 extra tips, a plastic watch holder, a dual head hammer, 4 pin punches,20pcs cotter.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for use_case.",
+          "last_assistant_message": "What is your preference for use_case?",
+          "last_question": "What is your preference for use_case?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "other"
+        },
+        {
+          "turn": 4,
+          "user_message": "Actually, ignore my earlier preference. What I need is: What is in the package?EFIXTK watch band tool kit comes with a watch band link pin remover with 6 extra tips, a plastic watch holder, a dual head hammer, 4 pin punches,20pcs cotter.",
+          "last_assistant_message": "What is your preference for other?",
+          "last_question": "What is your preference for other?",
+          "response_shape": "explicit_override",
+          "ask_attribute": null
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0197",
+        "scenario_type": "intent_override",
+        "difficulty_bucket": "hard",
+        "source_ordinal": 197
+      }
+    },
+    {
+      "id": "official_simulator_boundary_01",
+      "tier": "smoke",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Athletic Walking, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have a preference for feature; please use your judgment.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "explicit_no_preference",
+          "ask_attribute": "use_case"
+        },
+        {
+          "turn": 3,
+          "user_message": "For that, what matters is: A Lightweight Sneaker, Which Is Suitable For Running, Sports, Hiking, Walking, Tourism And Climbing.",
+          "last_assistant_message": "What is your preference for use_case?",
+          "last_question": "What is your preference for use_case?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "other"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: leather; Leather sole.",
+          "last_assistant_message": "What is your preference for other?",
+          "last_question": "What is your preference for other?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": null
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0112",
+        "scenario_type": "boundary",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 112
+      }
+    },
+    {
+      "id": "official_simulator_boundary_02",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Shoes Fashion Sneakers, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have a preference for size; please use your judgment.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "explicit_no_preference",
+          "ask_attribute": "style"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for style.",
+          "last_assistant_message": "What is your preference for style?",
+          "last_question": "What is your preference for style?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for brand.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "budget"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0180",
+        "scenario_type": "boundary",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 180
+      }
+    },
+    {
+      "id": "official_simulator_boundary_03",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Work & Utility Industrial & Construction Boots, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "style"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have a preference for style; please use your judgment.",
+          "last_assistant_message": "What is your preference for style?",
+          "last_question": "What is your preference for style?",
+          "response_shape": "explicit_no_preference",
+          "ask_attribute": "brand"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for brand.",
+          "last_assistant_message": "What is your preference for brand?",
+          "last_question": "What is your preference for brand?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for budget.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "feature"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0050",
+        "scenario_type": "boundary",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 50
+      }
+    },
+    {
+      "id": "official_simulator_boundary_04",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Hats & Caps Headbands, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have a preference for category; please use your judgment.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "explicit_no_preference",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 3,
+          "user_message": "For that, what matters is: leather; Classy Leather-like Fabric.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 4,
+          "user_message": "For that, what matters is: color: black.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "size"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0104",
+        "scenario_type": "boundary",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 104
+      }
+    },
+    {
+      "id": "official_simulator_boundary_05",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Socks & Hosiery Leg Warmers, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have a preference for color; please use your judgment.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "explicit_no_preference",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for size.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "style"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for style.",
+          "last_assistant_message": "What is your preference for style?",
+          "last_question": "What is your preference for style?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "brand"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0131",
+        "scenario_type": "boundary",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 131
+      }
+    },
+    {
+      "id": "official_simulator_boundary_06",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Women Jeans, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "category"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have a preference for category; please use your judgment.",
+          "last_assistant_message": "What is your preference for category?",
+          "last_question": "What is your preference for category?",
+          "response_shape": "explicit_no_preference",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 3,
+          "user_message": "For that, what matters is: cotton; 57% Cotton, 26% Polyester, 10% Other Fibers, 7% Elastane.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for color.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "size"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0169",
+        "scenario_type": "boundary",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 169
+      }
+    },
+    {
+      "id": "official_simulator_boundary_07",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Athletic Walking, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "budget"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have a preference for budget; please use your judgment.",
+          "last_assistant_message": "What is your preference for budget?",
+          "last_question": "What is your preference for budget?",
+          "response_shape": "explicit_no_preference",
+          "ask_attribute": "feature"
+        },
+        {
+          "turn": 3,
+          "user_message": "For that, what matters is: 100% Textile; Imported.",
+          "last_assistant_message": "What is your preference for feature?",
+          "last_question": "What is your preference for feature?",
+          "response_shape": "attribute_disclosure",
+          "ask_attribute": "use_case"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for use_case.",
+          "last_assistant_message": "What is your preference for use_case?",
+          "last_question": "What is your preference for use_case?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "other"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0035",
+        "scenario_type": "boundary",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 35
+      }
+    },
+    {
+      "id": "official_simulator_boundary_08",
+      "tier": "full",
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "I'm looking for Shoes Loafers & Slip-Ons, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "response_shape": "initial_exploration",
+          "ask_attribute": "material"
+        },
+        {
+          "turn": 2,
+          "user_message": "I don't have a preference for material; please use your judgment.",
+          "last_assistant_message": "What is your preference for material?",
+          "last_question": "What is your preference for material?",
+          "response_shape": "explicit_no_preference",
+          "ask_attribute": "color"
+        },
+        {
+          "turn": 3,
+          "user_message": "I don't have an additional preference for color.",
+          "last_assistant_message": "What is your preference for color?",
+          "last_question": "What is your preference for color?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "size"
+        },
+        {
+          "turn": 4,
+          "user_message": "I don't have an additional preference for size.",
+          "last_assistant_message": "What is your preference for size?",
+          "last_question": "What is your preference for size?",
+          "response_shape": "no_additional_preference",
+          "ask_attribute": "style"
+        }
+      ],
+      "provenance": {
+        "sample_id": "public_0187",
+        "scenario_type": "boundary",
+        "difficulty_bucket": "medium",
+        "source_ordinal": 187
+      }
+    }
+  ]
+}

@@ -43,6 +43,7 @@ from .reducer import reduce_intent
 from .registry import (
     CATEGORICAL_OPERATORS,
     NUMERIC_OPERATORS,
+    FacetAuthority,
     FacetKind,
     FacetRegistry,
     FacetSpec,
@@ -65,6 +66,11 @@ from .views import (
     most_recent_question,
     question_keys_since_goal_switch,
 )
+from .wide_facets import (
+    RETRIEVAL_DERIVED_FACET_IDS,
+    retrieval_derived_facet_specs,
+    with_retrieval_derived_facets,
+)
 
 __all__ = (
     "CATEGORICAL_OPERATORS",
@@ -75,6 +81,7 @@ __all__ = (
     "ClearFacet",
     "Commitment",
     "ErrorCode",
+    "FacetAuthority",
     "FacetKind",
     "FacetRegistry",
     "FacetSpec",
@@ -91,6 +98,7 @@ __all__ = (
     "ProductFeedback",
     "ProfilePrior",
     "RemovePreference",
+    "RETRIEVAL_DERIVED_FACET_IDS",
     "ReplaceFacet",
     "SCHEMA_ID",
     "SearchBelief",
@@ -114,6 +122,7 @@ __all__ = (
     "most_recent_question",
     "question_keys_since_goal_switch",
     "reduce_intent",
+    "retrieval_derived_facet_specs",
     "validate_intent_state",
     "validate_preference",
     "validate_profile_prior",
@@ -122,4 +131,5 @@ __all__ = (
     "validate_session_transition",
     "validate_state_update_batch",
     "validate_turn_record",
+    "with_retrieval_derived_facets",
 )

@@ -1,0 +1,168 @@
+{
+  "schema": "shopping-copilot/gate-b-selection/v0",
+  "builder_version": "catalog_semantic_gate_b_v0",
+  "catalog_id": "sha256:da979b05a68af864cb0dcf9ee6a81c010c7e66a57978ad286c7a2e005fc69a67",
+  "category_registry_id": "sha256:ab395979b675bdda8b28afb4ffa1a89f5afae4c7dad4e1073c02fd00ba1a9a2d",
+  "facet_schema_id": "sha256:058fe6f118c9b94f0bf1fb45d14fa1c9baa4b6068f00650608eecd62014d07d6",
+  "facet_applicability_id": "sha256:7ab8513f05fa31f033359826e20d3ea155c2f1724f67ee1a7d498168a575c0b9",
+  "product_facet_index_id": "sha256:8f9dc45f8a7e953a04b912b49f52ac6d409b112e18eda5682bfecdcd0ddaf0da",
+  "catalog_facet_stats_id": "sha256:232dd59497d1f2f8641f971059b2fe8d18c200c4d8b031b2232fd8993480146c",
+  "gate_b_review_proposal_id": "sha256:ec064460c7bc0c64862978ced376d79a699f20a9891f1cc2ce3ce0bce91995f6",
+  "public_target_audit_id": "sha256:884331876d343b4d317f93527825e1fd2156fa7a3aff9af27b39d6e0e0959a56",
+  "resolution_policy_id": "structured_resolution_v1",
+  "intent_value_normalizer_id": "usd_cent_int_v1",
+  "reviewed_value_aliases": [],
+  "approvals": [
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_06119f55ab362c65b56675dc23ce614741afb628b611cc22064461ffcf9f7b78",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_1daeae43e268141116de29e837a59117cd3c3af3eb97701deeab877c01794033",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_2c312aab6f86fcf5d6819d37025610df5335a98593729bb69e0ae18d3b2d67ea",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_43db08e9c2019b924980a1662b71fd3bfd6435dae16ec23a62534cce8c302335",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_44efbd141104ab1b5b38a6d7e5587d8d08d0765dff3c1086f4a4865cea396741",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_4c3bc41eccaeb2ea321e320f4c87cbe54de04587616520ed4590309ba84e7cce",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_551654b17a6b82adb3eac800f83055ca0395d5815f814589e5f7968f8c02a575",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_935a5e7ffac7bf979934b7b232529d86a53a36a02a93477be1135d61d979c4a1",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_9c0356a05f65175e336fbbb08187bfe00c0e325b22448cd5c3969e52c5445d25",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_a9479185d8fdbe72f7141a11b363b0f0149b8fd446ecc514ea4d505bc7a43b44",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_ba7912b76e91081a3084c492befc07335016a7f99e48147d3695d5fcae2cd5bb",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_ce59dca3d1276366e0999b190ca3f3b9b7e04eb27cd8e3d8688495c6b6476b82",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_dee1c5f4eae7c1e5d7c06fa546d89734d615a2d601d7d2f64096d29fb6690e14",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_ecc1ad1c0a28e5eb27a28643cb603b526844b9b76c287f2a900556ba0172503e",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    },
+    {
+      "facet_id": "price",
+      "category_scope_id": "cs_f28eb45ef30e23f6e71d7d31f81d9be1f7eaacd50e77153be733dd55edc490b8",
+      "decision": "runtime_accept",
+      "resolution_policy_id": "structured_resolution_v1",
+      "intent_committable": true,
+      "retrieval_eligible": true,
+      "probe_eligible": true,
+      "clarification_eligible": false
+    }
+  ],
+  "rationale": "Repository owner approved the reviewed price proposal on 2026-08-28: explicit budgets may be committed and used by conservative retrieval and Probe in every exact published scope, while proactive budget clarification remains disabled."
+}

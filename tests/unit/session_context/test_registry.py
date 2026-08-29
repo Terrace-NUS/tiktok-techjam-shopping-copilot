@@ -10,11 +10,17 @@ from shopping_copilot.session_context.models import Operator
 from shopping_copilot.session_context.registry import (
     CATEGORICAL_OPERATORS,
     NUMERIC_OPERATORS,
+    FacetAuthority,
     FacetKind,
     FacetRegistry,
     FacetSpec,
     canonical_number,
     canonical_text,
+)
+from shopping_copilot.session_context.wide_facets import (
+    RETRIEVAL_DERIVED_FACET_IDS,
+    retrieval_derived_facet_specs,
+    with_retrieval_derived_facets,
 )
 
 
@@ -98,6 +104,45 @@ def test_closed_operator_families_are_exposed_by_kind(
         {Operator.EQ, Operator.NEQ, Operator.IN, Operator.NOT_IN}
     )
     assert budget_spec.operators == frozenset({Operator.LT, Operator.LE, Operator.GT, Operator.GE})
+
+
+def test_facet_authority_defaults_to_catalog_verified() -> None:
+    spec = FacetSpec(
+        id="price",
+        kind=FacetKind.NUMERIC,
+        operators=NUMERIC_OPERATORS,
+        normalizer=canonical_number,
+    )
+
+    assert spec.authority is FacetAuthority.CATALOG_VERIFIED
+
+
+def test_retrieval_derived_facet_vocabulary_is_static_and_canonical() -> None:
+    specs = retrieval_derived_facet_specs()
+
+    assert tuple(spec.id for spec in specs) == RETRIEVAL_DERIVED_FACET_IDS
+    assert RETRIEVAL_DERIVED_FACET_IDS == tuple(sorted(RETRIEVAL_DERIVED_FACET_IDS))
+    assert all(spec.authority is FacetAuthority.RETRIEVAL_DERIVED for spec in specs)
+    assert all(spec.kind is FacetKind.CATEGORICAL for spec in specs)
+    assert all(spec.operators == CATEGORICAL_OPERATORS for spec in specs)
+    assert all(spec.normalizer("  SILK  ") == "silk" for spec in specs)
+
+
+def test_wide_facet_composition_never_shadows_a_catalog_verified_spec() -> None:
+    verified_color = FacetSpec(
+        id="color",
+        kind=FacetKind.CATEGORICAL,
+        operators=CATEGORICAL_OPERATORS,
+        normalizer=canonical_text,
+        authority=FacetAuthority.CATALOG_VERIFIED,
+    )
+    source = FacetRegistry(specs=(verified_color,))
+
+    combined = with_retrieval_derived_facets(source)
+
+    assert combined.require("color") is verified_color
+    assert combined.require("color").authority is FacetAuthority.CATALOG_VERIFIED
+    assert {spec.id for spec in combined} == set(RETRIEVAL_DERIVED_FACET_IDS)
 
 
 def test_text_values_are_nfkc_normalized_casefolded_and_whitespace_collapsed() -> None:
@@ -268,6 +313,14 @@ def test_facet_spec_rejects_invalid_trusted_configuration() -> None:
             kind=FacetKind.CATEGORICAL,
             operators=CATEGORICAL_OPERATORS,
             normalizer=None,
+        )
+    with pytest.raises(TypeError):
+        FacetSpec(  # type: ignore[arg-type]
+            id="color",
+            kind=FacetKind.CATEGORICAL,
+            operators=CATEGORICAL_OPERATORS,
+            normalizer=canonical_text,
+            authority="retrieval_derived",
         )
 
 

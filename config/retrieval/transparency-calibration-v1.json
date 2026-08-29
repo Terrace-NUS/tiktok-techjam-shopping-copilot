@@ -1,0 +1,15 @@
+{
+  "schema": "shopping-copilot/transparency-calibration/v1",
+  "policy_id": "semantic_mode_linear_v1",
+  "probe_policy_id": "fixed_multiview_probe_v1",
+  "probe_k": 80,
+  "mode_similarity_threshold": 0.94,
+  "catalog_id": "sha256:da979b05a68af864cb0dcf9ee6a81c010c7e66a57978ad286c7a2e005fc69a67",
+  "catalog_semantic_release_id": "sha256:325af3fea978f34116ffec7ea13a1cbf1edd654ee3457c5877b51a3ec92a8907",
+  "dense_index_id": "sha256:af5b074e3889eebae00402c22cea717c18cde37ba6e81aba19ef4c7b48f647c2",
+  "prompt_suite_id": "sha256:9094210614d22694419dc7e7ffc8661cc44f4022c09ebc1bab353d7956cc3f13",
+  "evaluation_report": "docs/design/retrieve/transparency-evaluation-v1.md",
+  "low_anchor": 0.256963026520931,
+  "high_anchor": 0.4483984914520624,
+  "approved": true
+}

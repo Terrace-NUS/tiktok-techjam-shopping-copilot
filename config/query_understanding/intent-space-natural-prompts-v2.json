@@ -1,0 +1,2040 @@
+{
+  "schema": "shopping-copilot/query-understanding-natural-suite/v0",
+  "suite_id": "intent-space-natural-prompts-v2",
+  "language": "mixed English, Simplified Chinese, and code-switching",
+  "authorship": "Expanded hand-authored conversations for intent-space evaluation; no catalog targets or simulator hidden state.",
+  "oracle_policy": "Each conversation carries one expected-transition tag. Narrower and broader conversations score first-to-last scalar direction, stable conversations allow ten percent relative movement, and override conversations are observational. Progressive conversations also retain their intermediate state for adjacent-turn diagnostics. Known QU failure cases additionally carry retrieval-changing semantic assertions.",
+  "conversations": [
+    {
+      "id": "n01_wedding_outfit",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need something to wear to a wedding, but I'm still figuring out the look.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Let's make it a navy knee-length wrap dress with sleeves, no sequins, under $120.",
+          "last_assistant_message": "What kind of wedding outfit would work for you?",
+          "last_question": "Could you narrow down the style, color, or budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n02_running_shoes",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I want some shoes to help me get back into exercise.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Women's size 8 wide road-running shoes, neutral support, mostly white, below $130.",
+          "last_assistant_message": "What activity and fit do you need?",
+          "last_question": "Can you share the use, size, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n03_trip_luggage",
+      "tier": "full",
+      "language": "en",
+      "domain": "luggage",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need luggage for an upcoming trip.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A navy 20-inch hard-shell carry-on with spinner wheels and a TSA lock, under $140.",
+          "last_assistant_message": "Let's narrow down the luggage.",
+          "last_question": "What size, construction, features, and budget matter?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n04_everyday_watch",
+      "tier": "full",
+      "language": "en",
+      "domain": "watches",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'd like a watch I can wear most days.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A simple men's analog watch with a white dial, black leather band, under 40 mm and $150.",
+          "last_assistant_message": "What details matter for an everyday watch?",
+          "last_question": "Can you specify style, material, size, and budget?",
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "preference",
+              "facet": null,
+              "relation": "semantic_positive",
+              "values": [],
+              "strength": null,
+              "text_contains": "40 mm"
+            },
+            {
+              "kind": "preference",
+              "facet": "price",
+              "relation": "upper",
+              "values": [
+                "150"
+              ],
+              "strength": null,
+              "text_contains": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "n05_gift_jewelry",
+      "tier": "full",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need a piece of jewelry as a birthday gift for my sister.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A small sterling-silver moon pendant necklace, no gemstones, under $60.",
+          "last_assistant_message": "What sort of jewelry does she like?",
+          "last_question": "Could you choose a type, material, motif, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n06_work_bag",
+      "tier": "full",
+      "language": "en",
+      "domain": "handbags",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm looking for a bag for work.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A structured dark-brown leather tote that fits a 15-inch laptop, with a zip top, under $180.",
+          "last_assistant_message": "What does the work bag need to handle?",
+          "last_question": "What shape, material, capacity, and budget do you prefer?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n07_rain_jacket",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need something for wet weather.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A men's lightweight waterproof rain jacket with a hood, dark green, no wool, under $100.",
+          "last_assistant_message": "What kind of wet-weather item are you after?",
+          "last_question": "Could you specify the garment, fit, features, color, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n08_summer_sandals",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I want some easy summer shoes.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Women's tan leather flat sandals, size 7, with an ankle strap and no platform sole.",
+          "last_assistant_message": "What does easy summer footwear mean for you?",
+          "last_question": "Can you give me the type, size, material, color, and sole preference?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n09_office_shirt",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I could use a new top for the office.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A men's slim-fit light-blue cotton button-down shirt, long sleeves, neck size 15.5, under $70.",
+          "last_assistant_message": "What kind of office top are you considering?",
+          "last_question": "Please narrow down department, style, material, size, and budget.",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n10_winter_coat",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need something warm for a winter trip.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A women's knee-length black down coat with a removable hood, size medium, under $220.",
+          "last_assistant_message": "What kind of warm item would suit the trip?",
+          "last_question": "Could you specify garment, length, insulation, size, color, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n11_school_shoes",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "My son needs shoes for school.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Boys' black low-top sneakers, size 2, with hook-and-loop straps and non-marking soles, under $50.",
+          "last_assistant_message": "What are the school's footwear requirements?",
+          "last_question": "Can you specify type, color, size, fastening, sole, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n12_hiking_boots",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need footwear for hiking on weekends.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Men's waterproof mid-height hiking boots, brown, size 10 wide, with a grippy rubber sole, under $160.",
+          "last_assistant_message": "What terrain and fit should the hiking footwear handle?",
+          "last_question": "Please specify height, weather protection, size, color, sole, and budget.",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n13_beach_swimwear",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need something for a beach holiday.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A women's black one-piece swimsuit with a high neckline and tummy control, size 12, under $80.",
+          "last_assistant_message": "What kind of beach item do you need?",
+          "last_question": "Could you specify garment, cut, features, size, color, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n14_pearl_earrings",
+      "tier": "full",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm after a classic gift for a graduation.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "White freshwater-pearl stud earrings with sterling-silver posts, around 7 mm, under $75.",
+          "last_assistant_message": "What sort of classic graduation gift are you considering?",
+          "last_question": "Can you choose the product, material, size, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n15_commute_backpack",
+      "tier": "full",
+      "language": "zh",
+      "domain": "luggage",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific",
+        "multilingual"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想买一个每天通勤用的包，现在还没有特别具体的想法。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "就要黑色双肩包吧，能放 15 寸电脑，防泼水，带独立水杯袋，预算 80 美元以内。",
+          "last_assistant_message": "你希望通勤包是什么类型？",
+          "last_question": "可以补充容量、颜色、功能和预算吗？",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n16_home_slippers",
+      "tier": "full",
+      "language": "mixed",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific",
+        "code_switch"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想找一双在家穿着舒服的鞋，nothing fancy.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Women's size 7 灰色包头拖鞋，memory foam 鞋垫，防滑橡胶底，40 美元以内。",
+          "last_assistant_message": "你说的舒适家居鞋可以再具体一点。",
+          "last_question": "需要什么款式、尺码、颜色、鞋垫和预算？",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "b01_release_heel_constraints",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need red leather closed-toe heels, women's size 7, under $80.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Actually only the size and the fact they're heels matter; color, material, toe shape, and budget are all open.",
+          "last_assistant_message": "I'll keep those exact heel requirements.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "goal_contains",
+              "text": "heels"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "red"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "leather"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "color"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "material"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "price"
+            },
+            {
+              "kind": "preference_absent",
+              "facet": null,
+              "relation": null,
+              "values": [],
+              "strength": null,
+              "text_contains": "closed-toe"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b02_release_necklace_constraints",
+      "tier": "full",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Find a sterling-silver star pendant necklace with no stones, 18-inch chain, below $45.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "That's too narrow. Any necklace for a teenager is fine; I don't care about metal, motif, stones, length, or price now.",
+          "last_assistant_message": "I'll look for that exact star necklace.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "goal_contains",
+              "text": "necklace"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "star"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "sterling"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "material"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "price"
+            },
+            {
+              "kind": "preference_absent",
+              "facet": null,
+              "relation": null,
+              "values": [],
+              "strength": null,
+              "text_contains": "18-inch"
+            },
+            {
+              "kind": "preference_absent",
+              "facet": null,
+              "relation": null,
+              "values": [],
+              "strength": null,
+              "text_contains": "stone"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b03_release_jacket_constraints",
+      "tier": "full",
+      "language": "zh",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release",
+        "multilingual"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "给女儿找一件黄色防水雨衣，儿童 130 码，必须带可拆卸帽子，预算 60 美元以内。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "不用卡这么死了，只要是女童外套就行，颜色、材质、帽子、尺码和价格都先不限制。",
+          "last_assistant_message": "我会保留这些雨衣条件。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "goal_contains_any",
+              "texts": [
+                "coat",
+                "outerwear",
+                "外套"
+              ]
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "黄色"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "color"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "material"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "size"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "price"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "feature"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s01_presentation_only",
+      "tier": "full",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_stable",
+        "presentation_directive"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Show me medium-size sterling-silver hoop earrings under $50.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Give me five options and explain the differences, but don't change what we're searching for.",
+          "last_assistant_message": "I have the earring requirements.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "s02_irrelevant_chitchat",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_stable",
+        "irrelevant_turn"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need men's black road-running shoes, size 10, under $120.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "By the way, I'm shopping during my lunch break. The shoe requirements stay exactly the same.",
+          "last_assistant_message": "I'll search using those requirements.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "o01_shoes_to_earrings",
+      "tier": "full",
+      "language": "en",
+      "domain": "cross_domain",
+      "tags": [
+        "intent_space",
+        "expected_override",
+        "goal_change"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm looking for women's cushioned running shoes under $120.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Forget the shoes—I changed my mind. Find small pearl stud earrings under $50 instead.",
+          "last_assistant_message": "I'll search for running shoes.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "o02_luggage_to_coat",
+      "tier": "full",
+      "language": "en",
+      "domain": "cross_domain",
+      "tags": [
+        "intent_space",
+        "expected_override",
+        "goal_change"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need a lightweight carry-on suitcase with spinner wheels.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Actually luggage can wait. I need a women's warm wool coat in camel, size medium.",
+          "last_assistant_message": "Let's refine the carry-on.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "o03_handbag_to_loafers",
+      "tier": "full",
+      "language": "zh",
+      "domain": "cross_domain",
+      "tags": [
+        "intent_space",
+        "expected_override",
+        "goal_change",
+        "multilingual"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "先看看黑色皮质通勤手提包，最好能放电脑。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "算了不要包了，改找男士棕色乐福鞋，42 码，预算 100 美元。",
+          "last_assistant_message": "我会继续找通勤包。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n17_progressive_trail_shoes",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need shoes for weekend trails, but I haven't decided what kind yet.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Probably men's trail-running shoes rather than hiking boots, size 10.",
+          "last_assistant_message": "Let's narrow down the trail footwear.",
+          "last_question": "Are you after boots or running shoes, and what size?",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Make them waterproof, wide fit, dark grey, with strong grip, under $150.",
+          "last_assistant_message": "I'll focus on men's size 10 trail-running shoes.",
+          "last_question": "Any weather protection, fit, color, sole, or budget requirements?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n18_progressive_work_tote",
+      "tier": "full",
+      "language": "en",
+      "domain": "handbags",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Could you help me find a nicer bag for work?",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "I'd prefer a structured tote that can hold a 14-inch laptop.",
+          "last_assistant_message": "What style and capacity should the work bag have?",
+          "last_question": "What kind of bag and what must fit inside?",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Black pebbled leather, zip closure, silver hardware, no visible logo, up to $170.",
+          "last_assistant_message": "I'll look for a structured laptop tote.",
+          "last_question": "What material, color, closure, branding, and budget do you want?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n19_progressive_carry_on",
+      "tier": "full",
+      "language": "en",
+      "domain": "luggage",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm replacing my travel suitcase.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "It needs to be a carry-on, not checked luggage, preferably hard-sided.",
+          "last_assistant_message": "What type of suitcase do you need?",
+          "last_question": "Carry-on or checked, and soft or hard shell?",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Twenty inches, matte black, spinner wheels, TSA lock, expandable, below $130.",
+          "last_assistant_message": "I'll focus on hard-shell carry-ons.",
+          "last_question": "What size, color, features, and budget matter?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n20_progressive_anniversary_necklace",
+      "tier": "full",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I want a small anniversary gift for my wife.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Let's make it a necklace, something understated rather than flashy.",
+          "last_assistant_message": "What kind of anniversary gift would she wear?",
+          "last_question": "Could you choose a jewelry type and overall style?",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A 14k yellow-gold heart pendant on an 18-inch chain, no diamonds, under $250.",
+          "last_assistant_message": "I'll look for understated necklaces.",
+          "last_question": "What metal, motif, chain length, stones, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n21_progressive_winter_boots",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need something warmer for my feet this winter.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Women's winter boots, mostly for walking around the city, size 8.",
+          "last_assistant_message": "What kind of warm footwear and what size?",
+          "last_question": "Where will you use it, and what size do you wear?",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Mid-calf, waterproof, black, faux-fur lining, flat sole, under $120—and no suede.",
+          "last_assistant_message": "I'll search for women's city winter boots in size 8.",
+          "last_question": "What height, weather protection, color, lining, sole, material, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n22_progressive_everyday_watch",
+      "tier": "full",
+      "language": "en",
+      "domain": "watches",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'd like a watch that works with everyday clothes.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "An analog men's watch, simple enough for the office.",
+          "last_assistant_message": "What sort of everyday watch do you picture?",
+          "last_question": "Analog or digital, and what style?",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Blue dial, stainless-steel bracelet, 38 to 41 mm, water resistant, below $180.",
+          "last_assistant_message": "I'll focus on simple men's analog watches.",
+          "last_question": "What dial, band, case size, features, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n23_progressive_yoga_leggings",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need comfortable bottoms for exercise classes.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "High-waisted women's leggings for yoga, size medium.",
+          "last_assistant_message": "What activity and garment are these for?",
+          "last_question": "Can you choose the type, rise, and size?",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Full length, dark navy, squat-proof, side pockets, no front seam, under $55.",
+          "last_assistant_message": "I'll look for high-waisted yoga leggings in medium.",
+          "last_question": "Any length, color, opacity, pocket, seam, or budget preferences?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n24_progressive_office_blazer",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I could use another layer for the office.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A women's blazer, tailored but not too formal, size 10.",
+          "last_assistant_message": "What kind of office layer do you need?",
+          "last_question": "Could you choose the garment, fit, and size?",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Single-breasted camel blazer with full-length sleeves, no shoulder pads, under $140.",
+          "last_assistant_message": "I'll search for tailored women's blazers in size 10.",
+          "last_question": "What color, construction, sleeves, exclusions, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n25_progressive_commute_backpack_zh",
+      "tier": "full",
+      "language": "zh",
+      "domain": "luggage",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing",
+        "multilingual"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想换一个每天上班背的包，但还没想好具体款式。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "还是双肩包吧，至少要能放下 16 寸电脑。",
+          "last_assistant_message": "你更喜欢哪种通勤包？",
+          "last_question": "包的类型和容量有什么要求？",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "要深灰色、防泼水、背部透气，带行李箱固定带，预算 90 美元以内。",
+          "last_assistant_message": "我会找能装 16 寸电脑的通勤双肩包。",
+          "last_question": "颜色、面料、背负功能和预算还有要求吗？",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n26_progressive_summer_dress_mixed",
+      "tier": "full",
+      "language": "mixed",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "progressive_narrowing",
+        "code_switch"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想找一条 summer dress，平时周末穿。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Midi length，女款 M 码，整体轻松一点。",
+          "last_assistant_message": "你希望是什么长度和尺码？",
+          "last_question": "可以先确定长度、尺码和风格吗？",
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "浅绿色 linen blend，短袖，有口袋，不要露背，under $90。",
+          "last_assistant_message": "我会找休闲的女款中长连衣裙。",
+          "last_question": "颜色、材质、袖子、功能、排除项和预算呢？",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n27_formal_oxfords",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need shoes for a formal work event.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Men's black leather cap-toe Oxford shoes, size 11, no patent finish, below $160.",
+          "last_assistant_message": "What kind of formal shoes should I look for?",
+          "last_question": "Please specify style, material, color, size, exclusions, and budget.",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n28_swim_cover_up",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need something easy to throw on at the pool.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A women's white cotton beach cover-up, knee length, loose fit, size large, under $45.",
+          "last_assistant_message": "What kind of poolside item do you want?",
+          "last_question": "Could you narrow down type, material, length, fit, size, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n29_minimalist_earrings",
+      "tier": "full",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm looking for simple earrings I can wear every day.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Small 14k rose-gold huggie hoops, plain with no stones, under $130.",
+          "last_assistant_message": "What does simple everyday jewelry mean to you?",
+          "last_question": "Can you choose the earring type, metal, decoration, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n30_polarized_sunglasses",
+      "tier": "full",
+      "language": "en",
+      "domain": "accessories",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need sunglasses for driving.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Men's matte-black rectangular sunglasses with polarized grey lenses, medium fit, under $100.",
+          "last_assistant_message": "What sunglasses work best for you?",
+          "last_question": "Please specify shape, color, lens, fit, and budget.",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n31_leather_belt",
+      "tier": "full",
+      "language": "en",
+      "domain": "accessories",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'd like a belt that works with jeans.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Men's dark-brown full-grain leather belt, 1.5 inches wide, size 36, brass buckle, under $65.",
+          "last_assistant_message": "What kind of jeans belt do you prefer?",
+          "last_question": "Could you specify material, color, width, size, hardware, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n32_compact_wallet_zh",
+      "tier": "full",
+      "language": "zh",
+      "domain": "accessories",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific",
+        "multilingual"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想买个小一点的钱包，平时随身带。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "要女士黑色真皮短款钱包，带拉链零钱袋和至少 6 个卡位，不要大 logo，70 美元以内。",
+          "last_assistant_message": "你希望小钱包有哪些特点？",
+          "last_question": "可以补充款式、材质、颜色、容量、排除项和预算吗？",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n33_running_socks",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need better socks for running.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Men's white ankle running socks, moisture-wicking, cushioned heel, no wool, pack of at least three, under $30.",
+          "last_assistant_message": "What running socks would work for you?",
+          "last_question": "Please specify department, color, height, features, material exclusions, quantity, and budget.",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n34_cotton_pajamas",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I want something more comfortable to sleep in.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Women's navy cotton pajama set, long sleeves and full-length pants, size medium, no satin, below $65.",
+          "last_assistant_message": "What sleepwear would feel comfortable?",
+          "last_question": "Could you specify type, material, color, coverage, size, exclusions, and budget?",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n35_sun_hat_mixed",
+      "tier": "full",
+      "language": "mixed",
+      "domain": "accessories",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific",
+        "code_switch"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想买个帽子去海边，主要是防晒。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Women's wide-brim straw hat，米白色，可折叠，有 chin strap，under $40。",
+          "last_assistant_message": "你想要哪种海边防晒帽？",
+          "last_question": "款式、材质、颜色、便携功能和预算有什么要求？",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "n36_tennis_bracelet",
+      "tier": "full",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_narrower",
+        "vague_to_specific"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm considering a bracelet as a gift.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "A sterling-silver tennis bracelet with clear cubic zirconia, 7 inches, lobster clasp, under $90.",
+          "last_assistant_message": "What kind of gift bracelet are you considering?",
+          "last_question": "Please choose style, material, stones, length, clasp, and budget.",
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "b04_release_boot_color_budget",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Women's black waterproof ankle boots, size 8, under $90, with a low heel.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Keep waterproof ankle boots in size 8, but any color, price, or heel height is fine.",
+          "last_assistant_message": "I'll keep all those boot requirements.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "goal_contains",
+              "text": "boot"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "black"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "color"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "price"
+            },
+            {
+              "kind": "preference",
+              "facet": null,
+              "relation": null,
+              "values": [],
+              "strength": null,
+              "text_contains": "waterproof"
+            },
+            {
+              "kind": "preference",
+              "facet": "size",
+              "relation": "include",
+              "values": [
+                "8"
+              ],
+              "strength": null,
+              "text_contains": null
+            },
+            {
+              "kind": "preference_absent",
+              "facet": null,
+              "relation": null,
+              "values": [],
+              "strength": null,
+              "text_contains": "low heel"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b05_release_watch_material",
+      "tier": "full",
+      "language": "en",
+      "domain": "watches",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "A men's blue-dial automatic watch on a steel bracelet, 40 mm or smaller, below $300.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "preference",
+              "facet": null,
+              "relation": "semantic_positive",
+              "values": [],
+              "strength": null,
+              "text_contains": "40 mm"
+            }
+          ]
+        },
+        {
+          "user_message": "Actually only the automatic movement matters. Dial, band, size, and budget can all be open.",
+          "last_assistant_message": "I'll search for that exact watch configuration.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "goal_contains",
+              "text": "watch"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "blue"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "color"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "material"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "price"
+            },
+            {
+              "kind": "preference",
+              "facet": null,
+              "relation": null,
+              "values": [],
+              "strength": null,
+              "text_contains": "automatic"
+            },
+            {
+              "kind": "preference_absent",
+              "facet": null,
+              "relation": null,
+              "values": [],
+              "strength": null,
+              "text_contains": "40 mm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b06_release_bag_brand_color",
+      "tier": "full",
+      "language": "en",
+      "domain": "handbags",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Find a black Coach leather crossbody bag under $180 with gold hardware.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Any small crossbody bag is okay now; brand, color, material, hardware, and price don't matter.",
+          "last_assistant_message": "I'll stick with the black Coach bag.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "b07_release_dress_exclusions",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "A navy midi dress with sleeves, no sequins or lace, size 8, under $100.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Keep it as a size 8 midi dress, but release the color, sleeves, fabric exclusions, and budget.",
+          "last_assistant_message": "I'll keep all of those dress constraints.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "goal_contains",
+              "text": "dress"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "navy"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "sleeve"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "color"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "price"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b08_release_sneaker_features_zh",
+      "tier": "full",
+      "language": "zh",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release",
+        "multilingual"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "找男款白色低帮运动鞋，42 码，要真皮、鞋带款，预算 100 美元以内。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "只保留男款 42 码运动鞋就行，颜色、鞋帮、材质、闭合方式和价格都不限。",
+          "last_assistant_message": "我会保留刚才所有运动鞋条件。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "b09_release_necklace_stone",
+      "tier": "full",
+      "language": "mixed",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release",
+        "code_switch"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想找 18-inch sterling silver necklace，要蓝宝石吊坠，under $120。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "长度和宝石都不重要了，any silver necklace under $120 is fine。",
+          "last_assistant_message": "我会继续找指定长度的蓝宝石项链。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {
+              "kind": "goal_contains",
+              "text": "necklace"
+            },
+            {
+              "kind": "goal_not_contains",
+              "text": "sapphire"
+            },
+            {
+              "kind": "preference",
+              "facet": "material",
+              "relation": "include",
+              "values": [],
+              "strength": null,
+              "text_contains": "silver"
+            },
+            {
+              "kind": "preference",
+              "facet": "price",
+              "relation": "upper",
+              "values": [
+                "120"
+              ],
+              "strength": null,
+              "text_contains": null
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "size"
+            },
+            {
+              "kind": "facet_absent",
+              "facet": "feature"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b10_release_coat_most_constraints",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_broader",
+        "constraint_release"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Women's camel wool knee-length coat, belted, size medium, no hood, under $220.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "That's over-specified. Any women's coat in medium works; everything else is flexible.",
+          "last_assistant_message": "I'll keep looking for that exact camel coat.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "s03_sort_only",
+      "tier": "full",
+      "language": "en",
+      "domain": "footwear",
+      "tags": [
+        "intent_space",
+        "expected_stable",
+        "presentation_directive"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Men's brown leather loafers, size 10, under $120.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Sort the results from lowest to highest price, but keep the search requirements unchanged.",
+          "last_assistant_message": "I have the loafer requirements.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "s04_explanation_only",
+      "tier": "full",
+      "language": "en",
+      "domain": "luggage",
+      "tags": [
+        "intent_space",
+        "expected_stable",
+        "presentation_directive"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "A black 20-inch hard-shell carry-on with spinner wheels and a TSA lock.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "For each option, explain the warranty. Don't alter the kind of suitcase we're finding.",
+          "last_assistant_message": "I'll search for that carry-on.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "s05_repeat_requirements_zh",
+      "tier": "full",
+      "language": "zh",
+      "domain": "jewelry",
+      "tags": [
+        "intent_space",
+        "expected_stable",
+        "state_confirmation",
+        "multilingual"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "要 925 银的小号圆圈耳环，不带宝石，预算 50 美元。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "对，就按刚才这些条件继续，没有要补充或删除的。",
+          "last_assistant_message": "我会按这些耳环条件搜索。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "s06_irrelevant_weather",
+      "tier": "full",
+      "language": "en",
+      "domain": "apparel",
+      "tags": [
+        "intent_space",
+        "expected_stable",
+        "irrelevant_turn"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "A women's black cotton cardigan, size small, under $60.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "It started raining outside, but that has nothing to do with this search. Keep everything the same.",
+          "last_assistant_message": "I'll look for the cardigan you described.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "s07_result_count_only_mixed",
+      "tier": "full",
+      "language": "mixed",
+      "domain": "handbags",
+      "tags": [
+        "intent_space",
+        "expected_stable",
+        "presentation_directive",
+        "code_switch"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "要一个 black leather tote，能装 15-inch laptop，under $150。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Show me 8 results instead of 5，search conditions 不要变。",
+          "last_assistant_message": "我已经记住通勤包条件。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "o04_watch_to_boots",
+      "tier": "full",
+      "language": "en",
+      "domain": "cross_domain",
+      "tags": [
+        "intent_space",
+        "expected_override",
+        "goal_change"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm looking for a simple men's analog watch under $100.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Forget watches. I need women's waterproof hiking boots, size 7, under $140.",
+          "last_assistant_message": "I'll keep searching for watches.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "o05_earrings_to_luggage",
+      "tier": "full",
+      "language": "en",
+      "domain": "cross_domain",
+      "tags": [
+        "intent_space",
+        "expected_override",
+        "goal_change"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Find small sterling-silver stud earrings under $50.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "New priority: a navy carry-on suitcase with spinner wheels. Drop all jewelry preferences.",
+          "last_assistant_message": "I'll show you silver earrings.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "o06_coat_to_handbag_zh",
+      "tier": "full",
+      "language": "zh",
+      "domain": "cross_domain",
+      "tags": [
+        "intent_space",
+        "expected_override",
+        "goal_change",
+        "multilingual"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "先找女款黑色羊毛大衣，M 码，200 美元以内。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "大衣先不买了，改成棕色皮质斜挎包，小号，预算 120 美元。",
+          "last_assistant_message": "我会继续找黑色羊毛大衣。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    },
+    {
+      "id": "o07_shoes_to_bracelet_mixed",
+      "tier": "full",
+      "language": "mixed",
+      "domain": "cross_domain",
+      "tags": [
+        "intent_space",
+        "expected_override",
+        "goal_change",
+        "code_switch"
+      ],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想找 men's white sneakers，size 10，under $90。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        },
+        {
+          "user_message": "Change of plan，不要鞋了，找一条 sterling silver bracelet 当礼物，under $80。",
+          "last_assistant_message": "我会继续找白色男鞋。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": []
+        }
+      ]
+    }
+  ]
+}

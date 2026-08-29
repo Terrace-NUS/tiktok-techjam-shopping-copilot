@@ -1,0 +1,15 @@
+{
+  "schema": "shopping-copilot/gate-a-profile-selection/v0",
+  "catalog_id": "sha256:da979b05a68af864cb0dcf9ee6a81c010c7e66a57978ad286c7a2e005fc69a67",
+  "category_registry_id": "sha256:ab395979b675bdda8b28afb4ffa1a89f5afae4c7dad4e1073c02fd00ba1a9a2d",
+  "product_category_assignment_id": "sha256:3d501ab3e6221b53fe637042fed4e37ab420bad4c82813809f51853129527074",
+  "builder_version": "catalog_semantic_gate_a_profile_v0",
+  "top_level_keys": [
+    "price",
+    "store"
+  ],
+  "include_all_details": true,
+  "sample_seed": "gate-a-source-profile-v0",
+  "sample_limit": 20,
+  "top_value_limit": 50
+}

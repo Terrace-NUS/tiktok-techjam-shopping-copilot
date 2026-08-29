@@ -1,5 +1,10 @@
 """Core application package for the TechJam shopping copilot."""
 
-from . import session_context
+from . import catalog, query_compiler, query_understanding, session_context
 
-__all__ = ("session_context",)
+__all__ = (
+    "catalog",
+    "query_compiler",
+    "query_understanding",
+    "session_context",
+)

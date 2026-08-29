@@ -1,0 +1,55 @@
+{
+  "schema": "shopping-copilot/gate-a-selection/v0",
+  "catalog_id": "sha256:da979b05a68af864cb0dcf9ee6a81c010c7e66a57978ad286c7a2e005fc69a67",
+  "category_registry_id": "sha256:ab395979b675bdda8b28afb4ffa1a89f5afae4c7dad4e1073c02fd00ba1a9a2d",
+  "product_category_assignment_id": "sha256:3d501ab3e6221b53fe637042fed4e37ab420bad4c82813809f51853129527074",
+  "source_profile_manifest_sha256": "15b79c67e9a7e4782414599a0e3191d415eed391ce614334ff5d01f099def3b9",
+  "builder_version": "catalog_semantic_gate_a_v0",
+  "approvals": [
+    {
+      "decision": "extraction_approved",
+      "definition": {
+        "id": "price",
+        "name": "Price",
+        "data_type": "numeric",
+        "item_cardinality": "single"
+      },
+      "applicability": {
+        "facet_id": "price",
+        "category_scope_ids": [
+          "cs_1daeae43e268141116de29e837a59117cd3c3af3eb97701deeab877c01794033"
+        ]
+      },
+      "bindings": [
+        {
+          "id": "price_top_level_v1",
+          "facet_id": "price",
+          "source": {
+            "kind": "top_level",
+            "key": "price"
+          },
+          "applicable_category_scope_ids": [
+            "cs_1daeae43e268141116de29e837a59117cd3c3af3eb97701deeab877c01794033"
+          ],
+          "extractor_id": "top_level_price_usd_v1",
+          "catalog_value_normalizer_id": "usd_cent_interval_v1",
+          "priority": 0,
+          "completeness": "complete",
+          "resolver_id": "priority_exact_v1"
+        }
+      ],
+      "extraction_expectation": {
+        "product_count": 50000,
+        "source_present_count": 50000,
+        "source_missing_count": 0,
+        "valid_count": 10415,
+        "empty_count": 39473,
+        "invalid_count": 112,
+        "exact_interval_count": 10410,
+        "lower_bound_interval_count": 5,
+        "zero_exact_count": 1
+      },
+      "rationale": "The exact top-level price lane has a deterministic USD-cent interpretation. Missing and invalid values remain non-negative audit states, while runtime use remains subject to Gate B."
+    }
+  ]
+}

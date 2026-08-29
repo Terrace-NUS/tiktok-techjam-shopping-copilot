@@ -1,0 +1,4 @@
+# Platform-specific dense retrieval stack. Resolve for Python 3.10 on the
+# target platform; the pure-Python catalog-semantic runtime lock stays separate.
+numpy==2.2.6
+sentence-transformers==5.7.0

@@ -1,0 +1,319 @@
+{
+  "schema": "shopping-copilot/transparency-prompt-suite/v1",
+  "language": "en",
+  "authorship": "Human-authored before retrieval; no target identifier, benchmark annotation, score, ranking, or model output was consulted.",
+  "families": [
+    {
+      "id": "boardroom_separates",
+      "domain": "women_tailoring",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "women polished office clothing",
+        "q_sem": "For a new client-facing job, I want polished women's clothing but could start with a blazer, trousers, a skirt, or a matching set."
+      },
+      "specific": {
+        "q_lex": "women camel single breasted blazer petite 8 wool blend",
+        "q_sem": "For a new client-facing job, I want a camel single-breasted women's blazer in petite size 8, with a wool-blend fabric, two buttons, and no shoulder pads."
+      }
+    },
+    {
+      "id": "coastal_pullover",
+      "domain": "women_knitwear",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "women knit layer cool evenings",
+        "q_sem": "For cool evenings by the coast, I want a women's knit layer and am open to pullovers, cardigans, vests, or ponchos."
+      },
+      "specific": {
+        "q_lex": "women cream cotton cable crewneck pullover medium",
+        "q_sem": "For cool evenings by the coast, I want a cream cable-knit crewneck pullover in women's medium, made mostly from cotton, with a relaxed fit and no cropped hem."
+      }
+    },
+    {
+      "id": "museum_weekend_boots",
+      "domain": "women_footwear",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "women shoes museum restaurant weekend",
+        "q_sem": "For a weekend of museums and restaurants, I need women's shoes but could choose flats, boots, sneakers, or loafers."
+      },
+      "specific": {
+        "q_lex": "women burgundy leather Chelsea ankle boots 8 low heel",
+        "q_sem": "For a weekend of museums and restaurants, I want burgundy leather Chelsea ankle boots in women's size 8, with a low heel, cushioned footbed, and no pointed toe."
+      }
+    },
+    {
+      "id": "reception_suit",
+      "domain": "men_tailoring",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "men formal reception clothing",
+        "q_sem": "For a formal reception, I need men's clothing and have not chosen among a suit, tuxedo, blazer combination, or dress separates."
+      },
+      "specific": {
+        "q_lex": "men navy two piece suit 40 regular flat front",
+        "q_sem": "For a formal reception, I want a navy two-piece men's suit in 40 regular, with a single-breasted jacket, notch lapels, flat-front trousers, and no visible pattern."
+      }
+    },
+    {
+      "id": "dawn_training_top",
+      "domain": "men_activewear",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "men outdoor workout layer",
+        "q_sem": "For early outdoor workouts, I need a men's layer and might use a hoodie, light jacket, vest, or long-sleeve training top."
+      },
+      "specific": {
+        "q_lex": "men blue quarter zip running top large reflective",
+        "q_sem": "For early outdoor workouts, I want a blue men's quarter-zip running top in size large, with moisture-wicking fabric, thumbholes, reflective trim, and no hood."
+      }
+    },
+    {
+      "id": "hospitality_shift_clogs",
+      "domain": "men_footwear",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "men shoes long hospitality shifts",
+        "q_sem": "For long hospitality shifts, I need men's footwear and am considering clogs, sneakers, loafers, or work boots."
+      },
+      "specific": {
+        "q_lex": "men black slip resistant clogs 11 wipe clean",
+        "q_sem": "For long hospitality shifts, I want black slip-resistant men's clogs in size 11, with a closed toe, cushioned insole, wipe-clean upper, and no laces."
+      }
+    },
+    {
+      "id": "graduation_initial_pendant",
+      "domain": "jewelry_gifts",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "graduation jewelry gift",
+        "q_sem": "For a graduation gift, I want jewelry but have not decided between a necklace, bracelet, earrings, or ring."
+      },
+      "specific": {
+        "q_lex": "14k yellow gold initial pendant 16 inch chain under 180",
+        "q_sem": "For a graduation gift, I want a small 14-karat yellow-gold initial pendant on a 16-inch chain, with a plain finish, nickel-free hardware, and a price below $180."
+      }
+    },
+    {
+      "id": "farmers_market_crossbody",
+      "domain": "handbags",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "bag weekend market essentials",
+        "q_sem": "For weekend markets, I need a bag for daily essentials and could use a tote, crossbody, small backpack, or belt bag."
+      },
+      "specific": {
+        "q_lex": "tan leather crossbody zip top adjustable strap under 90",
+        "q_sem": "For weekend markets, I want a tan leather crossbody bag with a zip top, adjustable strap, exterior phone pocket, room for a small wallet, and a price below $90."
+      }
+    },
+    {
+      "id": "rail_trip_compression_cubes",
+      "domain": "travel_organization",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "organize clothes train trip",
+        "q_sem": "For a two-week train trip, I want to organize clothing and am open to cubes, zip pouches, garment folders, or divided organizers."
+      },
+      "specific": {
+        "q_lex": "six compression packing cubes lightweight washable gray",
+        "q_sem": "For a two-week train trip, I want a set of six gray compression packing cubes in mixed sizes, with lightweight washable fabric, mesh panels, and double zippers."
+      }
+    },
+    {
+      "id": "readable_everyday_watch",
+      "domain": "watches",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "easy read everyday watch",
+        "q_sem": "For checking the time throughout a busy day, I want an easy-to-read watch and am open to digital, analog, sporty, or dress styles."
+      },
+      "specific": {
+        "q_lex": "women silver analog watch navy dial 34mm bracelet",
+        "q_sem": "For checking the time throughout a busy day, I want a women's silver-tone analog watch with a navy high-contrast dial, a 34-millimeter case, bracelet band, and no crystals."
+      }
+    },
+    {
+      "id": "playground_overalls",
+      "domain": "childrenswear",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "toddler clothes outdoor play",
+        "q_sem": "For a toddler who plays outdoors, I need durable clothing and could choose overalls, joggers, shorts, or a one-piece play suit."
+      },
+      "specific": {
+        "q_lex": "toddler denim overalls 3T adjustable straps snap legs",
+        "q_sem": "For a toddler who plays outdoors, I want blue denim overalls in size 3T, with adjustable straps, reinforced knees, side buttons, and snaps along the legs."
+      }
+    },
+    {
+      "id": "space_party_jumpsuit",
+      "domain": "costumes_uniforms",
+      "split": "calibration",
+      "vague": {
+        "q_lex": "adult space themed party costume",
+        "q_sem": "For a space-themed party, I want an adult costume and could dress as an astronaut, alien, planet, or science-fiction character."
+      },
+      "specific": {
+        "q_lex": "adult white astronaut jumpsuit large patches belt",
+        "q_sem": "For a space-themed party, I want a white adult astronaut jumpsuit in size large, with embroidered mission patches, a front zipper, detachable belt, and no rigid helmet."
+      }
+    },
+    {
+      "id": "client_dinner_trousers",
+      "domain": "women_tailoring",
+      "split": "audit",
+      "vague": {
+        "q_lex": "women polished client dinner outfit",
+        "q_sem": "For dinner with a client, I want polished women's clothing and could wear a dress, skirt, trousers, or a tailored jumpsuit."
+      },
+      "specific": {
+        "q_lex": "women black wide leg trousers 10 high rise washable",
+        "q_sem": "For dinner with a client, I want black wide-leg women's trousers in size 10, with a high rise, full length, machine-washable fabric, and no pleats."
+      }
+    },
+    {
+      "id": "spring_commute_cardigan",
+      "domain": "women_knitwear",
+      "split": "audit",
+      "vague": {
+        "q_lex": "women light layer spring commute",
+        "q_sem": "For a breezy spring commute, I want a light women's layer and could use a cardigan, jacket, vest, or wrap."
+      },
+      "specific": {
+        "q_lex": "women lavender fine knit button cardigan small hip length",
+        "q_sem": "For a breezy spring commute, I want a lavender fine-knit button cardigan in women's small, hip length, with a crew neck, fitted cuffs, and no wool."
+      }
+    },
+    {
+      "id": "station_platform_loafers",
+      "domain": "women_footwear",
+      "split": "audit",
+      "vague": {
+        "q_lex": "women footwear train commute",
+        "q_sem": "For commuting by train, I need women's footwear and might choose sneakers, loafers, ankle boots, or flats."
+      },
+      "specific": {
+        "q_lex": "women tan leather penny loafers 7.5 rubber sole",
+        "q_sem": "For commuting by train, I want tan leather penny loafers in women's size 7.5, with a cushioned footbed, flexible rubber sole, and no metal ornament."
+      }
+    },
+    {
+      "id": "conference_presentation_shirt",
+      "domain": "men_tailoring",
+      "split": "audit",
+      "vague": {
+        "q_lex": "men conference presentation clothing",
+        "q_sem": "For presenting at a conference, I need men's clothing and could start with a shirt, blazer, suit, or fine-gauge sweater."
+      },
+      "specific": {
+        "q_lex": "men pale blue regular dress shirt 15.5 33 non iron",
+        "q_sem": "For presenting at a conference, I want a pale-blue men's dress shirt with a 15.5-inch neck and 33-inch sleeve, regular fit, non-iron cotton, and button cuffs."
+      }
+    },
+    {
+      "id": "park_run_joggers",
+      "domain": "men_activewear",
+      "split": "audit",
+      "vague": {
+        "q_lex": "men park exercise apparel",
+        "q_sem": "For exercising at the park, I want men's apparel and could use shorts, joggers, a training top, or a lightweight jacket."
+      },
+      "specific": {
+        "q_lex": "men charcoal tapered running joggers medium zip ankles",
+        "q_sem": "For exercising at the park, I want charcoal men's running joggers in size medium, with a tapered fit, stretch fabric, zippered ankle openings, and a secure back pocket."
+      }
+    },
+    {
+      "id": "campsite_hiking_shoes",
+      "domain": "men_footwear",
+      "split": "audit",
+      "vague": {
+        "q_lex": "men campsite outdoor footwear",
+        "q_sem": "For moving around a campsite, I need men's footwear and am considering hiking shoes, boots, trail sandals, or easy slip-ons."
+      },
+      "specific": {
+        "q_lex": "men olive low hiking shoes 10 wide waterproof grippy",
+        "q_sem": "For moving around a campsite, I want olive low-cut men's hiking shoes in size 10 wide, with a waterproof lining, grippy outsole, reinforced toe, and no ankle collar."
+      }
+    },
+    {
+      "id": "promotion_hoop_earrings",
+      "domain": "jewelry_gifts",
+      "split": "audit",
+      "vague": {
+        "q_lex": "jewelry gift job promotion",
+        "q_sem": "To celebrate a job promotion, I want a jewelry gift and could choose earrings, a necklace, a bracelet, or a ring."
+      },
+      "specific": {
+        "q_lex": "rose gold vermeil hoop earrings 20mm hinged under 75",
+        "q_sem": "To celebrate a job promotion, I want rose-gold-vermeil hoop earrings about 20 millimeters across, with hinged closures, a plain lightweight design, and a price below $75."
+      }
+    },
+    {
+      "id": "neighborhood_errand_belt_bag",
+      "domain": "handbags",
+      "split": "audit",
+      "vague": {
+        "q_lex": "hands free bag neighborhood errands",
+        "q_sem": "For neighborhood errands, I want a hands-free bag and could use a crossbody, sling, mini backpack, or belt bag."
+      },
+      "specific": {
+        "q_lex": "olive nylon belt bag two zip compartments adjustable",
+        "q_sem": "For neighborhood errands, I want an olive nylon belt bag with two zip compartments, an adjustable buckle strap, an interior key clip, and no prominent logo."
+      }
+    },
+    {
+      "id": "overnight_duffel",
+      "domain": "travel_organization",
+      "split": "audit",
+      "vague": {
+        "q_lex": "bag overnight trip",
+        "q_sem": "For an overnight trip, I need something to carry my belongings and could choose a duffel, backpack, rolling case, or large tote."
+      },
+      "specific": {
+        "q_lex": "black 30 liter duffel shoe compartment luggage sleeve",
+        "q_sem": "For an overnight trip, I want a black 30-liter duffel with a separate shoe compartment, removable shoulder strap, luggage sleeve, and a water-resistant exterior."
+      }
+    },
+    {
+      "id": "caregiver_large_dial_watch",
+      "domain": "watches",
+      "split": "audit",
+      "vague": {
+        "q_lex": "simple readable watch older relative",
+        "q_sem": "For an older relative, I want a simple readable watch and am open to analog, digital, talking, or expansion-band designs."
+      },
+      "specific": {
+        "q_lex": "unisex analog watch white large numerals stretch band 38mm",
+        "q_sem": "For an older relative, I want a unisex analog watch with a white dial, large black numerals, a 38-millimeter case, stretch metal band, and no date window."
+      }
+    },
+    {
+      "id": "portrait_day_cardigan",
+      "domain": "childrenswear",
+      "split": "audit",
+      "vague": {
+        "q_lex": "child clothes family portrait",
+        "q_sem": "For a family portrait, I need an outfit piece for a young child and could choose a dress, cardigan, trousers, or romper."
+      },
+      "specific": {
+        "q_lex": "kids burgundy cotton cardigan size 5 wooden buttons",
+        "q_sem": "For a family portrait, I want a burgundy cotton cardigan in children's size 5, with a V-neck, wooden buttons, ribbed cuffs, and no printed graphics."
+      }
+    },
+    {
+      "id": "bakery_chef_coat",
+      "domain": "costumes_uniforms",
+      "split": "audit",
+      "vague": {
+        "q_lex": "commercial kitchen work clothing",
+        "q_sem": "For work in a commercial kitchen, I need clothing and could start with a chef coat, apron, work trousers, or slip-resistant footwear."
+      },
+      "specific": {
+        "q_lex": "white chef coat medium short sleeve double breasted washable",
+        "q_sem": "For work in a commercial kitchen, I want a white double-breasted chef coat in size medium, with short sleeves, ten cloth-covered buttons, a thermometer pocket, and washable fabric."
+      }
+    }
+  ]
+}

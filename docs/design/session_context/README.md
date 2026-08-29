@@ -1,7 +1,7 @@
 # Session Context
 
 - Contract: **v1 frozen for implementation**
-- Implementation: **M3 session-context core complete; M4 adapter integration pending**
+- Implementation: **M3 core, CS7 catalog-bound integration, and QU P0 integration complete**
 - Last design review: **2026-08-27**
 
 Session context is the shared state boundary between query understanding,
@@ -62,7 +62,19 @@ session-context core with belief and replay-aware aggregate validation,
 derived interaction views, a canonical versioned snapshot codec, and a
 copy-on-write in-memory store with per-session transactions.
 
-The registry deliberately contains no default production facet list and does
-not derive facets from the official `ask_attribute` protocol. Query
-understanding, Probe production, retrieval, ranking, response normalization,
-and the thin official adapter remain application-layer work beginning in M4.
+Catalog Semantic CS7 now supplies the application-layer authority deliberately
+kept out of this catalog-independent contract. It binds one verified semantic
+release to a private raw store, reruns catalog checks and the raw commit under
+one session lock, restricts reserved category writes, gates live SearchBelief
+provenance, and wraps snapshots in a release-pinned outer envelope. The v1
+types, reducer, codec, store, and error meanings remain unchanged.
+
+The catalog-independent reducer registry still contains no implicit production
+facet list and does not derive facets from the official `ask_attribute`
+protocol. At the application boundary, CS7 now composes the verified
+price/category registry with the explicit retrieval-derived competition
+vocabulary; the two paths remain distinguishable through `FacetAuthority`.
+Query Understanding consumes that combined boundary under its own
+[`contract-v1`](../query_understanding/contract-v1.md). Query Compiler, Probe
+production, final orchestration, response normalization, and the thin official
+adapter remain downstream work.

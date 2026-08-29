@@ -1,0 +1,23 @@
+{
+  "schema": "shopping-copilot/intent-volume-policy/v1",
+  "policy_id": "soft_hybrid_intent_volume_v1",
+  "mapping_id": "catalog_log_volume_v1",
+  "approved": true,
+  "parameters": {
+    "density_temperature": 0.025,
+    "membership_quantile": 0.85,
+    "membership_temperature": 0.06,
+    "hard_mismatch_floor": 0.01,
+    "soft_preference_exponent": 0.5,
+    "stable_relative_tolerance": 0.1,
+    "diagnostic_top_k": 20
+  },
+  "selection_evidence": {
+    "suite": "config/query_understanding/intent-space-natural-prompts-v2.json",
+    "qu_to_probe_artifact": "artifacts/retrieval/qu-to-probe-intent-space-natural-v3.json",
+    "volume_artifact": "artifacts/retrieval/fuzzy-intent-volume-natural-v3.json",
+    "natural_direction": "50/50",
+    "progressive_direction": "20/20"
+  },
+  "boundary": "Hackathon runtime v1. Direction and presentation policy, not a claim of universal product-relevance calibration."
+}

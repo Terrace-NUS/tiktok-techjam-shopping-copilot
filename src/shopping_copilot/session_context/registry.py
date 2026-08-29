@@ -23,6 +23,13 @@ class FacetKind(str, Enum):
     NUMERIC = "numeric"
 
 
+class FacetAuthority(str, Enum):
+    """Evidence boundary that authorizes a facet to enter committed intent."""
+
+    CATALOG_VERIFIED = "catalog_verified"
+    RETRIEVAL_DERIVED = "retrieval_derived"
+
+
 CATEGORICAL_OPERATORS = frozenset({Operator.EQ, Operator.NEQ, Operator.IN, Operator.NOT_IN})
 NUMERIC_OPERATORS = frozenset({Operator.LT, Operator.LE, Operator.GT, Operator.GE})
 
@@ -64,6 +71,7 @@ class FacetSpec:
     kind: FacetKind
     operators: frozenset[Operator]
     normalizer: ScalarNormalizer
+    authority: FacetAuthority = FacetAuthority.CATALOG_VERIFIED
 
     def __post_init__(self) -> None:
         if type(self.id) is not str or _FACET_ID_PATTERN.fullmatch(self.id) is None:
@@ -72,6 +80,8 @@ class FacetSpec:
             raise ValueError("'other' is an adapter key, not a structured facet")
         if not isinstance(self.kind, FacetKind):
             raise TypeError("facet kind must be a FacetKind")
+        if not isinstance(self.authority, FacetAuthority):
+            raise TypeError("facet authority must be a FacetAuthority")
         operators = frozenset(self.operators)
         if not all(isinstance(operator, Operator) for operator in operators):
             raise TypeError("facet operators must be Operator values")
