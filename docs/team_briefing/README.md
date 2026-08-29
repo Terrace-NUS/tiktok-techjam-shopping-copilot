@@ -1,12 +1,13 @@
 # Shopping Copilot 组内讲解材料
 
-这组文档用于向组员解释当前系统的五块核心基础设施：
+这组文档用于向组员解释当前系统的六块核心基础设施：
 
 1. 我们怎样保存多轮购物记忆；
 2. 我们怎样从 50k catalog 建立可信 facet，又怎样从用户语言抽取 facet；
 3. Query Understanding 怎样把一句自然语言变成可提交的状态更新。
 4. Fuzzy Intent Volume 怎样从商品空间计算意图透明度 $T_t$，并用 $D_t$ 说明测量质量；
 5. 正式检索怎样执行 hard mask、三路召回、RRF 和 $T_t$ 控制的向量多样化。
+6. Ranking 实测怎样权衡单件相关性、整组多样性和运行延迟。
 
 这些是讲解材料，不替代各模块的 normative contract。发生冲突时，以链接的设计 contract 和当前代码
 为准。
@@ -20,6 +21,7 @@
 | 3 | [`03-query-understanding.md`](03-query-understanding.md) | DeepSeek 读什么、输出什么、本地怎样落地 | 10 分钟 |
 | 4 | [`04-intent-transparency.md`](04-intent-transparency.md) | Intent Volume 怎样观察 catalog，$T_t/D_t$ 分别表示什么 | 10 分钟 |
 | 5 | [`05-formal-retrieval.md`](05-formal-retrieval.md) | 三路怎样找候选、怎样融合，$T_t$ 怎样改变 Top-10 | 8 分钟 |
+| 6 | [`06-ranking.md`](06-ranking.md) | BGE/Qwen、MMR/DPP/xQuAD 实测后怎样取舍 | 6 分钟 |
 
 QU 的逐字段长例子仍保留在：
 [`session-context-flow-example.md`](../design/query_understanding/session-context-flow-example.md)。
@@ -103,6 +105,7 @@ transaction 中原子提交新的 Session Context。
 - 完整 catalog 上的 Fuzzy Intent Volume $T_t$ runtime v1，以及独立健康诊断 $D_t$；
 - hard-mask-first 的 Dense / Lexical / Facet 三路正式召回、RRF 和 $T_t$-aware 向量 MMR；
 - 真实 50k catalog 上的单路、两路、三路消融与逐商品 route contribution 日志；
+- 同池 Ranking 实验：Relative Score / CombMNZ、Qwen/BGE、MMR/DPP/xQuAD 与配对统计；
 - 自然语言与官方 simulator prompt suite。
 
 尚未形成 production 闭环：
@@ -120,4 +123,5 @@ transaction 中原子提交新的 Session Context。
 - Query Compiler：[`design/query_compiler/contract-v0.md`](../design/query_compiler/contract-v0.md)
 - Intent Transparency：[`design/intent_purity/runtime-contract-v1.md`](../design/intent_purity/runtime-contract-v1.md)
 - Formal Retrieval：[`design/retrieve/formal-multi-route-v0.md`](../design/retrieve/formal-multi-route-v0.md)
+- Ranking 实验：[`design/retrieve/ranking-strategy-evaluation-v0.md`](../design/retrieve/ranking-strategy-evaluation-v0.md)
 - 官方问题边界：[`official_problem/README.md`](../official_problem/README.md)

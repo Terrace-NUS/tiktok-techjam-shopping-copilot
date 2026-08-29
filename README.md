@@ -52,9 +52,11 @@ and trace views. The earlier fixed Top-80 mode-coherence `C_t` remains as a
 compatibility probe, while the story-facing runtime now measures full-catalog
 Fuzzy Intent Volume: structured evidence and semantic preferences form a
 Product of Experts, duplicate listings are density-discounted, and the result
-is exposed as `T_t` with separate health diagnostics `D_t`. Hard-mask
-resolution is implemented; adaptive multi-route fusion/ranking, application
-orchestration, and asking remain downstream steps. See
+is exposed as `T_t` with separate health diagnostics `D_t`. Hard-mask-first
+Dense/Lexical/Facet retrieval, RRF, and `T_t`-aware vector MMR are implemented.
+Relative-score fusion, Qwen/BGE cross-encoders, vector DPP, and latent xQuAD
+now have a same-pool 50k evaluation; selecting a new production ranking policy,
+application orchestration, and asking remain downstream steps. See
 [`docs/design/query_understanding/README.md`](docs/design/query_understanding/README.md).
 
 Install the optional local embedding stack, build the 50k dense index, and run

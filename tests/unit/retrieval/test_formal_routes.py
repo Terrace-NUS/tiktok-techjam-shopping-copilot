@@ -18,6 +18,7 @@ from shopping_copilot.query_compiler import (
 from shopping_copilot.retrieval import (
     FacetRoute,
     ReciprocalRankFusion,
+    RelativeScoreFusion,
     RetrievalRoute,
     RouteHit,
     RouteObservation,
@@ -207,3 +208,33 @@ def test_rrf_rewards_cross_route_agreement_without_mixing_raw_scores() -> None:
         RetrievalRoute.FACET,
     }
     assert [item.parent_asin for item in fused].count("B") == 1
+
+
+def test_relative_score_fusion_handles_lexical_score_orientation() -> None:
+    observations = (
+        RouteObservation(
+            route=RetrievalRoute.DENSE,
+            requested_top_k=2,
+            available=True,
+            reason=None,
+            hits=(
+                RouteHit(parent_asin="A", rank=1, raw_score=0.9),
+                RouteHit(parent_asin="B", rank=2, raw_score=0.5),
+            ),
+        ),
+        RouteObservation(
+            route=RetrievalRoute.LEXICAL,
+            requested_top_k=2,
+            available=True,
+            reason=None,
+            hits=(
+                RouteHit(parent_asin="B", rank=1, raw_score=-10.0),
+                RouteHit(parent_asin="C", rank=2, raw_score=-2.0),
+            ),
+        ),
+    )
+
+    fused = RelativeScoreFusion(agreement_power=1.0).fuse(observations, top_k=3)
+
+    assert [item.parent_asin for item in fused] == ["B", "A", "C"]
+    assert len(fused[0].contributions) == 2

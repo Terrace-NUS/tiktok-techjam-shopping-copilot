@@ -36,6 +36,7 @@ from .errors import (
     DenseIndexIntegrityError,
     EmbeddingBackendUnavailableError,
     QueryEmbeddingError,
+    RankingBackendUnavailableError,
     RetrievalError,
 )
 from .evidence import (
@@ -55,6 +56,7 @@ from .factory import (
 from .fusion import (
     FusedCandidate,
     ReciprocalRankFusion,
+    RelativeScoreFusion,
     RouteContribution,
     normalized_fusion_relevance,
 )
@@ -89,6 +91,17 @@ from .modes import (
 )
 from .multi_probe import CompiledProbeRun, CompiledProbeRunner, ProbeSnapshot
 from .probe import DenseProbeObservation, FixedDenseProbe
+from .ranking import (
+    CrossEncoderRankingHit,
+    CrossEncoderRankingResult,
+    CrossEncoderRelevanceReranker,
+    CrossEncoderScorer,
+    GreedyDPPSelector,
+    LatentAspectXQuADSelector,
+    SentenceTransformerCrossEncoderScorer,
+    VectorSlateHit,
+    VectorSlateResult,
+)
 from .resolved_probe import ResolvedCompiledProbeRun, ResolvedCompiledProbeRunner
 from .routing import (
     FacetRoute,
@@ -167,6 +180,7 @@ __all__ = [
     "ProductDocument",
     "ProductDocumentError",
     "QueryEmbeddingError",
+    "RankingBackendUnavailableError",
     "RETRIEVAL_EVIDENCE_POLICY_ID",
     "RETRIEVAL_EVIDENCE_SCHEMA",
     "ResolvedCompiledProbeRun",
@@ -178,6 +192,7 @@ __all__ = [
     "RetrievalController",
     "RetrievalRoute",
     "ReciprocalRankFusion",
+    "RelativeScoreFusion",
     "RouteContribution",
     "RouteHit",
     "RouteObservation",
@@ -222,5 +237,14 @@ __all__ = [
     "VectorDiversityPolicy",
     "VectorDiversityResult",
     "VectorMMRReranker",
+    "CrossEncoderRankingHit",
+    "CrossEncoderRankingResult",
+    "CrossEncoderRelevanceReranker",
+    "CrossEncoderScorer",
+    "GreedyDPPSelector",
+    "LatentAspectXQuADSelector",
+    "SentenceTransformerCrossEncoderScorer",
+    "VectorSlateHit",
+    "VectorSlateResult",
     "write_dense_index",
 ]

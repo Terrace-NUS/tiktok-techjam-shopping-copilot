@@ -19,6 +19,10 @@ class EmbeddingBackendUnavailableError(RetrievalError):
     """Raised when the configured embedding backend cannot be loaded."""
 
 
+class RankingBackendUnavailableError(RetrievalError):
+    """Raised when an optional semantic ranking backend cannot run."""
+
+
 class QueryEmbeddingError(RetrievalError):
     """Raised when a query cannot be converted into a valid vector."""
 
