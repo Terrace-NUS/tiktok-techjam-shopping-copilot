@@ -21,9 +21,13 @@ COMPARISONS = (
     ("bge_topk", "qwen_topk"),
     ("qwen_mmr_low", "qwen_topk"),
     ("qwen_dpp_low", "qwen_topk"),
+    ("bge_dpp_low", "bge_topk"),
+    ("bge_dpp_high", "bge_topk"),
+    ("bge_dpp_low", "rrf_mmr_low"),
+    ("bge_dpp_low", "qwen_dpp_low"),
     ("qwen_xquad_low", "qwen_topk"),
 )
-T_FAMILIES = ("rrf_mmr", "qwen_mmr", "qwen_dpp", "qwen_xquad")
+T_FAMILIES = ("rrf_mmr", "qwen_mmr", "qwen_dpp", "bge_dpp", "qwen_xquad")
 
 
 def main() -> int:
@@ -96,6 +100,8 @@ def main() -> int:
             "bge_harms_rrf": _case_ids(cases, metrics, winner="rrf_topk", loser="bge_topk"),
             "dpp_rescues_qwen": _case_ids(cases, metrics, winner="qwen_dpp_low", loser="qwen_topk"),
             "dpp_harms_qwen": _case_ids(cases, metrics, winner="qwen_topk", loser="qwen_dpp_low"),
+            "dpp_rescues_bge": _case_ids(cases, metrics, winner="bge_dpp_low", loser="bge_topk"),
+            "dpp_harms_bge": _case_ids(cases, metrics, winner="bge_topk", loser="bge_dpp_low"),
         },
     }
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
@@ -205,6 +211,8 @@ def _render_markdown(analysis: dict[str, object]) -> str:
             f"伤害：{len(audit['bge_harms_rrf'])}。",
             f"- 低 T DPP 相对 Qwen Top-K 救回：{len(audit['dpp_rescues_qwen'])}；"
             f"伤害：{len(audit['dpp_harms_qwen'])}。",
+            f"- 低 T DPP 相对 BGE Top-K 救回：{len(audit['dpp_rescues_bge'])}；"
+            f"伤害：{len(audit['dpp_harms_bge'])}。",
             "",
         ]
     )

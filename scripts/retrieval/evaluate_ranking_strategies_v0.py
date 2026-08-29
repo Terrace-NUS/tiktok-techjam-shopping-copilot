@@ -372,6 +372,14 @@ def _evaluate_case(
                 ),
             ),
             (
+                f"bge_dpp_{suffix}",
+                GreedyDPPSelector(index=controller.retriever.index).select(
+                    bge_result.candidates,
+                    top_k=final_k,
+                    relevance_weight=weight,
+                ),
+            ),
+            (
                 f"qwen_xquad_{suffix}",
                 LatentAspectXQuADSelector(index=controller.retriever.index).select(
                     qwen_result.candidates,
@@ -528,8 +536,8 @@ def _variant_payload(
             {
                 **asdict(hit),
                 "rrf_relevance": rrf_scores[hit.parent_asin],
-                "qwen_score": qwen_scores[hit.parent_asin],
-                "bge_score": bge_scores[hit.parent_asin],
+                "qwen_score": qwen_scores.get(hit.parent_asin),
+                "bge_score": bge_scores.get(hit.parent_asin),
                 "route_contributions": [
                     {
                         "route": contribution.route.value,
@@ -580,10 +588,15 @@ def _list_metrics(index: Any, products: list[dict[str, object]]) -> dict[str, ob
         "reporting_groups": sorted({str(item["reporting_group"]) for item in products}),
         "unique_leaf_categories": len({str(item["leaf_category"]) for item in products}),
         "mean_rrf_relevance": float(np.mean([float(item["rrf_relevance"]) for item in products])),
-        "mean_qwen_score": float(np.mean([float(item["qwen_score"]) for item in products])),
-        "mean_bge_score": float(np.mean([float(item["bge_score"]) for item in products])),
+        "mean_qwen_score": _optional_mean(products, "qwen_score"),
+        "mean_bge_score": _optional_mean(products, "bge_score"),
         "maximum_candidate_rank": max(int(item["candidate_rank"]) for item in products),
     }
+
+
+def _optional_mean(products: list[dict[str, object]], key: str) -> float | None:
+    values = [float(item[key]) for item in products if item.get(key) is not None]
+    return None if not values else float(np.mean(values))
 
 
 def _aggregate_public(cases: list[dict[str, object]]) -> dict[str, object]:
@@ -625,8 +638,8 @@ def _aggregate_public(cases: list[dict[str, object]]) -> dict[str, object]:
             "mean_unique_reporting_groups": float(
                 np.mean([int(item["unique_reporting_groups"]) for item in metrics])
             ),
-            "mean_qwen_score": float(np.mean([float(item["mean_qwen_score"]) for item in metrics])),
-            "mean_bge_score": float(np.mean([float(item["mean_bge_score"]) for item in metrics])),
+            "mean_qwen_score": _optional_metric_mean(metrics, "mean_qwen_score"),
+            "mean_bge_score": _optional_metric_mean(metrics, "mean_bge_score"),
             "by_scenario": {
                 scenario: _scenario_metrics(public, name, scenario)
                 for scenario in sorted(PUBLIC_SCENARIOS)
@@ -638,6 +651,11 @@ def _aggregate_public(cases: list[dict[str, object]]) -> dict[str, object]:
         / len(public),
         "variants": summaries,
     }
+
+
+def _optional_metric_mean(metrics: list[dict[str, object]], key: str) -> float | None:
+    values = [float(item[key]) for item in metrics if item.get(key) is not None]
+    return None if not values else float(np.mean(values))
 
 
 def _scenario_metrics(
@@ -713,7 +731,8 @@ def _render_markdown(payload: dict[str, object]) -> str:
             f"{metrics['conditional_mrr_at_10']:.3f} | "
             f"{metrics['mean_pairwise_product_cosine']:.3f} | "
             f"{metrics['mean_unique_reporting_groups']:.2f} | "
-            f"{metrics['mean_qwen_score']:.3f} | {metrics['mean_bge_score']:.3f} |"
+            f"{_format_optional(metrics['mean_qwen_score'])} | "
+            f"{_format_optional(metrics['mean_bge_score'])} |"
         )
     lines.extend(
         [
@@ -742,11 +761,16 @@ def _render_markdown(payload: dict[str, object]) -> str:
             metrics = variant["metrics"]
             lines.append(
                 f"| {variant['name']} | {metrics['mean_pairwise_product_cosine']:.3f} | "
-                f"{metrics['unique_reporting_groups']} | {metrics['mean_qwen_score']:.3f} | "
-                f"{metrics['mean_bge_score']:.3f} |"
+                f"{metrics['unique_reporting_groups']} | "
+                f"{_format_optional(metrics['mean_qwen_score'])} | "
+                f"{_format_optional(metrics['mean_bge_score'])} |"
             )
         lines.append("")
     return "\n".join(lines) + "\n"
+
+
+def _format_optional(value: object) -> str:
+    return "n/a" if value is None else f"{float(value):.3f}"
 
 
 def _parse_args() -> argparse.Namespace:

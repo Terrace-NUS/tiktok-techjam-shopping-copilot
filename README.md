@@ -55,7 +55,8 @@ Product of Experts, duplicate listings are density-discounted, and the result
 is exposed as `T_t` with separate health diagnostics `D_t`. Hard-mask-first
 Dense/Lexical/Facet retrieval, RRF, and `T_t`-aware vector MMR are implemented.
 Relative-score fusion, Qwen/BGE cross-encoders, vector DPP, and latent xQuAD
-now have a same-pool 50k evaluation; selecting a new production ranking policy,
+now have a same-pool 50k evaluation. The combined RRF → BGE → T-aware DPP
+story policy is validated; controller integration and its RRF/MMR fallback,
 application orchestration, and asking remain downstream steps. See
 [`docs/design/query_understanding/README.md`](docs/design/query_understanding/README.md).
 

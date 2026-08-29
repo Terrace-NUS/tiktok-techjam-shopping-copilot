@@ -40,6 +40,8 @@ are named directly in the document.
 Ranking model revisions and runtime parameters are frozen in
 `scripts/retrieval/evaluate_ranking_strategies_v0.py`. The experiment compares
 all methods over the same RRF-bounded Top-80 pool and writes generated results
-under ignored `artifacts/retrieval/`. Its conclusions and exact metrics are
+under ignored `artifacts/retrieval/`. The BGE-only augmentation entry point is
+`scripts/retrieval/augment_bge_dpp_ranking_v0.py`; it adds the final BGE+DPP
+low/high-T comparison without re-running Qwen. Conclusions and exact metrics are
 documented in
 [`../../docs/design/retrieve/ranking-strategy-evaluation-v0.md`](../../docs/design/retrieve/ranking-strategy-evaluation-v0.md).

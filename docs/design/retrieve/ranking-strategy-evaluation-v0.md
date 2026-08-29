@@ -88,6 +88,8 @@ batch_size = 32
 | RRF MMR, low T | 0.060 | 0.142 | **0.734** | **2.28** |
 | Qwen MMR, low T | 0.096 | 0.226 | 0.773 | 1.21 |
 | Qwen DPP, low T | 0.100 | 0.235 | 0.767 | 1.21 |
+| BGE DPP, low T | 0.137 | 0.323 | 0.767 | 1.67 |
+| BGE DPP, high T | 0.142 | 0.334 | 0.806 | 1.21 |
 | Qwen xQuAD, low T | 0.100 | 0.234 | 0.806 | 1.14 |
 
 这个表体现了真正的冲突：cross-encoder 提高了 target 排名，却会把开放结果收缩为更相似、更少类的商品；
@@ -121,6 +123,28 @@ Qwen+DPP 从高 T 改为低 T 后：
 相对 Qwen Top-K，低 T DPP 把 cosine 降低 `0.0385`，同时 MRR 差值
 `-0.0024 [-0.0174, +0.0127]`。它比 Qwen+MMR 的向量展开更强，MRR 损失更小。
 
+### BGE+DPP 组合通过，但相关性并非完全无损
+
+BGE+DPP 从高 T 改为低 T 后：
+
+- 93.1% 的请求变得更分散；
+- 平均商品 cosine 降低 `0.0387 [-0.0453, -0.0322]`；
+- MRR 改变 `-0.0047 [-0.0104, +0.0007]`，没有观察到可靠的低/高 T 差异。
+
+低 T 的 BGE+DPP 相对纯 BGE Top-K：
+
+- Hit@10 从 `0.269` 小幅升至 `0.275`；
+- MRR 从 `0.145` 降至 `0.137`，配对差值 `-0.0082 [-0.0157, -0.0014]`；
+- cosine 从 `0.808` 降至 `0.767`；
+- 平均大类数从 `1.20` 增至 `1.67`。
+
+因此它不是“白拿多样性”：Top-10 找到 target 的任务略多，但 target 的平均位置略后。不过相对
+Qwen+DPP，BGE+DPP 在几乎相同 cosine 下把 MRR 提高 `+0.0375 [+0.0053, +0.0703]`，平均大类数还
+增加 `0.46`。它是这轮相关性与可感知多样性之间最好的综合方案。
+
+自然语言案例也符合预期：summer wedding 从 3 个大类扩为 5 个，office request 从 4 个扩为 6 个；
+两个明确鞋类请求始终保持 1 个大类。也就是说它没有把所有请求一律打散。
+
 ### xQuAD 在当前向量空间失败
 
 xQuAD 只有 40% 的请求满足低 T 比高 T 更分散；平均 cosine 甚至轻微上升，区间跨 0。自动找出的
@@ -140,6 +164,7 @@ Relative Score 和 CombMNZ 的 MRR 点估计都高于 RRF，但 95% 区间跨 0�
 | --- | ---: | ---: | ---: |
 | Qwen3 0.6B | 3.32 s | 6.54 s | 15.89 s（含首次 warm-up） |
 | BGE v2-m3 | 3.00 s | 4.91 s | 6.97 s |
+| BGE v2-m3（单模型组合复测） | 3.27 s | 4.60 s | 6.32 s |
 
 两者都能稳定运行，但这个延迟不适合不加条件地进入每一轮请求。DPP/MMR 本身只处理 80 个已存在向量，
 成本远小于 cross-encoder。
@@ -150,22 +175,25 @@ Relative Score 和 CombMNZ 的 MRR 点估计都高于 RRF，但 95% 区间跨 0�
 
 - RRF 继续作为安全、无训练的候选池边界；
 - MMR 继续作为当前正式 $T_t$ 控制点；
-- DPP 通过实验，成为下一版 slate selector 的首选候选；
-- BGE 通过实验，成为精确相关性重排的首选候选；
+- **RRF → BGE → $T_t$-aware DPP** 已通过组合实验，成为下一版 story-facing controller 的首选；
+- 纯 BGE 仍是只追求 simulator target rank 时的更优选择；
+- 当前 controller 尚未替换，下一步是明确 cross-encoder 超时/不可用时的降级，再做工程接线；
 - Qwen 保留为模型消融，不优先于 BGE；
 - Relative Score / CombMNZ 只保留 shadow；
 - latent xQuAD 淘汰。
 
-下一次只需回答一个尚未实测的组合问题：**BGE relevance + DPP slate** 能否同时保留 BGE 的 target-rank
-收益和 DPP 的稳定 $T_t$ 响应。得到这组数据后，再决定是否修改 `RetrievalController`，不要现在凭组件
-各自最好就假设组合一定最好。
+组合结论不是“指标全赢”，而是一个可解释的 Pareto 取舍：低 $T_t$ 用约 `0.008` MRR 换取明显的向量
+展开和 `+0.47` 个可感知大类；高 $T_t$ 基本退回 BGE 顺序。这个行为与我们的主线故事一致。
 
 ## 8. 复现
 
 ```powershell
 .\.venv-3.10\Scripts\python.exe scripts/retrieval/evaluate_ranking_strategies_v0.py
+.\.venv-3.10\Scripts\python.exe scripts/retrieval/augment_bge_dpp_ranking_v0.py
 .\.venv-3.10\Scripts\python.exe scripts/retrieval/analyze_ranking_strategies_v0.py
 ```
 
-完整 JSON 保留每个请求、路线状态、候选位置、模型分数、13 套 Top-10、category 审计和 target rank。
+完整 JSON 保留每个请求、路线状态、候选位置、模型分数、15 套 public Top-10、category 审计和 target
+rank。增量 BGE+DPP 变体没有重复计算仅供旁路审计的 Qwen 分数，因此该字段明确为 `null`；所需的 BGE
+分数完整保留。
 生成物位于 ignored `artifacts/`；代码、固定模型版本和分析协议进入 Git。
