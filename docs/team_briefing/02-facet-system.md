@@ -69,8 +69,10 @@ use_case
 - 每件商品在这些维度上都有可靠值；
 - Session Context 中的用户要求本身就证明某商品满足条件。
 
-商品侧真值必须由后续 Retrieval Evidence Index 或检索证据判断。没有证据就是 unknown，不能靠
-LLM 补成 catalog truth。
+商品侧真值必须由后续 Retrieval Evidence Index 或检索证据判断。没有证据就是 unknown，不能让
+LLM 脱离原文补成 catalog truth。当前新增的 Product Fact Card 会让 DeepSeek 阅读完整商品字段，但每条
+事实都必须引用真实 `source_ref + evidence`；它属于 model-derived retrieval evidence，不冒充
+Gate-A/B verified fact。
 
 ### Semantic-only
 
@@ -436,7 +438,21 @@ other
 可以是官方交互协议中的选项，但它不是一个合法 structured facet。我们可以把官方键映射到内部
 facet 或问题策略，但不能反过来让 evaluator 定义系统的语义 registry。
 
-## 13. 如果以后要正式增加 color 或 material
+## 13. Product Fact Card：两侧使用同一种语言
+
+旧 Evidence Index 依赖字段白名单和关键词，因此会漏掉只写在 description 中的 material/color。
+现在商品侧与 QU 共享 `shopping_facet_language_v1`：两侧都先判断主语、部件和否定范围，都保留原文证据，
+也都能从一段描述抽出多个 facet。
+
+区别是 QU 输出用户偏好和 hard/soft；商品卡输出 present/absent 商品事实。商品卡还保存 aliases，用于连接
+`gossypium` 与 `cotton` 等明确同义术语，但 alias 不能代替原文引用。
+
+21 件商品 live test 已达到 21/21 tool call + 本地验证成功，共生成 647 条去重事实；两个原先因
+description 未进入 material evidence 而失败的目标商品都恢复了 fabric/cotton 事实。完整协议见
+[Product Fact Cards v1](../design/catalog_semantic/product-fact-cards-v1.md)。当前尚未启动 50k 全量生成，
+也尚未接入正式 hard mask。
+
+## 14. 如果以后要正式增加 color 或 material
 
 不能只在 prompt 里加一个名字。正确流程是：
 
@@ -451,7 +467,7 @@ facet 或问题策略，但不能反过来让 evaluator 定义系统的语义 re
 9. 让 Gateway 绑定新 release；
 10. 最后才把它从 `retrieval_derived` 晋升为 `catalog_verified`。
 
-## 14. 常见误解
+## 15. 常见误解
 
 ### “coverage 高就是一个好 facet”
 
@@ -463,7 +479,8 @@ facet 或问题策略，但不能反过来让 evaluator 定义系统的语义 re
 
 ### “LLM 能看 title 猜出来，所以就是 catalog truth”
 
-错误。模型推断可以作为 retrieval evidence 或 semantic signal，但不能冒充 Gate-A/B verified fact。
+错误。模型推断可以作为 retrieval evidence 或 semantic signal，但不能冒充 Gate-A/B verified fact；
+Product Fact Card 还要求每条事实引用原始 source，无法引用的猜测必须丢弃。
 
 ### “现在 registry 有 material，所以 material 已经从 50k catalog 发布”
 

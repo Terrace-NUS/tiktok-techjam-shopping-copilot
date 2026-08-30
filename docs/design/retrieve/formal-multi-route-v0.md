@@ -1,5 +1,11 @@
 # Formal Multi-route Retrieval v0
 
+> Historical baseline. The fixed single-center Top-80 recall described here is
+> preserved behind `RecallStrategy.LEGACY_SINGLE_CENTER`. The active recall policy
+> is [Transparency-aware Multi-center Recall v1](transparency-aware-recall-v1.md),
+> where `T_t` changes candidate generation before fusion. The ranking discussion in
+> this v0 document is not the final ranking design.
+
 - 状态：**已实现并完成 50k catalog 实测。**
 - 实现入口：[`../../../src/shopping_copilot/retrieval/controller.py`](../../../src/shopping_copilot/retrieval/controller.py)
 - 完整实验：[`../../../artifacts/retrieval/multi-route-v0.md`](../../../artifacts/retrieval/multi-route-v0.md)

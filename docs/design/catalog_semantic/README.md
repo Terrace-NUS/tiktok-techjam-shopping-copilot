@@ -40,6 +40,9 @@ raw catalog
   repository hygiene. It is non-normative; the contract remains authoritative.
 - [`contract-v0.md`](contract-v0.md): normative category, facet, resolution,
   grounding, gateway, and release rules.
+- [`product-fact-cards-v1.md`](product-fact-cards-v1.md): experimental,
+  source-grounded DeepSeek sidecar that shares the QU facet language. It does
+  not mutate the raw catalog or silently extend the v0 verified release.
 - [Facet Registry research report](<../facet/TechJam Facet Registry v0：从 50k Catalog 抽取和构建 Facet 的实施规范.md>):
   discovery and implementation research retained as design input; the contract
   is authoritative where the documents differ.

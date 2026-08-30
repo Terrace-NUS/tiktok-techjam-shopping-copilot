@@ -1,77 +1,183 @@
-# 06：Ranking 怎么选
+# 06: How ranking works
 
-## 一句话结论
+## One-sentence version
 
-我们实测后没有用一个“更高级”的模型把 RRF 全部替掉：
-
-> RRF 负责给出可信候选边界，cross-encoder 负责判断单件商品是否更相关，MMR/DPP 负责让整个
-> Top-10 在低 $T_t$ 时展开、在高 $T_t$ 时聚焦。
-
-这三件事是不同问题。
-
-## 测了哪些办法
-
-同一个 Top-80 商品池上，我们比较了：
-
-1. RRF、相对分数相加、CombMNZ；
-2. Qwen3-Reranker-0.6B、BGE-reranker-v2-m3；
-3. 直接 Top-K、MMR、DPP、自动语义方向 xQuAD。
-
-所有方法都在 hard mask 之后运行；“不要黑色”之类的约束不会被 ranking 模型重新放回来。
-
-## 最容易理解的结果
-
-### BGE 最会把正确商品往前提
-
-target 已经在 Top-80 时，BGE 把它放进最终 Top-10 的比例是 `63.2%`；RRF 是 `38.2%`。但是 BGE
-给出的十件商品也更像彼此，平均只覆盖 `1.20` 个审计大类。
-
-所以 BGE 很适合回答“我已经很清楚要什么，请帮我排准”，不适合独自回答“去北海道有什么可以买”。
-
-### DPP 最能体现 $T_t$
-
-DPP 把 Top-10 看成一个整体：十件都不错但几乎相同，不是一个好集合。低 $T_t$ 时它加强商品间的
-排斥，高 $T_t$ 时加强单件相关性。
-
-Qwen+DPP 有 99.4% 的请求满足“低 T 比高 T 更分散”。把前一级换成更准的 BGE 后，这个比例是
-93.1%，平均 cosine 降低 `0.0387`，仍然是很稳定的 $T_t$ 响应。
-
-### BGE+DPP 的组合结果
-
-组合已经实测，不再是推测：
-
-- 纯 BGE 的 MRR 是 `0.145`，低 T BGE+DPP 是 `0.137`；
-- 但 Hit@10 从 `26.9%` 小幅升到 `27.5%`；
-- 商品相似度从 `0.808` 降到 `0.767`；
-- 平均商品大类从 `1.20` 增到 `1.67`。
-
-这表示 DPP 找回的正确商品没有变少，但为了组成更丰富的十件套装，部分 target 被放到了稍后的位置。
-它不是免费提升，却是一个很适合讲清楚的取舍。
-
-自然语言演示更直观：“夏季婚礼穿什么”从 3 类扩到 5 类，“刚开始办公室工作买什么”从 4 类扩到
-6 类；而明确的雪地靴、皮质高跟鞋请求仍然只有鞋类。
-
-### xQuAD 没成功
-
-我们尝试只靠商品向量自动找 6 个潜在方向，再覆盖不同方向。实际只有 40% 的请求符合低 T 更分散，
-所以这个版本淘汰。数学名字更 fancy，不代表在我们的商品向量空间里更好。
-
-## 当前系统是否已经换成 BGE+DPP
-
-还没有。当前 production-like controller 仍是：
+Recall finds a safe and broad candidate space. BGE removes obvious noise. DeepSeek
+judges how well each remaining product fits the current user intent. Finally,
+`T_t` decides whether the displayed set should explore or focus.
 
 ```text
-RRF Top-80 → T-aware MMR → Top-10
+up to 300 recalled products
+  -> BGE relevance ranking
+  -> 48 products, with every recall direction protected
+  -> DeepSeek judges individual product fit
+  -> quality = 0.8 * DeepSeek + 0.2 * BGE
+  -> T-aware DPP selects the displayed Top-10
 ```
 
-**BGE+DPP 已经通过同池组合实验**，建议作为下一版故事链路：
+The four stages answer different questions. They should not be collapsed into one
+opaque LLM prompt.
+
+## 1. What BGE does
+
+BGE is a local cross-encoder. Unlike embedding search, it reads the shopping query
+and one complete product document together. It is good at saying whether that one
+product is basically relevant.
+
+Running an LLM over all 300 products would be slow and expensive, so BGE reduces the
+pool to 48. The reduction is not a plain global Top-48: up to six products from every
+semantic recall direction are protected first. This prevents a popular direction
+such as snow boots from deleting gloves, coats, or other valid directions before the
+LLM sees them.
+
+## 2. What DeepSeek reads
+
+DeepSeek receives one batch containing:
+
+- the complete resolved `IntentState` from the current Session Context;
+- the compiled semantic and lexical query;
+- an optional versioned `user_profile` envelope;
+- 48 compact product evidence cards.
+
+It does not receive `T_t`, BGE scores, recall routes, direction IDs, or the original
+candidate ranks. Hiding these values prevents the model from copying an earlier
+ranking instead of reading the product evidence.
+
+The candidate order is deterministically shuffled for each request. The same request
+is reproducible, but position is not a quality signal.
+
+## 3. Current intent versus long-term memory
+
+The Session Context is authoritative. A future long-term user profile is supporting
+evidence only.
+
+For example, if the profile says that the user usually likes blue, but the current
+session asks for a red wedding accessory, DeepSeek must judge red products against
+the current request. This precedence is stated in the prompt and is represented in
+the request contract. The long-term-memory schema itself is intentionally not frozen
+yet; ranking accepts a generic versioned JSON envelope.
+
+## 4. What DeepSeek outputs
+
+DeepSeek is forced to call one native tool named
+`submit_candidate_judgements`. It must return exactly one judgement for every input
+candidate:
+
+```json
+{
+  "candidate_id": "B07...",
+  "fit_score": 82,
+  "verdict": "strong_match",
+  "matched_preference_ids": ["p_1_1_0"],
+  "unsupported_preference_ids": ["p_1_1_1"],
+  "conflict_preference_ids": [],
+  "concerns": ["Size is not stated."],
+  "reason": "The product matches the requested use case and color."
+}
+```
+
+The score bands are fixed:
+
+- `75-100`: `strong_match`;
+- `40-74`: `possible_match`;
+- `0-39`: `weak_match`.
+
+Missing evidence is `unsupported`, not a conflict. An explicit incompatible value is
+a conflict: size 13 conflicts with a current size 10 preference. Hard current-session
+preferences matter more than soft ones.
+
+DeepSeek judges individual fit only. It does not choose the final set and does not
+reward diversity.
+
+## 5. Why BGE still keeps 20 percent
+
+The final individual quality score is:
 
 ```text
-RRF Top-80 → BGE relevance → T-aware DPP → Top-10
+quality = 0.8 * DeepSeek_fit + 0.2 * BGE_relevance
 ```
 
-但代码里的正式 controller 还没有切换。工程接线前还需要定义 BGE 超时或本地模型不可用时，怎样自动
-退回当前的 `RRF → MMR`，避免演示链路被模型加载问题直接打断。
+DeepSeek supplies evidence-aware reasoning and understands the complete Session
+Context. BGE supplies a stable local relevance anchor. The 80/20 split makes DeepSeek
+decisive without making one model response the only numerical signal.
 
-详细数字、置信区间和失败案例见
-[`ranking-strategy-evaluation-v0.md`](../design/retrieve/ranking-strategy-evaluation-v0.md)。
+This is a hackathon policy value, not a learned optimum.
+
+## 6. How failures behave
+
+The local decoder checks that every candidate appears exactly once, preference IDs
+are real, judgement groups are disjoint, and score bands agree with verdicts.
+
+If the tool arguments fail those checks, the system retries once with a focused repair
+instruction. If the second call fails, times out, is rate-limited, or is unavailable,
+ranking falls back to BGE. Retrieval and the demo do not stop.
+
+One real focused test produced an `invalid_judgements` response. After the repair
+instruction explicitly restated the candidate, score-band, and disjoint-group rules,
+the second call returned all 29 judgements successfully. This is why repair exists,
+rather than silently trusting malformed JSON.
+
+## 7. Where T_t acts
+
+`T_t` does not change DeepSeek's opinion of one product. A black waterproof boot does
+not become individually worse merely because the user is browsing broadly.
+
+After quality ranking, DPP looks at the set of products together. Its relevance weight
+is continuous:
+
+```text
+relevance_weight = 0.30 + 0.60 * T_t
+```
+
+- low `T_t`: stronger product-to-product repulsion, so the Top-10 explores;
+- high `T_t`: stronger quality weight, so the Top-10 focuses;
+- a user diversity directive may move this weight by 0.10.
+
+This separation is the main story: DeepSeek answers "is this product good for the
+current intent?" while `T_t` answers "what should this group of ten look like?"
+
+## 8. Real 50k smoke result
+
+The implementation was run against the real catalog, not a fabricated unit fixture.
+
+- Broad Hokkaido request: 300 candidates, 48 DeepSeek cards, 35 strong / 9 possible /
+  4 weak judgements in one tool call. The quality Top-10 included snow boots, gloves,
+  ski pants, and a down jacket.
+- Red lightweight wedding accessory: one strong, 39 possible, and eight weak. The
+  top product was a red wedding fascinator. A deliberately conflicting profile that
+  preferred blue did not override the current red request.
+- Focused men's black waterproof insulated snow boots: hard mask left 29 products.
+  Six were possible and 23 weak, largely because exact size evidence was absent or
+  incompatible.
+
+Accepted model calls used roughly 14k-20k reported tokens. First-pass calls took
+23-28 seconds; the focused case took 46 seconds including its repair call. BGE took
+about 0.7-5.3 seconds after model initialization. These are development-machine smoke
+numbers, not a latency SLA.
+
+Replaying the accepted quality scores through final DPP produced the expected graded
+response. At `T=0.10`, mean Top-10 pair cosine fell from `0.7842` to `0.7452` and four
+products changed. At `T=0.55`, cosine fell only from `0.7298` to `0.7160` and one
+product changed. At `T=0.90`, the focused boot Top-10 was unchanged.
+
+## 9. Current boundary
+
+Implemented now:
+
+- direction-protected BGE shortlist;
+- optional long-term-profile input with Session Context precedence;
+- forced DeepSeek native tool call and exact batch decoder;
+- one repair attempt and BGE fallback;
+- 80/20 individual quality fusion;
+- separate T-aware DPP finalizer;
+- complete request, judgement, token, and timing logs.
+
+Still intentionally separate from this module:
+
+- the final long-term-memory schema and update policy;
+- answer generation and product explanations shown to the user;
+- complete DeepSeek-generated product fact cards for catalog rows not yet processed;
+- the dedicated toy-simulator scoring branch.
+
+The normative design is in
+[`deepseek-ranking-contract-v1.md`](../design/retrieve/deepseek-ranking-contract-v1.md).

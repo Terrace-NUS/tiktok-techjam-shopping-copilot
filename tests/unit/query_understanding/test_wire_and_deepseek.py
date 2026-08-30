@@ -25,6 +25,7 @@ from shopping_copilot.query_understanding.models import (
     ShownProductView,
     UnderstandingDisposition,
 )
+from shopping_copilot.query_understanding.prompt import PROMPT_VERSION, SYSTEM_PROMPT
 from shopping_copilot.query_understanding.wire import (
     TOOL_NAME,
     decode_reconciled_intent,
@@ -249,6 +250,28 @@ def test_tool_schema_is_closed_complete_and_strict_flag_is_explicit() -> None:
     preference_groups = cast(dict[str, object], properties["new_preferences"])
     group_properties = cast(dict[str, object], preference_groups["properties"])
     assert set(group_properties) == {"structured", "price", "semantic"}
+
+
+def test_v1_4_prompt_and_native_schema_expose_fact_extraction_policy() -> None:
+    assert PROMPT_VERSION == "query_understanding_v1_4"
+    assert "nose won't get red and irritated" in SYSTEM_PROMPT
+    assert "95% gossypium, 5% spandex" in SYSTEM_PROMPT
+    assert "For that, what matters is: ..." in SYSTEM_PROMPT
+    assert "Boots Rain" in SYSTEM_PROMPT
+
+    tool = reconcile_session_intent_tool(strict=False)
+    function = cast(dict[str, object], tool["function"])
+    parameters = cast(dict[str, object], function["parameters"])
+    root_properties = cast(dict[str, object], parameters["properties"])
+    groups = cast(dict[str, object], root_properties["new_preferences"])
+    group_properties = cast(dict[str, object], groups["properties"])
+    structured = cast(dict[str, object], group_properties["structured"])
+    item = cast(dict[str, object], structured["items"])
+    item_properties = cast(dict[str, object], item["properties"])
+
+    assert "lexical anchors" in cast(dict[str, object], item_properties["values"])["description"]
+    assert "wearer reaction" in cast(dict[str, object], item_properties["facet"])["description"]
+    assert "non-negotiable" in cast(dict[str, object], item_properties["strength"])["description"]
 
 
 def test_decoder_builds_the_complete_typed_frame() -> None:

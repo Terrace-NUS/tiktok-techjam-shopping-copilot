@@ -345,6 +345,38 @@ price value。
 非价格数值范围是一个特例：DeepSeek 可以在 `structured` 中写 `case_size/le/["40 mm"]`，本地会把
 完整 meaning 保存成 semantic-only。这样既不会假装 catalog 有可信的表盘尺寸列，也不会丢掉用户要求。
 
+### 6.1 自然描述也能抽成 facet，但要先看句子在说谁
+
+QU 不要求用户必须说成 `material: cotton`。普通描述同样可以一次抽出多个事实：
+
+```text
+“100% Cotton cups. Colors: White and Black.”
+→ material = 100% Cotton
+→ color IN [White, Black]
+```
+
+但不能只搜关键词：
+
+```text
+“nose won't get red and irritated”
+→ 希望产品不引起红肿
+→ 不是 color = red
+```
+
+系统把两个东西分开保存：
+
+- `meaning`：整理后的完整意思；
+- `values/evidence`：尽量保留用户原话，供 catalog evidence 匹配。
+
+因此 `95% gossypium, 5% spandex` 不会被随手改成 `cotton blend`，`Heel measures approximately
+1.57 inches` 也不会变成 catalog 中从未出现的 `heel height ~1.57 inches`。gender 是封闭枚举，
+所以 men's/women's 会规范成 `men/women`，原文仍保存在 evidence。
+
+另外，“用户亲口说了”不等于“不可妥协”：
+
+- `must`、`key requirement`、明确价格上限、`不要/avoid` 等才是 hard；
+- 普通商品描述、候选属性摘录、`what matters is ...` 默认 soft。
+
 ## 7. Decoder：先检查 DeepSeek 填的表格
 
 API 返回以后，decoder 首先做格式检查。它会确认：
@@ -479,34 +511,25 @@ ResolvedTurnIntent
 
 ## 11. 当前测试结果说明什么
 
-DeepSeek V4 Flash smoke 结果：
+DeepSeek V4 Flash v1.4 结果：
 
 | 指标 | 结果 |
 | --- | ---: |
-| contract + materialization + Gateway | 36 / 36 |
-| natural smoke turns contract | 20 / 20 |
-| simulator smoke turns compatibility | 16 / 16 |
-| critical semantic assertions | 59 / 60 |
-| repair triggered | 2 / 36 |
-| repair exhausted | 0 |
+| description 专项 tool call | 11 / 11 |
+| description 专项语义断言 | 25 / 25 |
+| v1.3 历史失败集 tool call | 24 / 24 |
+| v1.3 历史关键语义断言 | 49 / 49 |
+| 上述两组 repair | 0 |
+| 原 hard-mask 失败任务恢复 | 5 / 7 |
 
-这些数字表示：
+专项语料覆盖 description 多事实、否定范围、词法锚点、类别去重和 hard/soft。另有一次 20 轮自然
+语言 smoke：20/20 通过协议，第一次为 58/60 断言；补上 gender 封闭值后，对两个失败对话原样复测为
+18/18。完整 artifact 和解释见
+[v1.4 fact extraction results](../design/query_understanding/v1-4-fact-extraction-results.md)。
 
-- 一共实测了 36 个 turn；
-- 20 个来自我们自己编写的自然语言对话；
-- 16 个来自官方 simulator 风格对话；
-- 36 个输出都通过了协议、materializer 和 Gateway；
-- 其中有 2 个第一次输出不合格，但一次 repair 后成功；
-- 没有 case 连续两次失败。
-
-这不是两套 full suite 的全部 live replay。完整固定语料分别是 40/72 和 32/128；这里运行的是
-12 个 natural smoke conversations 的 20 个 turns，加上 4 个 simulator smoke conversations
-的 16 个 turns。该次配置为 `strict_tools=false`。
-
-59/60 中唯一不同的是：`waterproof` 被 DeepSeek 保留为 hard semantic，而不是 structured
-`feature=waterproof`。
-
-用户的防水要求没有丢失。差别只是下游应该把它当成 structured filter，还是强语义检索条件。
+原先 7 个“目标被 hard mask 删除”的任务强制走满 5 轮后，5 个最终状态已经没有错误 hard
+constraints；剩余两个都是首轮明确 `key requirement=fabric/cotton`，而对应事实只出现在商品
+description。它们不再属于 QU 问题，下一步需要商品侧 description fact sidecar。
 
 ## 12. 当前已经完成什么，还缺什么
 
@@ -521,21 +544,12 @@ DeepSeek V4 Flash smoke 结果：
 - Query Compiler；
 - Retrieval Evidence Index 与 hard-mask resolver；
 - 固定 Dense Probe 入口；
-- 对应的离线测试和 DeepSeek smoke 测试。
+- Intent Volume、正式多路召回和实验 simulator adapter；
+- 对应的离线测试和 DeepSeek live 回归。
 
-目前仍然没有形成正式 production loop：
-
-- `starter.Agent.respond()` 还没有调用 QU；
-- production 多路检索、回答、TurnRecord 和 commit 还没有完整串起来。
-
-`CompiledQuery.hard_constraints` 现在已经会解析成真正的 bound eligible mask，并和固定 Probe
-共用。下一阶段不是继续扩大 QU，而是把：
-
-```text
-C_t + q_lex/q_sem + ranking_preferences + eligible_mask
-```
-
-接入正式多路召回、融合、排序和官方 adapter。
+实验 runner 已经跑通 QU → Session Context → $T_t$ → 多路召回 → 排序 → simulator 日志。接下来
+仍缺的是商品 description 的 LLM 结构化 sidecar、最终 production 入口，以及之后再讨论的 runtime
+分支选择。
 
 ## 延伸阅读
 

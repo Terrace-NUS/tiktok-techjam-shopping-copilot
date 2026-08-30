@@ -3,7 +3,7 @@
 - 状态：**P0 核心已实现**
 - 日期：**2026-08-28**
 - 模型目标：**DeepSeek V4 Flash**
-- Tool protocol：**`query_understanding_v1_3`，typed wire，扩大自然语言回归已补强**
+- Tool protocol：**`query_understanding_v1_4`，typed wire，description fact extraction 已补强**
 - 上游：**Session Context v1 + Catalog Semantic release v0**
 - 下游：**Query Compiler → fixed Probe → $C_t$ → Retrieval**
 
@@ -108,6 +108,25 @@ class FacetAuthority(str, Enum):
 并保存成 `facet=None` 的 semantic-only Preference，同时记录 fallback facet 供演示 trace 使用。
 
 未知 facet 的 `dont-care` 无法形成稳定 marker，因此要求模型修复；它不能偷偷进入 structured 状态。
+
+### 3.4 description fact 与词法锚点
+
+QU 可以从自然描述中抽取多个结构化商品事实，不要求输入必须写成 `facet: value`。抽取前必须判断
+事实的主语和否定范围：商品或商品部件的属性可以进入 facet；佩戴者反应、包装文字、保养说明和比较
+对象中的词不能冒充商品属性。因此 `nose won't get red` 不是 `color=red`，而 `must not contain wool`
+才是 `material/not_in/wool`。
+
+`meaning` 保存标准化完整含义，`values` 与 `evidence` 则承担后续 catalog evidence 的词法锚点：
+
+- `evidence` 优先保存 latest utterance 中的连续原文；
+- 开放文本值保留原始措辞，不把 `95% gossypium, 5% spandex` 改成 `cotton blend`；
+- `Heel measures approximately 1.57 inches` 不改写成新的 `heel height` 标签；
+- gender 等协议封闭枚举例外地规范成 `men/women`，原始写法仍留在 evidence；
+- 同一段 description 中的 material、color、feature 等独立事实应逐项抽取。
+
+`basis=explicit` 只说明信息由用户亲口给出，不自动表示 `strength=hard`。`must/required/key
+requirement/only/exactly/absolutely`、明确价格边界以及 `no/not/avoid` 排除可设为 hard；普通愿望、
+商品属性摘录和 `For that, what matters is: ...` 默认为 soft。
 
 ## 4. 模型输入
 
@@ -393,17 +412,16 @@ DeepSeek adapter 不持有 store 或 transaction；Session Context 和 Gateway �
 - Catalog Semantic runtime artifact 仍只有 price 与 reserved category。
 - 40 组 / 72 轮人工自然语言语义回归；
 - 32 组 / 128 轮由官方 toy simulator 确定性生成的兼容性回归；
-- opt-in DeepSeek V4 Flash live smoke。固定结果和解释见
-  [`prompt-evaluation-v0.md`](prompt-evaluation-v0.md)。
+- 10 组 / 11 轮 description fact 专项回归；
+- opt-in DeepSeek V4 Flash live 回归。v1.4 专项结果为 11/11 tool call、25/25 语义断言；
+  v1.3 历史失败集为 24/24 tool call、49/49 语义断言，均为 0 repair。详见
+  [`v1-4-fact-extraction-results.md`](v1-4-fact-extraction-results.md)。
 
 普通测试不需要 API key，也不会联网。
 
-下面这些属于下一阶段，不假装已经完成：
-
-- Query Compiler 与 Retrieval Evidence Index；
-- fixed Probe、$C_t$ 计算和可视化 trace；
-- 将独立 `session_facet_policy_id` 写入持久化 envelope。当前 policy 由代码版本固定；hackathon P0
-  暂不扩大 snapshot schema。
+Query Compiler、Retrieval Evidence Index、Intent Volume 和正式多路召回均已有实验实现。仍未包含的
+关键项是：用与 QU 同一 facet 语言从完整商品 description 离线生成结构化事实 sidecar，以及最终
+production/runtime router。原始 catalog 与 Catalog Semantic release 不会被覆写。
 
 ## 12. 参考
 

@@ -1,4 +1,4 @@
-"""Small synchronous adapter for DeepSeek native Chat Completions tool calls."""
+"""Synchronous DeepSeek native-tool adapter for candidate judgement."""
 
 from __future__ import annotations
 
@@ -6,26 +6,27 @@ import json
 from dataclasses import dataclass
 from typing import cast
 
-from shopping_copilot.providers import (
-    DeepSeekTransport,
-    UrllibDeepSeekTransport,
-)
+from shopping_copilot.providers import DeepSeekTransport, UrllibDeepSeekTransport
 from shopping_copilot.providers import HttpResponse as HttpResponse
 
-from .errors import QueryUnderstandingError, QueryUnderstandingErrorCode
-from .models import ProviderResult, ProviderTrace, ReconcileRequest
+from .errors import DeepSeekRankingError, DeepSeekRankingErrorCode
+from .models import (
+    DeepSeekJudgementResult,
+    DeepSeekRankingRequest,
+    DeepSeekRankingTrace,
+)
 from .prompt import build_messages
-from .wire import TOOL_NAME, decode_reconciled_intent, reconcile_session_intent_tool
+from .wire import TOOL_NAME, candidate_judgement_tool, decode_candidate_judgements
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class DeepSeekConfig:
-    """Explicit V4 Flash request settings; no hidden environment lookup."""
+class DeepSeekRankingConfig:
+    """Explicit request settings for one complete candidate batch."""
 
     model: str = "deepseek-v4-flash"
     base_url: str = "https://api.deepseek.com"
-    timeout_seconds: float = 30.0
-    max_tokens: int = 2048
+    timeout_seconds: float = 90.0
+    max_tokens: int = 8192
     temperature: float = 0.0
     strict_tools: bool = False
     disable_thinking: bool = True
@@ -45,8 +46,8 @@ class DeepSeekConfig:
             raise TypeError("DeepSeek boolean settings must be bool values")
 
 
-class DeepSeekProvider:
-    """Translate one model-safe request into exactly one reconciled intent frame."""
+class DeepSeekRankingProvider:
+    """Ask DeepSeek for one exact judgement per shortlisted product."""
 
     __slots__ = ("_api_key", "_config", "_transport")
 
@@ -54,34 +55,36 @@ class DeepSeekProvider:
         self,
         *,
         api_key: str | None,
-        config: DeepSeekConfig | None = None,
+        config: DeepSeekRankingConfig | None = None,
         transport: DeepSeekTransport | None = None,
     ) -> None:
         if api_key is not None and type(api_key) is not str:
             raise TypeError("DeepSeek API key must be a string or None")
         self._api_key = api_key
-        self._config = config or DeepSeekConfig()
+        self._config = config or DeepSeekRankingConfig()
         self._transport = transport or UrllibDeepSeekTransport()
 
-    def reconcile(
+    def judge(
         self,
-        request: ReconcileRequest,
+        request: DeepSeekRankingRequest,
         *,
         repair_instruction: str | None = None,
-    ) -> ProviderResult:
-        """Call Chat Completions with a forced native function invocation."""
+    ) -> DeepSeekJudgementResult:
+        """Call Chat Completions with one forced native function invocation."""
 
+        if type(request) is not DeepSeekRankingRequest:
+            raise TypeError("request must be an exact DeepSeekRankingRequest")
         if not self._api_key or not self._api_key.strip():
-            raise QueryUnderstandingError(
-                code=QueryUnderstandingErrorCode.MISSING_API_KEY,
-            )
+            raise DeepSeekRankingError(DeepSeekRankingErrorCode.MISSING_API_KEY)
         payload: dict[str, object] = {
             "model": self._config.model,
-            "messages": list(build_messages(request, repair_instruction=repair_instruction)),
+            "messages": list(
+                build_messages(request, repair_instruction=repair_instruction)
+            ),
             "stream": False,
             "temperature": self._config.temperature,
             "max_tokens": self._config.max_tokens,
-            "tools": [reconcile_session_intent_tool(strict=self._config.strict_tools)],
+            "tools": [candidate_judgement_tool(strict=self._config.strict_tools)],
             "tool_choice": {
                 "type": "function",
                 "function": {"name": TOOL_NAME},
@@ -94,7 +97,7 @@ class DeepSeekProvider:
             ensure_ascii=False,
             allow_nan=False,
             separators=(",", ":"),
-        ).encode("utf-8")
+        ).encode()
         try:
             response = self._transport.post_json(
                 url=self._endpoint(),
@@ -107,18 +110,18 @@ class DeepSeekProvider:
                 timeout_seconds=float(self._config.timeout_seconds),
             )
         except TimeoutError as error:
-            raise QueryUnderstandingError(
-                code=QueryUnderstandingErrorCode.PROVIDER_TIMEOUT,
+            raise DeepSeekRankingError(
+                DeepSeekRankingErrorCode.PROVIDER_TIMEOUT
             ) from error
         except OSError as error:
-            raise QueryUnderstandingError(
-                code=QueryUnderstandingErrorCode.PROVIDER_UNAVAILABLE,
+            raise DeepSeekRankingError(
+                DeepSeekRankingErrorCode.PROVIDER_UNAVAILABLE
             ) from error
         self._raise_for_status(response.status)
         decoded = _decode_response_json(response.body)
         arguments, trace = _extract_tool_call(decoded)
-        return ProviderResult(
-            frame=decode_reconciled_intent(arguments),
+        return DeepSeekJudgementResult(
+            judgements=decode_candidate_judgements(arguments, request),
             trace=trace,
         )
 
@@ -133,66 +136,69 @@ class DeepSeekProvider:
         if status == 200:
             return
         if status in (401, 403):
-            code = QueryUnderstandingErrorCode.PROVIDER_AUTH
+            code = DeepSeekRankingErrorCode.PROVIDER_AUTH
         elif status == 429:
-            code = QueryUnderstandingErrorCode.PROVIDER_RATE_LIMIT
+            code = DeepSeekRankingErrorCode.PROVIDER_RATE_LIMIT
         elif status >= 500:
-            code = QueryUnderstandingErrorCode.PROVIDER_UNAVAILABLE
+            code = DeepSeekRankingErrorCode.PROVIDER_UNAVAILABLE
         else:
-            code = QueryUnderstandingErrorCode.INVALID_PROVIDER_RESPONSE
-        raise QueryUnderstandingError(code=code, details=(("status", status),))
+            code = DeepSeekRankingErrorCode.INVALID_PROVIDER_RESPONSE
+        raise DeepSeekRankingError(code, f"HTTP status {status}")
 
 
 def _decode_response_json(body: bytes) -> dict[str, object]:
     try:
         decoded = json.loads(
-            body.decode("utf-8"),
+            body.decode(),
             object_pairs_hook=_unique_object,
             parse_constant=_reject_json_constant,
         )
     except (UnicodeDecodeError, ValueError, json.JSONDecodeError) as error:
-        raise QueryUnderstandingError(
-            code=QueryUnderstandingErrorCode.INVALID_PROVIDER_RESPONSE,
+        raise DeepSeekRankingError(
+            DeepSeekRankingErrorCode.INVALID_PROVIDER_RESPONSE
         ) from error
     if type(decoded) is not dict:
-        raise QueryUnderstandingError(
-            code=QueryUnderstandingErrorCode.INVALID_PROVIDER_RESPONSE,
+        raise DeepSeekRankingError(
+            DeepSeekRankingErrorCode.INVALID_PROVIDER_RESPONSE
         )
     return cast(dict[str, object], decoded)
 
 
-def _extract_tool_call(response: dict[str, object]) -> tuple[str, ProviderTrace]:
+def _extract_tool_call(
+    response: dict[str, object],
+) -> tuple[str, DeepSeekRankingTrace]:
     choices = response.get("choices")
     if type(choices) is not list or len(choices) != 1 or type(choices[0]) is not dict:
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
+        raise DeepSeekRankingError(DeepSeekRankingErrorCode.INVALID_TOOL_CALL)
     choice = cast(dict[str, object], choices[0])
     message = choice.get("message")
     if type(message) is not dict:
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
+        raise DeepSeekRankingError(DeepSeekRankingErrorCode.INVALID_TOOL_CALL)
     calls = cast(dict[str, object], message).get("tool_calls")
     if type(calls) is not list or len(calls) != 1 or type(calls[0]) is not dict:
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
+        raise DeepSeekRankingError(DeepSeekRankingErrorCode.INVALID_TOOL_CALL)
     function = cast(dict[str, object], calls[0]).get("function")
     if type(function) is not dict:
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
+        raise DeepSeekRankingError(DeepSeekRankingErrorCode.INVALID_TOOL_CALL)
     function_object = cast(dict[str, object], function)
     if (
         function_object.get("name") != TOOL_NAME
         or type(function_object.get("arguments")) is not str
     ):
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
-    trace = _provider_trace(response)
-    return cast(str, function_object["arguments"]), trace
+        raise DeepSeekRankingError(DeepSeekRankingErrorCode.INVALID_TOOL_CALL)
+    return cast(str, function_object["arguments"]), _provider_trace(response)
 
 
-def _provider_trace(response: dict[str, object]) -> ProviderTrace:
+def _provider_trace(response: dict[str, object]) -> DeepSeekRankingTrace:
     usage = response.get("usage")
     usage_object = cast(dict[str, object], usage) if type(usage) is dict else {}
-    return ProviderTrace(
+    return DeepSeekRankingTrace(
         response_id=_optional_string(response.get("id")),
         model=_optional_string(response.get("model")),
         prompt_tokens=_optional_nonnegative_int(usage_object.get("prompt_tokens")),
-        completion_tokens=_optional_nonnegative_int(usage_object.get("completion_tokens")),
+        completion_tokens=_optional_nonnegative_int(
+            usage_object.get("completion_tokens")
+        ),
         total_tokens=_optional_nonnegative_int(usage_object.get("total_tokens")),
     )
 

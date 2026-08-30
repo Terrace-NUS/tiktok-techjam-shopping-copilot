@@ -385,22 +385,57 @@ def _parameters_schema() -> dict[str, object]:
         "strength": {
             "type": "string",
             "enum": [item.value for item in PreferenceStrength],
+            "description": (
+                "Use hard only for explicit non-negotiable wording or explicit exclusions; "
+                "ordinary stated or quoted product facts are soft."
+            ),
         },
-        "basis": {"type": "string", "enum": [item.value for item in PreferenceBasis]},
-        "meaning": {"type": "string"},
-        "evidence": {"type": "string"},
-        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "basis": {
+            "type": "string",
+            "enum": [item.value for item in PreferenceBasis],
+            "description": "Whether the user stated the fact or the model inferred it.",
+        },
+        "meaning": {
+            "type": "string",
+            "description": "Complete normalized meaning of this one preference.",
+        },
+        "evidence": {
+            "type": "string",
+            "description": (
+                "Prefer a short contiguous verbatim span from the latest user utterance."
+            ),
+        },
+        "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Confidence in the interpretation, not preference strength.",
+        },
     }
     structured_preference = {
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "facet": {"type": "string"},
+            "facet": {
+                "type": "string",
+                "description": (
+                    "Named attribute of the requested product or one of its components, not "
+                    "a wearer reaction, packaging mention, or unrelated comparison."
+                ),
+            },
             "relation": {
                 "type": "string",
                 "enum": [item.value for item in _STRUCTURED_RELATIONS],
             },
-            "values": string_array,
+            "values": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": (
+                    "Minimal catalog-verifiable lexical anchors from the utterance; do not "
+                    "paraphrase or replace them with synonyms, except protocol-defined closed "
+                    "values such as gender men/women."
+                ),
+            },
             **preference_metadata,
         },
         "required": [

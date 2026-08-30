@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+
 import pytest
 
 from shopping_copilot.retrieval.documents import ProductDocument
@@ -130,3 +132,13 @@ def test_invalid_documents_and_eligibility_fail_closed() -> None:
         probe.observe("red", eligible_parent_asins={"B"})
     with pytest.raises(TypeError, match="iterable"):
         probe.observe("red", eligible_parent_asins="A")
+
+
+def test_probe_can_be_used_sequentially_by_a_worker_thread() -> None:
+    probe = LexicalProbe((_document("A", title="red"),))
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        observed = executor.submit(probe.observe, "red").result()
+
+    assert observed.available is True
+    assert [hit.parent_asin for hit in observed.hits] == ["A"]

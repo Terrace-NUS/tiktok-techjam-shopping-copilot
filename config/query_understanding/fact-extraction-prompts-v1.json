@@ -1,0 +1,222 @@
+{
+  "schema": "shopping-copilot/query-understanding-natural-suite/v0",
+  "suite_id": "fact-extraction-prompts-v1",
+  "language": "English catalog-like descriptions embedded in shopping dialogue",
+  "authorship": "Hand-authored from failure shapes observed in target-blind toy-simulator runs; no target identifiers or hidden state are included.",
+  "oracle_policy": "Assertions check subject and negation scope, structured-fact extraction, lexical-anchor preservation, category non-duplication, and explicitly marked hard versus soft strength.",
+  "conversations": [
+    {
+      "id": "fx01_negative_body_outcome_not_color",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": ["negation_scope", "subject_scope", "description"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need hypoallergenic nose studs so my nose won't get red and irritated.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "nose"},
+            {"kind": "facet_absent", "facet": "color"},
+            {"kind": "preference", "facet": "feature", "relation": "include", "values": [], "strength": null, "text_contains": "hypoallergenic"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx02_description_material_and_colors",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "apparel",
+      "tags": ["description", "multi_facet", "soft_fact"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm considering a wire-free bra. The description says: 100% Cotton cups are trimmed in satin. Colors: White and Black.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "bra"},
+            {"kind": "preference", "facet": "material", "relation": "include", "values": [], "strength": "soft", "text_contains": "cotton"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["white", "black"], "strength": "soft", "text_contains": null}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx03_preserve_material_composition_anchor",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "apparel",
+      "tags": ["description", "lexical_anchor", "material"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm considering a bodysuit. Stretchy fabric: 95% gossypium, 5% spandex.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "bodysuit"},
+            {"kind": "preference", "facet": "material", "relation": "include", "values": [], "strength": "soft", "text_contains": "gossypium"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx04_preserve_measurement_anchor",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "footwear",
+      "tags": ["description", "lexical_anchor", "measurement"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm considering slides. Heel measures approximately 1.57 inches.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "slides"},
+            {"kind": "preference", "facet": "feature", "relation": "include", "values": [], "strength": "soft", "text_contains": "measures approximately 1.57 inches"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx05_category_phrase_not_feature",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "footwear",
+      "tags": ["category", "no_duplicate_facet"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm looking for Boots Rain.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "boot"},
+            {"kind": "preference", "facet": "category", "relation": "include", "values": ["General footwear"], "strength": null, "text_contains": null},
+            {"kind": "facet_absent", "facet": "feature"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx06_explicit_must_remains_hard",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "footwear",
+      "tags": ["explicit_hard", "material"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need sandals, and the straps must be fabric.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "sandals"},
+            {"kind": "preference", "facet": "material", "relation": "include", "values": ["fabric"], "strength": "hard", "text_contains": null}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx07_description_disclosure_defaults_soft",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "footwear",
+      "tags": ["multi_turn", "description", "soft_fact", "lexical_anchor"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm looking for sandals and slides, but I'm still exploring.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "sandals"}
+          ]
+        },
+        {
+          "user_message": "For that, what matters is: Ethylene Vinyl Acetate sole; Heel measures approximately 1.57 inches.",
+          "last_assistant_message": "What else matters for the sandals?",
+          "last_question": "What other product details matter?",
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "preference", "facet": "material", "relation": "include", "values": [], "strength": "soft", "text_contains": "Ethylene Vinyl Acetate"},
+            {"kind": "preference", "facet": "feature", "relation": "include", "values": [], "strength": "soft", "text_contains": "Heel measures approximately 1.57 inches"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx08_explicit_exclusion_remains_hard",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "apparel",
+      "tags": ["negation_scope", "explicit_hard", "material"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need a sweater with no wool. The word wool may appear in the care note, but the product itself must not contain it.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "sweater"},
+            {"kind": "preference", "facet": "material", "relation": "exclude", "values": ["wool"], "strength": "hard", "text_contains": null}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx09_explicit_color_still_counts",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "jewelry",
+      "tags": ["color", "positive_fact"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I want red nose studs.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "nose"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["red"], "strength": null, "text_contains": null}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fx10_component_scope_and_use_case",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "footwear",
+      "tags": ["description", "component_scope", "use_case"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I'm considering winter slippers. They have a down-fabric upper and an anti-slip EVA rubber sole for indoor and outdoor use.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "slippers"},
+            {"kind": "preference", "facet": "material", "relation": "include", "values": [], "strength": "soft", "text_contains": "down-fabric"},
+            {"kind": "preference", "facet": "use_case", "relation": "include", "values": [], "strength": "soft", "text_contains": "indoor and outdoor"}
+          ]
+        }
+      ]
+    }
+  ]
+}

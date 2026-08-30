@@ -223,6 +223,8 @@ def main() -> int:
                     }
                     for route in full.routes
                 ],
+                "recall_trace": _recall_trace_log(full.recall_trace, metadata),
+                "retrieval_timings_ms": asdict(full.timings),
                 "variants": variants,
             }
         )
@@ -235,7 +237,10 @@ def main() -> int:
             "behavior and does not claim to re-estimate T."
         ),
         "algorithm": {
-            "flow": "hard mask -> route Top-80 -> RRF Top-80 -> T-aware vector MMR Top-10",
+            "flow": (
+                "hard mask -> full dense score -> T-aware multi-center/lexical/facet "
+                "candidate pool -> RRF -> existing T-aware vector MMR Top-10"
+            ),
             "route_k": policy.route_k,
             "fusion_k": policy.fusion_k,
             "final_k": policy.final_k,
@@ -427,6 +432,27 @@ def _query_log(query: CompiledQuery) -> dict[str, object]:
         "ranking_preferences": [asdict(item) for item in query.ranking_preferences],
         "directives": asdict(query.directives),
     }
+
+
+def _recall_trace_log(trace: object, metadata: dict[str, dict[str, object]]) -> object:
+    if trace is None:
+        return None
+    payload = asdict(trace)
+    payload["directions"] = [
+        {
+            **item,
+            "title": metadata[item["center_parent_asin"]]["title"],
+            "reporting_group": metadata[item["center_parent_asin"]]["reporting_group"],
+            "leaf_category": metadata[item["center_parent_asin"]]["leaf_category"],
+        }
+        for item in payload["directions"]
+    ]
+    direction_counts: dict[str, int] = {}
+    for candidate in payload["dense_candidates"]:
+        direction_id = str(candidate["direction_id"])
+        direction_counts[direction_id] = direction_counts.get(direction_id, 0) + 1
+    payload["selected_dense_count_by_direction"] = direction_counts
+    return payload
 
 
 def _load_metadata(path: Path) -> dict[str, dict[str, object]]:

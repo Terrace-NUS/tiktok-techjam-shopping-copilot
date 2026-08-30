@@ -22,6 +22,7 @@ from .modes import DEFAULT_MODE_SIMILARITY_THRESHOLD
 from .multi_probe import CompiledProbeRunner
 from .resolved_probe import ResolvedCompiledProbeRunner
 from .routing import FacetRoute
+from .transparency_recall import TransparencyRecallPolicy
 from .vector_diversity import VectorDiversityPolicy
 
 
@@ -164,6 +165,7 @@ def create_retrieval_controller(
     local_files_only: bool = True,
     policy: FormalRetrievalPolicy | None = None,
     diversity_policy: VectorDiversityPolicy | None = None,
+    transparency_recall_policy: TransparencyRecallPolicy | None = None,
 ) -> RetrievalController:
     """Compose the release-bound formal retrieval stack over one 50k catalog."""
 
@@ -174,6 +176,13 @@ def create_retrieval_controller(
         raise TypeError("policy must be an exact FormalRetrievalPolicy")
     if diversity_policy is not None and type(diversity_policy) is not VectorDiversityPolicy:
         raise TypeError("diversity_policy must be an exact VectorDiversityPolicy")
+    if (
+        transparency_recall_policy is not None
+        and type(transparency_recall_policy) is not TransparencyRecallPolicy
+    ):
+        raise TypeError(
+            "transparency_recall_policy must be an exact TransparencyRecallPolicy"
+        )
 
     release_path = Path(release_dir)
     retriever = create_dense_retriever(
@@ -208,6 +217,7 @@ def create_retrieval_controller(
         hard_mask_resolver=resolver,
         policy=resolved_policy,
         diversity_policy=diversity_policy,
+        transparency_recall_policy=transparency_recall_policy,
     )
 
 

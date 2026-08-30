@@ -46,6 +46,9 @@ INTENT_SPACE_NATURAL_SUITE = (
 EXPANDED_INTENT_SPACE_NATURAL_SUITE = (
     REPOSITORY_ROOT / "config/query_understanding/intent-space-natural-prompts-v2.json"
 )
+FACT_EXTRACTION_SUITE = (
+    REPOSITORY_ROOT / "config/query_understanding/fact-extraction-prompts-v1.json"
+)
 SIMULATOR_SUITE = REPOSITORY_ROOT / "config/query_understanding/simulator-prompts-v0.json"
 NATURAL_SHA256 = "b59580be67de6bc503092dfb58827121ddfacd43fe51ede89edee9a57b3ad902"
 INTENT_SPACE_NATURAL_SHA256 = "650dc3b67942704c8ed634299a2ea389dc24331ce74641ba2a140a3b622d9391"
@@ -448,3 +451,28 @@ def test_expanded_intent_space_suite_identity_shape_and_expectations() -> None:
         )
         == 49
     )
+
+
+def test_fact_extraction_suite_covers_the_frozen_failure_shapes() -> None:
+    suite = load_prompt_suite(FACT_EXTRACTION_SUITE)
+    tags = {tag for conversation in suite.conversations for tag in conversation.tags}
+
+    assert suite.suite_id == "fact-extraction-prompts-v1"
+    assert len(suite.conversations) == 10
+    assert sum(len(item.turns) for item in suite.conversations) == 11
+    assert (
+        sum(
+            len(turn.critical_assertions)
+            for conversation in suite.conversations
+            for turn in conversation.turns
+        )
+        == 25
+    )
+    assert {
+        "negation_scope",
+        "subject_scope",
+        "lexical_anchor",
+        "no_duplicate_facet",
+        "explicit_hard",
+        "soft_fact",
+    }.issubset(tags)

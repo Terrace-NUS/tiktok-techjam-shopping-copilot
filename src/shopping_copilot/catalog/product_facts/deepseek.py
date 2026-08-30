@@ -1,4 +1,4 @@
-"""Small synchronous adapter for DeepSeek native Chat Completions tool calls."""
+"""Synchronous DeepSeek native-tool provider for catalog product facts."""
 
 from __future__ import annotations
 
@@ -6,26 +6,20 @@ import json
 from dataclasses import dataclass
 from typing import cast
 
-from shopping_copilot.providers import (
-    DeepSeekTransport,
-    UrllibDeepSeekTransport,
-)
-from shopping_copilot.providers import HttpResponse as HttpResponse
+from shopping_copilot.providers import DeepSeekTransport, UrllibDeepSeekTransport
 
-from .errors import QueryUnderstandingError, QueryUnderstandingErrorCode
-from .models import ProviderResult, ProviderTrace, ReconcileRequest
+from .errors import ProductFactError, ProductFactErrorCode
+from .models import ProductFactRequest, ProductFactResult, ProductFactTrace
 from .prompt import build_messages
-from .wire import TOOL_NAME, decode_reconciled_intent, reconcile_session_intent_tool
+from .wire import TOOL_NAME, decode_product_fact_card, product_fact_card_tool
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class DeepSeekConfig:
-    """Explicit V4 Flash request settings; no hidden environment lookup."""
-
+class DeepSeekProductFactConfig:
     model: str = "deepseek-v4-flash"
     base_url: str = "https://api.deepseek.com"
-    timeout_seconds: float = 30.0
-    max_tokens: int = 2048
+    timeout_seconds: float = 90.0
+    max_tokens: int = 8192
     temperature: float = 0.0
     strict_tools: bool = False
     disable_thinking: bool = True
@@ -36,56 +30,43 @@ class DeepSeekConfig:
         if type(self.base_url) is not str or not self.base_url.startswith("https://"):
             raise ValueError("DeepSeek base_url must be HTTPS")
         if type(self.timeout_seconds) not in (int, float) or self.timeout_seconds <= 0:
-            raise ValueError("DeepSeek timeout_seconds must be positive")
+            raise ValueError("DeepSeek timeout must be positive")
         if type(self.max_tokens) is not int or self.max_tokens < 1:
             raise ValueError("DeepSeek max_tokens must be positive")
         if type(self.temperature) not in (int, float) or not 0 <= self.temperature <= 2:
             raise ValueError("DeepSeek temperature must be between zero and two")
-        if type(self.strict_tools) is not bool or type(self.disable_thinking) is not bool:
-            raise TypeError("DeepSeek boolean settings must be bool values")
 
 
-class DeepSeekProvider:
-    """Translate one model-safe request into exactly one reconciled intent frame."""
-
+class DeepSeekProductFactProvider:
     __slots__ = ("_api_key", "_config", "_transport")
 
     def __init__(
         self,
         *,
         api_key: str | None,
-        config: DeepSeekConfig | None = None,
+        config: DeepSeekProductFactConfig | None = None,
         transport: DeepSeekTransport | None = None,
     ) -> None:
-        if api_key is not None and type(api_key) is not str:
-            raise TypeError("DeepSeek API key must be a string or None")
         self._api_key = api_key
-        self._config = config or DeepSeekConfig()
+        self._config = config or DeepSeekProductFactConfig()
         self._transport = transport or UrllibDeepSeekTransport()
 
-    def reconcile(
+    def extract(
         self,
-        request: ReconcileRequest,
+        request: ProductFactRequest,
         *,
         repair_instruction: str | None = None,
-    ) -> ProviderResult:
-        """Call Chat Completions with a forced native function invocation."""
-
+    ) -> ProductFactResult:
         if not self._api_key or not self._api_key.strip():
-            raise QueryUnderstandingError(
-                code=QueryUnderstandingErrorCode.MISSING_API_KEY,
-            )
+            raise ProductFactError(ProductFactErrorCode.MISSING_API_KEY)
         payload: dict[str, object] = {
             "model": self._config.model,
             "messages": list(build_messages(request, repair_instruction=repair_instruction)),
             "stream": False,
             "temperature": self._config.temperature,
             "max_tokens": self._config.max_tokens,
-            "tools": [reconcile_session_intent_tool(strict=self._config.strict_tools)],
-            "tool_choice": {
-                "type": "function",
-                "function": {"name": TOOL_NAME},
-            },
+            "tools": [product_fact_card_tool(strict=self._config.strict_tools)],
+            "tool_choice": {"type": "function", "function": {"name": TOOL_NAME}},
         }
         if self._config.disable_thinking:
             payload["thinking"] = {"type": "disabled"}
@@ -107,20 +88,20 @@ class DeepSeekProvider:
                 timeout_seconds=float(self._config.timeout_seconds),
             )
         except TimeoutError as error:
-            raise QueryUnderstandingError(
-                code=QueryUnderstandingErrorCode.PROVIDER_TIMEOUT,
-            ) from error
+            raise ProductFactError(ProductFactErrorCode.PROVIDER_TIMEOUT) from error
         except OSError as error:
-            raise QueryUnderstandingError(
-                code=QueryUnderstandingErrorCode.PROVIDER_UNAVAILABLE,
-            ) from error
+            raise ProductFactError(ProductFactErrorCode.PROVIDER_UNAVAILABLE) from error
         self._raise_for_status(response.status)
-        decoded = _decode_response_json(response.body)
+        decoded = _decode_response(response.body)
         arguments, trace = _extract_tool_call(decoded)
-        return ProviderResult(
-            frame=decode_reconciled_intent(arguments),
-            trace=trace,
-        )
+        try:
+            card = decode_product_fact_card(arguments, request)
+        except (TypeError, ValueError) as error:
+            raise ProductFactError(
+                ProductFactErrorCode.INVALID_FACT_CARD,
+                str(error),
+            ) from error
+        return ProductFactResult(card=card, trace=trace)
 
     def _endpoint(self) -> str:
         base = self._config.base_url.rstrip("/")
@@ -133,75 +114,62 @@ class DeepSeekProvider:
         if status == 200:
             return
         if status in (401, 403):
-            code = QueryUnderstandingErrorCode.PROVIDER_AUTH
+            code = ProductFactErrorCode.PROVIDER_AUTH
         elif status == 429:
-            code = QueryUnderstandingErrorCode.PROVIDER_RATE_LIMIT
+            code = ProductFactErrorCode.PROVIDER_RATE_LIMIT
         elif status >= 500:
-            code = QueryUnderstandingErrorCode.PROVIDER_UNAVAILABLE
+            code = ProductFactErrorCode.PROVIDER_UNAVAILABLE
         else:
-            code = QueryUnderstandingErrorCode.INVALID_PROVIDER_RESPONSE
-        raise QueryUnderstandingError(code=code, details=(("status", status),))
+            code = ProductFactErrorCode.INVALID_PROVIDER_RESPONSE
+        raise ProductFactError(code, f"DeepSeek HTTP status {status}")
 
 
-def _decode_response_json(body: bytes) -> dict[str, object]:
+def _decode_response(body: bytes) -> dict[str, object]:
     try:
-        decoded = json.loads(
-            body.decode("utf-8"),
-            object_pairs_hook=_unique_object,
-            parse_constant=_reject_json_constant,
-        )
+        decoded: object = json.loads(body.decode("utf-8"), object_pairs_hook=_unique_object)
     except (UnicodeDecodeError, ValueError, json.JSONDecodeError) as error:
-        raise QueryUnderstandingError(
-            code=QueryUnderstandingErrorCode.INVALID_PROVIDER_RESPONSE,
-        ) from error
+        raise ProductFactError(ProductFactErrorCode.INVALID_PROVIDER_RESPONSE) from error
     if type(decoded) is not dict:
-        raise QueryUnderstandingError(
-            code=QueryUnderstandingErrorCode.INVALID_PROVIDER_RESPONSE,
-        )
+        raise ProductFactError(ProductFactErrorCode.INVALID_PROVIDER_RESPONSE)
     return cast(dict[str, object], decoded)
 
 
-def _extract_tool_call(response: dict[str, object]) -> tuple[str, ProviderTrace]:
+def _extract_tool_call(response: dict[str, object]) -> tuple[str, ProductFactTrace]:
     choices = response.get("choices")
     if type(choices) is not list or len(choices) != 1 or type(choices[0]) is not dict:
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
-    choice = cast(dict[str, object], choices[0])
-    message = choice.get("message")
+        raise ProductFactError(ProductFactErrorCode.INVALID_TOOL_CALL)
+    message = cast(dict[str, object], choices[0]).get("message")
     if type(message) is not dict:
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
+        raise ProductFactError(ProductFactErrorCode.INVALID_TOOL_CALL)
     calls = cast(dict[str, object], message).get("tool_calls")
     if type(calls) is not list or len(calls) != 1 or type(calls[0]) is not dict:
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
+        raise ProductFactError(ProductFactErrorCode.INVALID_TOOL_CALL)
     function = cast(dict[str, object], calls[0]).get("function")
     if type(function) is not dict:
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
+        raise ProductFactError(ProductFactErrorCode.INVALID_TOOL_CALL)
     function_object = cast(dict[str, object], function)
     if (
         function_object.get("name") != TOOL_NAME
         or type(function_object.get("arguments")) is not str
     ):
-        raise QueryUnderstandingError(code=QueryUnderstandingErrorCode.INVALID_TOOL_CALL)
-    trace = _provider_trace(response)
-    return cast(str, function_object["arguments"]), trace
-
-
-def _provider_trace(response: dict[str, object]) -> ProviderTrace:
+        raise ProductFactError(ProductFactErrorCode.INVALID_TOOL_CALL)
     usage = response.get("usage")
     usage_object = cast(dict[str, object], usage) if type(usage) is dict else {}
-    return ProviderTrace(
+    trace = ProductFactTrace(
         response_id=_optional_string(response.get("id")),
         model=_optional_string(response.get("model")),
-        prompt_tokens=_optional_nonnegative_int(usage_object.get("prompt_tokens")),
-        completion_tokens=_optional_nonnegative_int(usage_object.get("completion_tokens")),
-        total_tokens=_optional_nonnegative_int(usage_object.get("total_tokens")),
+        prompt_tokens=_optional_int(usage_object.get("prompt_tokens")),
+        completion_tokens=_optional_int(usage_object.get("completion_tokens")),
+        total_tokens=_optional_int(usage_object.get("total_tokens")),
     )
+    return cast(str, function_object["arguments"]), trace
 
 
 def _optional_string(value: object) -> str | None:
     return value if type(value) is str else None
 
 
-def _optional_nonnegative_int(value: object) -> int | None:
+def _optional_int(value: object) -> int | None:
     return value if type(value) is int and value >= 0 else None
 
 
@@ -209,10 +177,6 @@ def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
     result: dict[str, object] = {}
     for key, value in pairs:
         if key in result:
-            raise ValueError("duplicate JSON object key")
+            raise ValueError(f"duplicate JSON key: {key}")
         result[key] = value
     return result
-
-
-def _reject_json_constant(value: str) -> object:
-    raise ValueError(f"non-finite JSON number: {value}")

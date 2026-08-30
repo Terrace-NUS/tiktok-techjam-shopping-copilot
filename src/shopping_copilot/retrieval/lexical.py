@@ -68,7 +68,11 @@ class LexicalProbe:
         if type(probe_k) is not int or probe_k <= 0:
             raise ValueError("probe_k must be a positive integer")
         self.probe_k = probe_k
-        self._connection = sqlite3.connect(":memory:")
+        # The formal simulator runner may overlap network-bound QU across
+        # sessions. Retrieval itself remains protected by one runtime lock, so
+        # this connection is used sequentially even when the owning worker
+        # thread changes between turns.
+        self._connection = sqlite3.connect(":memory:", check_same_thread=False)
         self._connection.execute(
             "CREATE VIRTUAL TABLE products USING fts5("
             "parent_asin UNINDEXED, title, categories, features, details, store, description, "
