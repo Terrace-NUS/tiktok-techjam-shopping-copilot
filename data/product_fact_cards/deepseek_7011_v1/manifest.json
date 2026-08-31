@@ -1,0 +1,22 @@
+{
+  "schema": "shopping-copilot/product-fact-bundle/v1",
+  "bundle": "deepseek_7011_v1",
+  "scope": "partial_catalogue_sidecar",
+  "selection_policy": "resumable_generation_progress_plus_targeted_validation_products",
+  "card_count": 7011,
+  "retained_fact_count": 174155,
+  "source_catalog": "data/catalog.jsonl",
+  "source_catalog_row_count": 50000,
+  "source_catalog_sha256": "da979b05a68af864cb0dcf9ee6a81c010c7e66a57978ad286c7a2e005fc69a67",
+  "extractor_model": "deepseek-v4-flash",
+  "prompt_version": "product_fact_card_v1_1",
+  "facet_language_version": "shopping_facet_language_v1",
+  "grounding_policy": "exact_source_substring_with_source_id_revalidation",
+  "cards_with_discarded_proposals": 56,
+  "discarded_ungrounded_fact_count": 70,
+  "provider_trace_removed": true,
+  "product_fact_sidecar": "data/product_fact_cards/deepseek_7011_v1/product-facts.jsonl.gz",
+  "product_fact_sidecar_compressed_bytes": 6720055,
+  "product_fact_sidecar_sha256": "334844b6ed44fbbba4b47467887dd1511016211dcbd2182711e27a0c5ec01f83",
+  "catalogue_mutated": false
+}

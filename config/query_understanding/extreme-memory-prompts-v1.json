@@ -1,0 +1,325 @@
+{
+  "schema": "shopping-copilot/query-understanding-natural-suite/v0",
+  "suite_id": "extreme-memory-prompts-v1",
+  "language": "mixed English, Simplified Chinese, and code-switching",
+  "authorship": "Hand-authored adversarial conversations for testing native tool-call memory mutation; no catalog targets or simulator hidden state.",
+  "oracle_policy": "Assertions judge the retrieval-changing meaning of the final Session Context after each turn, not exact tool names, JSON shape, wording, confidence, or operation order.",
+  "conversations": [
+    {
+      "id": "x01_ambiguous_word_then_priority_reversal",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "footwear",
+      "tags": ["multi_turn", "correction", "withdrawal", "hard_soft", "multi_operation"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need light waterproof sneakers under $120. Black is ideal, and absolutely no boots.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "sneakers"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["120"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "waterproof"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": "soft", "text_contains": null}
+          ]
+        },
+        {
+          "user_message": "Keep waterproof and the $120 cap. But by 'light' I meant lightweight, not light-coloured; delete black entirely because colour is irrelevant. Boots are allowed after all—I only meant I don't want anything knee-high.",
+          "last_assistant_message": "I'll look for light, waterproof black sneakers under $120 and avoid boots.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "sneakers"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["120"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "waterproof"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "lightweight"},
+            {"kind": "dont_care", "facet": "color", "present": true},
+            {"kind": "facet_absent", "facet": "color"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "knee-high"}
+          ]
+        },
+        {
+          "user_message": "One last reversal: lightweight is non-negotiable, waterproofing is merely a bonus, and the $120 limit stays hard. Change nothing else.",
+          "last_assistant_message": "Colour is open; I'll keep the cap and waterproofing, prioritize lightweight designs, and avoid knee-high footwear.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "sneakers"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["120"], "strength": "hard", "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": "hard", "text_contains": "lightweight"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": "soft", "text_contains": "water"},
+            {"kind": "dont_care", "facet": "color", "present": true},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "knee-high"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x02_material_ban_becomes_scoped_semantics",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "handbags",
+      "tags": ["multi_turn", "material_scope", "semantic_refinement", "withdrawal", "hard_soft"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Find a black minimalist office tote under $200: no polyester, no fake leather, and absolutely no visible logos.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "tote"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["200"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "material", "relation": "exclude", "values": ["polyester"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": "hard", "text_contains": "logo"}
+          ]
+        },
+        {
+          "user_message": "That material ban was too crude. Polyester is fine as a recycled lining, just not as a shiny outer shell; vegan leather is also fine. Keep black, minimalist, $200, and the no-logo rule exactly as they are.",
+          "last_assistant_message": "I'll avoid polyester, fake leather, and visible logos while keeping the tote black, minimalist, and under $200.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "tote"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["200"], "strength": null, "text_contains": null},
+            {"kind": "preference_absent", "facet": "material", "relation": "exclude", "values": ["polyester"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "recycled lining"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "shiny outer"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "vegan leather"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": "hard", "text_contains": "logo"}
+          ]
+        },
+        {
+          "user_message": "Make $200 a preference rather than a ceiling. A tiny tonal logo is okay now; only loud branding is banned. Everything else stays.",
+          "last_assistant_message": "Recycled-polyester lining and vegan leather are allowed, but not a shiny polyester shell; the tote remains black, minimalist, logo-free, and under $200.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "tote"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["200"], "strength": "soft", "text_contains": null},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "loud branding"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "recycled lining"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "vegan leather"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x03_double_goal_switch_selective_carry",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "cross_domain",
+      "tags": ["multi_turn", "double_goal_switch", "selective_carry", "dont_care", "replacement"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need a black silk minimalist evening dress under $180, and no sequins.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "dress"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "material", "relation": "include", "values": ["silk"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["180"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "feature", "relation": "exclude", "values": ["sequins"], "strength": null, "text_contains": null}
+          ]
+        },
+        {
+          "user_message": "Plot twist: the dress is solved. Now I need a travel jewellery organiser. Carry over only black, minimalist, and the $180 cap; silk and sequins are irrelevant, so leave material and decoration open.",
+          "last_assistant_message": "I'll search for a black silk minimalist evening dress under $180 without sequins.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains_any", "texts": ["jewellery organiser", "jewelry organizer"]},
+            {"kind": "goal_not_contains", "text": "dress"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["180"], "strength": null, "text_contains": null},
+            {"kind": "dont_care", "facet": "material", "present": true},
+            {"kind": "facet_absent", "facet": "material"},
+            {"kind": "preference_absent", "facet": "feature", "relation": "exclude", "values": ["sequins"], "strength": null, "text_contains": null}
+          ]
+        },
+        {
+          "user_message": "Second plot twist: not an organiser—a carry-on backpack. Keep only black and minimalist, lower the hard cap to $120, and add a must-have 15-inch laptop compartment. Material still does not matter.",
+          "last_assistant_message": "I'll carry black, minimalist styling, and the $180 cap into the travel jewellery organiser search; material and decoration are open.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "backpack"},
+            {"kind": "goal_not_contains", "text": "organiser"},
+            {"kind": "goal_not_contains", "text": "organizer"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["120"], "strength": "hard", "text_contains": null},
+            {"kind": "preference_absent", "facet": "price", "relation": "upper", "values": ["180"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": "hard", "text_contains": "15-inch laptop"},
+            {"kind": "dont_care", "facet": "material", "present": true}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x04_code_switch_scope_and_goal_change",
+      "tier": "smoke",
+      "language": "zh-en",
+      "domain": "cross_domain",
+      "tags": ["multi_turn", "code_switching", "scope_correction", "goal_switch", "selective_carry"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想找双 waterproof 的 office shoes，黑色，预算 150 刀，don't show me leather，最好轻一点。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "shoes"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["150"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "waterproof"},
+            {"kind": "preference", "facet": "material", "relation": "exclude", "values": ["leather"], "strength": null, "text_contains": null}
+          ]
+        },
+        {
+          "user_message": "预算照旧，颜色随意。还有，我说的 leather 是不要真皮，vegan leather 完全可以；office 也不是 formal，是要能通勤走一整天。",
+          "last_assistant_message": "我会找黑色、轻便、防水、150 美元以内的办公鞋，并排除皮革。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "shoes"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["150"], "strength": null, "text_contains": null},
+            {"kind": "dont_care", "facet": "color", "present": true},
+            {"kind": "facet_absent", "facet": "color"},
+            {"kind": "preference_absent", "facet": "material", "relation": "exclude", "values": ["leather"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "真皮"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "vegan leather"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "通勤"}
+          ]
+        },
+        {
+          "user_message": "鞋已经买了。Same vibe, different product：换成能放 15-inch laptop 的 tote；预算提到 200，其他只保留 lightweight 和全天通勤，材质规则、防水和颜色全部清掉。",
+          "last_assistant_message": "颜色不限；我会保留 150 美元预算和轻便需求，排除真皮但允许 vegan leather，并优先适合全天通勤步行的鞋。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "tote"},
+            {"kind": "goal_not_contains", "text": "shoes"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["200"], "strength": null, "text_contains": null},
+            {"kind": "preference_absent", "facet": "price", "relation": "upper", "values": ["150"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "15-inch laptop"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "lightweight"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "通勤"},
+            {"kind": "facet_absent", "facet": "material"},
+            {"kind": "preference_absent", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "waterproof"},
+            {"kind": "facet_absent", "facet": "color"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x05_referential_edit_then_strength_flip",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "footwear",
+      "tags": ["multi_turn", "reference_resolution", "correction", "hard_soft", "multi_operation"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "For hiking boots: women's size 8, waterproof, under $160, brown preferred, and leather banned.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "hiking boots"},
+            {"kind": "preference", "facet": "gender", "relation": "include", "values": ["women"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "size", "relation": "include", "values": ["8"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["160"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["brown"], "strength": "soft", "text_contains": null},
+            {"kind": "preference", "facet": "material", "relation": "exclude", "values": ["leather"], "strength": null, "text_contains": null}
+          ]
+        },
+        {
+          "user_message": "Scratch the first and last of those; keep the middle three—wait, that's ambiguous. Explicitly: keep size 8, waterproof, and $160; remove the women's filter and the leather ban; make brown mandatory.",
+          "last_assistant_message": "I'll search for women's size 8 waterproof hiking boots under $160, prefer brown, and exclude leather.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "hiking boots"},
+            {"kind": "facet_absent", "facet": "gender"},
+            {"kind": "preference", "facet": "size", "relation": "include", "values": ["8"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "waterproof"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["160"], "strength": null, "text_contains": null},
+            {"kind": "facet_absent", "facet": "material"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["brown"], "strength": "hard", "text_contains": null}
+          ]
+        },
+        {
+          "user_message": "Now soften only the two adjectives: waterproof and brown become preferences. The number and the money—size 8 and $160—stay hard. Nothing else changes.",
+          "last_assistant_message": "Size 8, waterproofing, and the $160 limit remain; gender and material are open, and brown is required.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "hiking boots"},
+            {"kind": "preference", "facet": "size", "relation": "include", "values": ["8"], "strength": "hard", "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["160"], "strength": "hard", "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": "soft", "text_contains": "waterproof"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["brown"], "strength": "soft", "text_contains": null},
+            {"kind": "facet_absent", "facet": "gender"},
+            {"kind": "facet_absent", "facet": "material"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x06_privacy_chatter_must_not_rewrite_state",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "jewellery",
+      "tags": ["multi_turn", "irrelevant_chatter", "privacy", "state_unchanged", "withdrawal"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need silver clip-on earrings under $80, with no hearts, and they must be hypoallergenic.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "earrings"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["silver"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["80"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "clip-on"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": "hard", "text_contains": "hypoallergenic"}
+          ]
+        },
+        {
+          "user_message": "Unrelated: my flight leaves at six and my sister hates airports. Don't remember either fact. Product-wise, change absolutely nothing.",
+          "last_assistant_message": "I'll look for silver hypoallergenic clip-on earrings under $80 without hearts.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "state_unchanged"}
+          ]
+        },
+        {
+          "user_message": "Product update only: budget is open and hearts are allowed again. Keep silver, clip-on, and hypoallergenic exactly as before.",
+          "last_assistant_message": "I won't retain the travel details; the earring requirements remain unchanged.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "earrings"},
+            {"kind": "dont_care", "facet": "price", "present": true},
+            {"kind": "facet_absent", "facet": "price"},
+            {"kind": "preference_absent", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "heart"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["silver"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "clip-on"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": "hard", "text_contains": "hypoallergenic"}
+          ]
+        }
+      ]
+    }
+  ]
+}

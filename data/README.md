@@ -32,6 +32,15 @@ using this known target-pool fixture must be labeled diagnostic rather than dire
 comparable 50k retrieval scores. See
 [`public-benchmark-product-cards-v1.md`](../docs/design/catalog_semantic/public-benchmark-product-cards-v1.md).
 
+## `product_fact_cards/deepseek_7011_v1/`
+
+Contains 7,011 source-grounded product fact cards extracted with DeepSeek V4 Flash.
+The cards are a partial-catalogue sidecar: they add model-derived retrieval evidence
+without modifying `catalog.jsonl`. The runtime loader reads the compressed JSONL
+directly and revalidates every retained fact against the immutable source row.
+
+See the bundle manifest and README in that directory for provenance and scope.
+
 After validating the profile, generate the deterministic category graph review
 packet with:
 

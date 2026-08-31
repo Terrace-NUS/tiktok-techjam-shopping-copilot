@@ -1,0 +1,183 @@
+{
+  "schema": "shopping-copilot/query-understanding-natural-suite/v0",
+  "suite_id": "implicit-memory-prompts-v1",
+  "language": "mixed English, Simplified Chinese, and code-switching",
+  "authorship": "Hand-authored implicit and underspecified natural-language revisions for live native tool-call testing.",
+  "oracle_policy": "Assertions evaluate the intended retrieval-changing Session Context after implicit natural-language edits. Exact operations, JSON layout, wording, confidence, and evidence phrasing are not prescribed.",
+  "conversations": [
+    {
+      "id": "i01_boardroom_boots_to_rainy_weekend",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "footwear",
+      "tags": ["implicit_revision", "scope", "withdrawal", "style_shift", "dont_care"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "I need black leather ankle boots, women's size 8, under $160, with a low heel and no zips. They need to be comfortable enough for a full day at the office.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "boots"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "material", "relation": "include", "values": ["leather"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "size", "relation": "include", "values": ["8"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["160"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "all day"}
+          ]
+        },
+        {
+          "user_message": "These are starting to sound much too serious. Keep the number stuff and the part about wearing them all day. I don't care whether they're black—or even leather, really. A zip is fine if it isn't the main visual thing. Think rainy-city weekend, not boardroom, and definitely not hiking gear.",
+          "last_assistant_message": "I'll find black leather ankle boots in women's size 8, under $160, with a low heel, no zips, and enough comfort for a full office day.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "boots"},
+            {"kind": "preference", "facet": "size", "relation": "include", "values": ["8"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["160"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "all day"},
+            {"kind": "dont_care", "facet": "color", "present": true},
+            {"kind": "facet_absent", "facet": "color"},
+            {"kind": "dont_care", "facet": "material", "present": true},
+            {"kind": "facet_absent", "facet": "material"},
+            {"kind": "preference_absent", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "low heel"},
+            {"kind": "preference_absent", "facet": "feature", "relation": "exclude", "values": ["zips"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "main visual"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "rainy-city weekend"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "hiking"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "i02_minimalist_necklace_reinterpreted",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "jewellery",
+      "tags": ["implicit_revision", "semantic_refinement", "scoped_exception", "hard_soft"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "A silver minimalist 18-inch necklace under $100, with no hearts, for a wedding.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "necklace"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["silver"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "size", "relation": "include", "values": ["18-inch"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["100"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "heart"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "wedding"}
+          ]
+        },
+        {
+          "user_message": "Forget the wedding part—this should be something she could live in every day. Silver can stay, but what I really meant by minimalist was 'doesn't announce itself.' The price is a guide, not a wall. And the heart thing: a tiny one hidden in the clasp wouldn't bother me; I just don't want a heart pendant.",
+          "last_assistant_message": "I'll look for a silver minimalist 18-inch necklace under $100, without hearts, suitable for a wedding.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "necklace"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["silver"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "size", "relation": "include", "values": ["18-inch"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["100"], "strength": "soft", "text_contains": null},
+            {"kind": "preference_absent", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "wedding"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "every day"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "announce"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "heart pendant"},
+            {"kind": "preference_absent", "facet": "feature", "relation": "exclude", "values": ["hearts"], "strength": null, "text_contains": null}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "i03_shoes_solved_find_the_real_problem",
+      "tier": "smoke",
+      "language": "en",
+      "domain": "cross_domain",
+      "tags": ["implicit_goal_switch", "selective_carry", "semantic_goal", "withdrawal"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "Understated black waterproof commuter sneakers under $120, lightweight, and no leather.",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "sneakers"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["120"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "understated"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "waterproof"},
+            {"kind": "preference", "facet": "material", "relation": "exclude", "values": ["leather"], "strength": null, "text_contains": null}
+          ]
+        },
+        {
+          "user_message": "Actually, the shoes are sorted. What I need now is something I can throw a 15-inch laptop, charger, and gym clothes into. Keep roughly the same spending limit and that quiet look—not necessarily black—but none of the shoe-specific stuff. It should pass at work without looking like one of those rigid briefcases.",
+          "last_assistant_message": "I'll find understated black waterproof commuter sneakers under $120 that are lightweight and not made of leather.",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "bag"},
+            {"kind": "goal_not_contains", "text": "sneakers"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["120"], "strength": "soft", "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "15-inch laptop"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "quiet"},
+            {"kind": "facet_absent", "facet": "color"},
+            {"kind": "facet_absent", "facet": "material"},
+            {"kind": "preference_absent", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "waterproof"},
+            {"kind": "preference_absent", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "lightweight"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "work"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "rigid briefcase"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "i04_code_switch_visual_intent",
+      "tier": "smoke",
+      "language": "zh-en",
+      "domain": "handbags",
+      "tags": ["code_switching", "implicit_revision", "partial_facet_withdrawal", "semantic_style"],
+      "initial_goal": null,
+      "turns": [
+        {
+          "user_message": "想买个 black tote，上班用，预算 200，must fit 15-inch laptop，真皮，不要大 logo，最好有拉链。",
+          "last_assistant_message": null,
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "tote"},
+            {"kind": "preference", "facet": "color", "relation": "include", "values": ["black"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "material", "relation": "include", "values": ["leather"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["200"], "strength": null, "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "15-inch laptop"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "logo"},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": "soft", "text_contains": "zipper"}
+          ]
+        },
+        {
+          "user_message": "嗯，black 不重要，leather 也不是重点；我只是不要那种看起来很塑料的亮面。预算差不多就行，但 laptop 必须放得下。拉链有没有无所谓，整体要有点 creative office 的感觉，不要太 corporate。",
+          "last_assistant_message": "我会找黑色真皮、200 美元以内、能放 15 英寸笔记本、没有大 logo、最好带拉链的通勤 tote。",
+          "last_question": null,
+          "shown_products": [],
+          "critical_assertions": [
+            {"kind": "goal_contains", "text": "tote"},
+            {"kind": "dont_care", "facet": "color", "present": true},
+            {"kind": "facet_absent", "facet": "color"},
+            {"kind": "dont_care", "facet": "material", "present": true},
+            {"kind": "facet_absent", "facet": "material"},
+            {"kind": "preference", "facet": "price", "relation": "upper", "values": ["200"], "strength": "soft", "text_contains": null},
+            {"kind": "preference", "facet": null, "relation": null, "values": [], "strength": "hard", "text_contains": "15-inch laptop"},
+            {"kind": "preference_absent", "facet": null, "relation": null, "values": [], "strength": null, "text_contains": "zipper"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "塑料"},
+            {"kind": "preference", "facet": null, "relation": "semantic_positive", "values": [], "strength": null, "text_contains": "creative office"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "corporate"},
+            {"kind": "preference", "facet": null, "relation": "semantic_negative", "values": [], "strength": null, "text_contains": "logo"}
+          ]
+        }
+      ]
+    }
+  ]
+}

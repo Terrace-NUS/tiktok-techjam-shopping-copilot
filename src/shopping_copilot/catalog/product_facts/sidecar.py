@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import gzip
 import json
-from collections.abc import Mapping, Set
+from collections.abc import Iterator, Mapping, Set
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -90,25 +91,33 @@ def load_product_fact_sidecar(
 def _load_records(path: Path) -> dict[str, dict[str, object]]:
     records: dict[str, dict[str, object]] = {}
     try:
-        with path.open("r", encoding="utf-8") as stream:
-            for line_number, line in enumerate(stream, start=1):
-                if not line.strip():
-                    raise ValueError(f"blank product-fact sidecar row: {line_number}")
-                decoded: object = json.loads(line)
-                if type(decoded) is not dict:
-                    raise ValueError(f"product-fact row is not an object: {line_number}")
-                record = cast(dict[str, object], decoded)
-                if record.get("schema") != PRODUCT_FACT_SIDECAR_SCHEMA:
-                    raise ValueError(f"unknown product-fact schema: {line_number}")
-                parent_asin = _text(record.get("parent_asin"), name="parent_asin")
-                if parent_asin in records:
-                    raise ValueError(f"duplicate product-fact card: {parent_asin}")
-                records[parent_asin] = record
+        for line_number, line in enumerate(_text_lines(path), start=1):
+            if not line.strip():
+                raise ValueError(f"blank product-fact sidecar row: {line_number}")
+            decoded: object = json.loads(line)
+            if type(decoded) is not dict:
+                raise ValueError(f"product-fact row is not an object: {line_number}")
+            record = cast(dict[str, object], decoded)
+            if record.get("schema") != PRODUCT_FACT_SIDECAR_SCHEMA:
+                raise ValueError(f"unknown product-fact schema: {line_number}")
+            parent_asin = _text(record.get("parent_asin"), name="parent_asin")
+            if parent_asin in records:
+                raise ValueError(f"duplicate product-fact card: {parent_asin}")
+            records[parent_asin] = record
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise ValueError(f"cannot load product-fact sidecar: {path}") from error
     if not records:
         raise ValueError("product-fact sidecar must not be empty")
     return records
+
+
+def _text_lines(path: Path) -> Iterator[str]:
+    if path.suffix.casefold() == ".gz":
+        with gzip.open(path, "rt", encoding="utf-8") as stream:
+            yield from stream
+        return
+    with path.open("r", encoding="utf-8") as stream:
+        yield from stream
 
 
 def _validate_expected(values: Set[str] | None) -> frozenset[str] | None:

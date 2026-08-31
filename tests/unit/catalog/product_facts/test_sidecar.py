@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 import json
 from pathlib import Path
 
@@ -80,6 +81,19 @@ def test_sidecar_revalidates_grounding_and_exact_expected_set(tmp_path: Path) ->
             catalog_path=catalog,
             expected_parent_asins={"P1", "P2"},
         )
+
+
+def test_sidecar_loads_gzip_jsonl(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.jsonl"
+    raw = _write_catalog(catalog)
+    sidecar = tmp_path / "cards.jsonl.gz"
+    with gzip.open(sidecar, "wt", encoding="utf-8") as stream:
+        stream.write(json.dumps(_record(raw), ensure_ascii=False) + "\n")
+
+    cards = load_product_fact_sidecar(sidecar, catalog_path=catalog)
+
+    assert tuple(cards) == ("P1",)
+    assert cards["P1"].card.summary == "A black cotton walking shoe."
 
 
 def test_sidecar_rejects_stale_source_and_ungrounded_fact(tmp_path: Path) -> None:
