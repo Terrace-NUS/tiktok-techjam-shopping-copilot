@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 from pathlib import Path
 
+from shopping_copilot.catalog.product_facts import VerifiedProductFactCard
 from shopping_copilot.catalog.semantic import CatalogSemanticError
 from shopping_copilot.catalog.semantic.release import load_catalog_semantic_release
 
@@ -20,6 +22,11 @@ from .hard_mask import HardMaskResolver
 from .lexical import LEXICAL_PROBE_K, LexicalProbe
 from .modes import DEFAULT_MODE_SIMILARITY_THRESHOLD
 from .multi_probe import CompiledProbeRunner
+from .product_cards import (
+    ProductCardMode,
+    product_fact_facet_overrides,
+    project_product_documents,
+)
 from .resolved_probe import ResolvedCompiledProbeRunner
 from .routing import FacetRoute
 from .transparency_recall import TransparencyRecallPolicy
@@ -166,6 +173,8 @@ def create_retrieval_controller(
     policy: FormalRetrievalPolicy | None = None,
     diversity_policy: VectorDiversityPolicy | None = None,
     transparency_recall_policy: TransparencyRecallPolicy | None = None,
+    product_fact_cards: Mapping[str, VerifiedProductFactCard] | None = None,
+    product_card_mode: ProductCardMode = ProductCardMode.AUGMENT,
 ) -> RetrievalController:
     """Compose the release-bound formal retrieval stack over one 50k catalog."""
 
@@ -180,9 +189,9 @@ def create_retrieval_controller(
         transparency_recall_policy is not None
         and type(transparency_recall_policy) is not TransparencyRecallPolicy
     ):
-        raise TypeError(
-            "transparency_recall_policy must be an exact TransparencyRecallPolicy"
-        )
+        raise TypeError("transparency_recall_policy must be an exact TransparencyRecallPolicy")
+    if type(product_card_mode) is not ProductCardMode:
+        raise TypeError("product_card_mode must be a ProductCardMode")
 
     release_path = Path(release_dir)
     retriever = create_dense_retriever(
@@ -199,11 +208,26 @@ def create_retrieval_controller(
     source = release_path / "catalog.jsonl" if catalog_path is None else Path(catalog_path)
     expected = set(retriever.index.parent_asins)
     documents = load_product_documents(source, expected_parent_asins=expected)
+    if product_fact_cards is not None:
+        documents = project_product_documents(
+            documents,
+            product_fact_cards,
+            mode=product_card_mode,
+        )
     evidence_index = build_retrieval_evidence_index(
         source,
         catalog_id=release.manifest.catalog_id,
         catalog_semantic_release_id=release.release_id,
         expected_parent_asins=expected,
+        facet_text_overrides=(
+            None
+            if product_fact_cards is None
+            else product_fact_facet_overrides(
+                product_fact_cards,
+                complete=product_card_mode is ProductCardMode.REPLACE,
+            )
+        ),
+        facet_text_override_mode=product_card_mode.value,
     )
     resolver = HardMaskResolver(
         release=release,

@@ -35,6 +35,8 @@ from shopping_copilot.query_compiler import (
 from shopping_copilot.retrieval.dense import DenseIndex
 from shopping_copilot.retrieval.errors import CompiledQueryBindingError
 from shopping_copilot.retrieval.evidence import (
+    RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID,
+    RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID,
     RetrievalEvidenceIndex,
     build_retrieval_evidence_index,
 )
@@ -634,3 +636,25 @@ def test_constructor_rejects_an_unrecognized_evidence_policy(
             evidence_index=replace(evidence, policy_id="different_policy"),
             dense_index=dense,
         )
+
+
+@pytest.mark.parametrize(
+    "policy_id",
+    [
+        RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID,
+        RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID,
+    ],
+)
+def test_constructor_accepts_product_fact_evidence_policies(
+    bound_system: tuple[HardMaskResolver, DenseIndex, RetrievalEvidenceIndex],
+    policy_id: str,
+) -> None:
+    _, dense, evidence = bound_system
+
+    resolver = HardMaskResolver(
+        release=_release(),
+        evidence_index=replace(evidence, policy_id=policy_id),
+        dense_index=dense,
+    )
+
+    assert resolver.resolve(_query()).eligible_parent_asins == PARENT_ASINS

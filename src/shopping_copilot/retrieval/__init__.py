@@ -6,6 +6,7 @@ from .bundle import (
     load_dense_index,
     validate_dense_index,
     write_dense_index,
+    write_partially_reembedded_dense_index,
 )
 from .calibration import (
     BoundTransparencyCalibration,
@@ -54,6 +55,8 @@ from .errors import (
 )
 from .evidence import (
     RETRIEVAL_EVIDENCE_POLICY_ID,
+    RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID,
+    RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID,
     RETRIEVAL_EVIDENCE_SCHEMA,
     SUPPORTED_FACETS,
     RetrievalEvidenceError,
@@ -104,6 +107,13 @@ from .modes import (
 )
 from .multi_probe import CompiledProbeRun, CompiledProbeRunner, ProbeSnapshot
 from .probe import DenseProbeObservation, FixedDenseProbe
+from .product_cards import (
+    ProductCardMode,
+    enrich_product_documents,
+    product_fact_facet_overrides,
+    project_product_documents,
+    replace_product_documents,
+)
 from .ranking import (
     CrossEncoderRankingHit,
     CrossEncoderRankingResult,
@@ -209,12 +219,15 @@ __all__ = [
     "ProbeSnapshot",
     "ProductDocument",
     "ProductDocumentError",
+    "ProductCardMode",
     "QueryEmbeddingError",
     "QualityPipelineResult",
     "QualityRankingResult",
     "RankingBackendUnavailableError",
     "RankingUserProfile",
     "RETRIEVAL_EVIDENCE_POLICY_ID",
+    "RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID",
+    "RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID",
     "RETRIEVAL_EVIDENCE_SCHEMA",
     "ResolvedCompiledProbeRun",
     "ResolvedCompiledProbeRunner",
@@ -254,6 +267,7 @@ __all__ = [
     "DiagnosticStatus",
     "SUPPORTED_FACETS",
     "build_retrieval_evidence_index",
+    "enrich_product_documents",
     "compute_catalog_mean",
     "compute_probe_coherence",
     "create_compiled_probe_runner",
@@ -273,6 +287,9 @@ __all__ = [
     "project_intent_transparency",
     "lexical_route_observation",
     "normalized_fusion_relevance",
+    "product_fact_facet_overrides",
+    "project_product_documents",
+    "replace_product_documents",
     "validate_dense_index",
     "CandidateVectorDiversityHit",
     "CandidateVectorDiversityResult",
@@ -291,4 +308,5 @@ __all__ = [
     "VectorSlateHit",
     "VectorSlateResult",
     "write_dense_index",
+    "write_partially_reembedded_dense_index",
 ]

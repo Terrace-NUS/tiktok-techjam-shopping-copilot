@@ -12,7 +12,7 @@ from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
-from typing import TypeAlias, cast
+from typing import Literal, TypeAlias, cast
 
 from pyunormalize import NFKC  # type: ignore[import-untyped]
 
@@ -20,6 +20,8 @@ from shopping_copilot.catalog.semantic.canonical import content_id_for_value
 
 RETRIEVAL_EVIDENCE_SCHEMA = "shopping-copilot/retrieval-evidence-index/v1"
 RETRIEVAL_EVIDENCE_POLICY_ID = "raw_catalog_evidence_v1"
+RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID = "raw_catalog_with_product_fact_evidence_v1"
+RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID = "product_fact_replacement_evidence_v1"
 
 SUPPORTED_FACETS = (
     "brand",
@@ -241,8 +243,10 @@ def build_retrieval_evidence_index(
     catalog_id: str,
     catalog_semantic_release_id: str,
     expected_parent_asins: AbstractSet[str] | None = None,
+    facet_text_overrides: Mapping[str, Mapping[str, tuple[str, ...]]] | None = None,
+    facet_text_override_mode: Literal["augment", "replace"] = "augment",
 ) -> RetrievalEvidenceIndex:
-    """Build deterministic evidence directly from raw JSONL field boundaries."""
+    """Build raw evidence with optional source-grounded product-fact additions."""
 
     _require_content_id(catalog_id, name="catalog_id")
     _require_content_id(
@@ -250,6 +254,9 @@ def build_retrieval_evidence_index(
         name="catalog_semantic_release_id",
     )
     expected = _validate_expected_parent_asins(expected_parent_asins)
+    overrides = _validate_facet_text_overrides(facet_text_overrides)
+    if facet_text_override_mode not in {"augment", "replace"}:
+        raise ValueError("facet_text_override_mode must be 'augment' or 'replace'")
 
     vocabulary: dict[str, int] = {}
     evidence_by_asin: dict[str, ProductEvidence] = {}
@@ -275,6 +282,13 @@ def build_retrieval_evidence_index(
                     )
 
                 facet_texts = _extract_facet_texts(row, line_number=line_number)
+                product_overrides = overrides.get(parent_asin)
+                if product_overrides is not None:
+                    facet_texts = _apply_facet_text_overrides(
+                        facet_texts,
+                        product_overrides,
+                        mode=facet_text_override_mode,
+                    )
                 evidence_id_by_asin[parent_asin] = content_id_for_value(
                     {
                         "parent_asin": parent_asin,
@@ -305,6 +319,12 @@ def build_retrieval_evidence_index(
     if not evidence_by_asin:
         raise RetrievalEvidenceError("catalog must contain at least one product")
 
+    unknown_overrides = sorted(set(overrides) - evidence_by_asin.keys())
+    if unknown_overrides:
+        raise RetrievalEvidenceError(
+            f"facet evidence override names an unknown product: {unknown_overrides[0]}"
+        )
+
     actual = frozenset(evidence_by_asin)
     if expected is not None and actual != expected:
         missing = expected - actual
@@ -319,12 +339,18 @@ def build_retrieval_evidence_index(
     products = tuple(evidence_by_asin[parent_asin] for parent_asin in parent_asins)
     del evidence_by_asin
     postings = _build_postings(products)
+    if not overrides:
+        policy_id = RETRIEVAL_EVIDENCE_POLICY_ID
+    elif facet_text_override_mode == "replace":
+        policy_id = RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID
+    else:
+        policy_id = RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID
     index_id = content_id_for_value(
         {
             "schema": RETRIEVAL_EVIDENCE_SCHEMA,
             "catalog_id": catalog_id,
             "catalog_semantic_release_id": catalog_semantic_release_id,
-            "policy_id": RETRIEVAL_EVIDENCE_POLICY_ID,
+            "policy_id": policy_id,
             "products": [
                 {
                     "parent_asin": parent_asin,
@@ -339,13 +365,53 @@ def build_retrieval_evidence_index(
         index_id=index_id,
         catalog_id=catalog_id,
         catalog_semantic_release_id=catalog_semantic_release_id,
-        policy_id=RETRIEVAL_EVIDENCE_POLICY_ID,
+        policy_id=policy_id,
         parent_asins=parent_asins,
         _vocabulary=MappingProxyType(dict(vocabulary)),
         _products=products,
         _postings=postings,
         _negator_ids=negator_ids,
     )
+
+
+def _validate_facet_text_overrides(
+    value: Mapping[str, Mapping[str, tuple[str, ...]]] | None,
+) -> Mapping[str, Mapping[str, tuple[str, ...]]]:
+    if value is None:
+        return MappingProxyType({})
+    if not isinstance(value, Mapping):
+        raise TypeError("facet_text_overrides must be a mapping or None")
+    result: dict[str, Mapping[str, tuple[str, ...]]] = {}
+    for parent_asin, by_facet in value.items():
+        if type(parent_asin) is not str or not parent_asin.strip():
+            raise ValueError("facet evidence override has an invalid product ID")
+        if not isinstance(by_facet, Mapping):
+            raise TypeError("facet evidence product override must be a mapping")
+        product: dict[str, tuple[str, ...]] = {}
+        for facet, texts in by_facet.items():
+            if facet not in _FACET_INDEX:
+                raise ValueError(f"facet evidence override names an unknown facet: {facet!r}")
+            if type(texts) is not tuple:
+                raise TypeError("facet evidence override values must be tuples")
+            if any(type(text) is not str or not text.strip() for text in texts):
+                raise ValueError("facet evidence override contains invalid text")
+            product[facet] = tuple(text.strip() for text in texts)
+        result[parent_asin] = MappingProxyType(product)
+    return MappingProxyType(result)
+
+
+def _apply_facet_text_overrides(
+    original: tuple[tuple[str, ...], ...],
+    overrides: Mapping[str, tuple[str, ...]],
+    *,
+    mode: Literal["augment", "replace"],
+) -> tuple[tuple[str, ...], ...]:
+    values = list(original)
+    for facet, texts in overrides.items():
+        facet_index = _FACET_INDEX[facet]
+        source = texts if mode == "replace" else (*values[facet_index], *texts)
+        values[facet_index] = _canonical_segments(source)
+    return tuple(values)
 
 
 def _extract_facet_texts(

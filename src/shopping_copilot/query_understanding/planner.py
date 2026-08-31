@@ -13,6 +13,7 @@ from shopping_copilot.catalog.semantic.runtime import (
     GroundingDisposition,
     RuntimeValueGroundingResult,
 )
+from shopping_copilot.facet_language import material_keywords
 from shopping_copilot.session_context import (
     AddPreference,
     ClearFacet,
@@ -35,6 +36,7 @@ from shopping_copilot.session_context import (
 )
 from shopping_copilot.session_context.models import PreferenceValue
 from shopping_copilot.session_context.operations import StateOperation
+from shopping_copilot.session_context.wide_facets import RETRIEVAL_DERIVED_FACET_IDS
 
 from .errors import QueryUnderstandingError, QueryUnderstandingErrorCode
 from .models import (
@@ -401,9 +403,14 @@ class IntentMaterializer:
             ), facet
         operator = Operator(frame.relation.value)
         if spec.authority is FacetAuthority.RETRIEVAL_DERIVED:
-            raw_value: PreferenceValue = (
-                frame.values[0] if operator in (Operator.EQ, Operator.NEQ) else tuple(frame.values)
-            )
+            if facet == "material":
+                operator, raw_value = _material_keyword_condition(operator, frame.values)
+            else:
+                raw_value = (
+                    frame.values[0]
+                    if operator in (Operator.EQ, Operator.NEQ)
+                    else tuple(frame.values)
+                )
             try:
                 normalized = self._gateway.registry.normalize_value(
                     facet,
@@ -591,12 +598,13 @@ class IntentMaterializer:
         value: PreferenceValue,
     ) -> _PreferenceCandidate:
         self._validate_source_strength(frame)
+        hybrid = facet in RETRIEVAL_DERIVED_FACET_IDS
         return _PreferenceCandidate(
             facet=facet,
             operator=operator,
             value=value,
-            semantic_text=None,
-            semantic_polarity=None,
+            semantic_text=frame.meaning if hybrid else None,
+            semantic_polarity=_operator_polarity(operator) if hybrid else None,
             commitment=_commitment(frame.strength),
             source=_source(frame.basis),
             source_turn=turn,
@@ -950,6 +958,20 @@ def _facet_alias(facet: str | None) -> str | None:
     return "category" if facet == SYSTEM_PRODUCT_CATEGORY_FACET_ID else facet
 
 
+def _material_keyword_condition(
+    operator: Operator,
+    values: tuple[str, ...],
+) -> tuple[Operator, PreferenceValue]:
+    anchors = tuple(
+        dict.fromkeys(anchor for value in values for anchor in material_keywords(value))
+    )
+    if len(anchors) == 1 and operator in (Operator.EQ, Operator.NEQ):
+        return operator, anchors[0]
+    if operator in (Operator.EQ, Operator.IN):
+        return Operator.IN, anchors
+    return Operator.NOT_IN, anchors
+
+
 _DONT_CARE_ALIASES = {
     "budget": "price",
     "colour": "color",
@@ -977,6 +999,14 @@ def _polarity(relation: PreferenceRelation) -> SemanticPolarity:
             PreferenceRelation.NEQ,
             PreferenceRelation.NOT_IN,
         )
+        else SemanticPolarity.POSITIVE
+    )
+
+
+def _operator_polarity(operator: Operator) -> SemanticPolarity:
+    return (
+        SemanticPolarity.NEGATIVE
+        if operator in (Operator.NEQ, Operator.NOT_IN)
         else SemanticPolarity.POSITIVE
     )
 

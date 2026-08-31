@@ -43,6 +43,12 @@ raw catalog
 - [`product-fact-cards-v1.md`](product-fact-cards-v1.md): experimental,
   source-grounded DeepSeek sidecar that shares the QU facet language. It does
   not mutate the raw catalog or silently extend the v0 verified release.
+- [`public-benchmark-product-cards-v1.md`](public-benchmark-product-cards-v1.md):
+  zero-new-token, source-validated cards for the 200 known public benchmark targets;
+  benchmark scores using this target-pool sidecar are diagnostic only.
+- [`public-200-full-replacement-experiment-v1.md`](public-200-full-replacement-experiment-v1.md):
+  partial Dense rebuild contract and the no-new-token A/B for replacing those 200
+  cards while preserving the other 49,800 products exactly.
 - [Facet Registry research report](<../facet/TechJam Facet Registry v0：从 50k Catalog 抽取和构建 Facet 的实施规范.md>):
   discovery and implementation research retained as design input; the contract
   is authoritative where the documents differ.

@@ -217,6 +217,10 @@ class QueryCompiler:
         if preference.facet == "price" and preference.operator in _NUMERIC_OPERATORS:
             return _price_phrase(preference, strength=strength)
 
+        if preference.semantic_text is not None:
+            label = "Requirement" if preference.commitment is Commitment.HARD else "Preference"
+            return f"{label}: {_sentence_fragment(preference.semantic_text)}."
+
         values = ", ".join(_scalar_text(value) for value in _values(preference.value))
         if preference.operator in _NEGATIVE_OPERATORS:
             label = "Exclude" if preference.commitment is Commitment.HARD else "Prefer avoiding"

@@ -23,6 +23,15 @@ python -m shopping_copilot.catalog.profiling `
 Generated reports are intentionally written outside `data/`; see
 [`docs/design/catalog_semantic/README.md`](../docs/design/catalog_semantic/README.md).
 
+## `benchmark_product_cards/public_200_v1/`
+
+Contains the reviewed, source-grounded product-card fixture for the 200 unique
+targets in `public_set.jsonl`. It is checked in so the team can run the same
+zero-new-token benchmark experiment. It does not modify `catalog.jsonl`, and scores
+using this known target-pool fixture must be labeled diagnostic rather than directly
+comparable 50k retrieval scores. See
+[`public-benchmark-product-cards-v1.md`](../docs/design/catalog_semantic/public-benchmark-product-cards-v1.md).
+
 After validating the profile, generate the deterministic category graph review
 packet with:
 

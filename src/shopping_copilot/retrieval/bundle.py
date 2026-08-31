@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -41,6 +41,8 @@ from .models import (
 )
 
 _DOCUMENT_CORPUS_DOMAIN = b"shopping-copilot/product-document-corpus/v0\0"
+PARTIAL_DENSE_INDEX_BUILDER_VERSION = "dense_index_partial_reembed_v1"
+PARTIAL_PRODUCT_DOCUMENT_TEMPLATE_ID = "product_document_partial_fact_card_v1"
 
 
 def write_dense_index(
@@ -146,6 +148,126 @@ def write_dense_index(
         target,
         expected_catalog_id=release.manifest.catalog_id,
         expected_release_id=release.release_id,
+    )
+
+
+def write_partially_reembedded_dense_index(
+    base_index_dir: str | Path,
+    output_dir: str | Path,
+    *,
+    base_documents: Sequence[ProductDocument],
+    replacement_documents: Mapping[str, ProductDocument],
+    embedder: TextEmbedder,
+    batch_size: int = 128,
+) -> DenseIndex:
+    """Copy a bound index and re-embed only explicitly replaced product documents."""
+
+    if type(batch_size) is not int or batch_size <= 0:
+        raise ValueError("batch_size must be a positive integer")
+    if not isinstance(base_documents, Sequence):
+        raise TypeError("base_documents must be a sequence")
+    if not isinstance(replacement_documents, Mapping):
+        raise TypeError("replacement_documents must be a mapping")
+    base_path = Path(base_index_dir)
+    target = Path(output_dir)
+    if base_path.resolve() == target.resolve():
+        raise ValueError("partial dense output must differ from the base index")
+
+    base = load_dense_index(base_path)
+    if embedder.spec != base.manifest.embedding:
+        raise DenseIndexIntegrityError("embedding specification differs from the base index")
+    documents = tuple(base_documents)
+    if any(type(document) is not ProductDocument for document in documents):
+        raise TypeError("base_documents must contain exact ProductDocument values")
+    if tuple(item.parent_asin for item in documents) != base.parent_asins:
+        raise DenseIndexIntegrityError("base documents differ from the dense index product order")
+    if document_corpus_id(documents) != base.manifest.document_corpus_id:
+        raise DenseIndexIntegrityError("base documents differ from the dense index corpus binding")
+
+    replacements = _validate_replacement_documents(
+        replacement_documents,
+        parent_asins=base.parent_asins,
+    )
+    hybrid_documents = tuple(
+        replacements.get(document.parent_asin, document) for document in documents
+    )
+    hybrid_corpus_id = document_corpus_id(hybrid_documents)
+    if hybrid_corpus_id == base.manifest.document_corpus_id:
+        raise DenseIndexIntegrityError("replacement documents did not change the document corpus")
+
+    if target.exists():
+        existing = load_dense_index(
+            target,
+            expected_catalog_id=base.manifest.catalog_id,
+            expected_release_id=base.manifest.catalog_semantic_release_id,
+        )
+        if (
+            existing.manifest.builder_version != PARTIAL_DENSE_INDEX_BUILDER_VERSION
+            or existing.manifest.document_template_id != PARTIAL_PRODUCT_DOCUMENT_TEMPLATE_ID
+            or existing.manifest.document_corpus_id != hybrid_corpus_id
+            or existing.manifest.embedding != embedder.spec
+        ):
+            raise DenseIndexIntegrityError("existing partial dense index uses another contract")
+        return existing
+
+    ordered_ids = tuple(sorted(replacements))
+    replacement_texts = [replacements[parent_asin].text for parent_asin in ordered_ids]
+    try:
+        encoded = embedder.encode_documents(replacement_texts, batch_size=batch_size)
+        replacement_vectors = normalize_rows(
+            np.asarray(encoded, dtype=np.float32),
+            name="replacement document embeddings",
+        )
+    except ValueError as error:
+        raise DenseIndexIntegrityError(str(error)) from error
+    if replacement_vectors.shape != (len(ordered_ids), embedder.spec.dimension):
+        raise DenseIndexIntegrityError("embedding backend returned the wrong replacement shape")
+
+    vectors = np.array(base.vectors, dtype=np.float32, order="C", copy=True)
+    row_by_asin = {parent_asin: row for row, parent_asin in enumerate(base.parent_asins)}
+    for replacement_row, parent_asin in enumerate(ordered_ids):
+        vectors[row_by_asin[parent_asin]] = replacement_vectors[replacement_row]
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with _exclusive_index_writer(target):
+        if target.exists():
+            raise DenseIndexIntegrityError("partial dense target appeared during publication")
+        with TemporaryDirectory(prefix=".dense-index-partial-", dir=target.parent) as temp:
+            generation = Path(temp) / "generation"
+            generation.mkdir()
+            (generation / PARENT_ASINS_FILENAME).write_bytes(
+                canonical_json_bytes(base.parent_asins)
+            )
+            with (generation / VECTORS_FILENAME).open("wb") as stream:
+                np.save(stream, vectors, allow_pickle=False)
+            manifest = DenseIndexManifest(
+                schema=DENSE_INDEX_SCHEMA,
+                builder_version=PARTIAL_DENSE_INDEX_BUILDER_VERSION,
+                catalog_id=base.manifest.catalog_id,
+                catalog_semantic_release_id=base.manifest.catalog_semantic_release_id,
+                document_template_id=PARTIAL_PRODUCT_DOCUMENT_TEMPLATE_ID,
+                document_corpus_id=hybrid_corpus_id,
+                product_count=base.manifest.product_count,
+                embedding=embedder.spec,
+                vector_dtype="float32",
+                artifacts=_artifact_refs(generation),
+            )
+            (generation / DENSE_INDEX_MANIFEST_FILENAME).write_bytes(
+                encode_dense_index_manifest(manifest)
+            )
+            load_dense_index(
+                generation,
+                expected_catalog_id=base.manifest.catalog_id,
+                expected_release_id=base.manifest.catalog_semantic_release_id,
+                mmap=False,
+            )
+            if target.exists():
+                raise DenseIndexIntegrityError("partial dense target appeared during publication")
+            os.replace(generation, target)
+    return load_dense_index(
+        target,
+        expected_catalog_id=base.manifest.catalog_id,
+        expected_release_id=base.manifest.catalog_semantic_release_id,
     )
 
 
@@ -349,6 +471,28 @@ def document_corpus_id(documents: Sequence[ProductDocument]) -> str:
             digest.update(len(encoded).to_bytes(8, byteorder="big", signed=False))
             digest.update(encoded)
     return f"sha256:{digest.hexdigest()}"
+
+
+def _validate_replacement_documents(
+    values: Mapping[str, ProductDocument],
+    *,
+    parent_asins: Sequence[str],
+) -> dict[str, ProductDocument]:
+    if not values:
+        raise ValueError("replacement_documents must not be empty")
+    allowed = frozenset(parent_asins)
+    result: dict[str, ProductDocument] = {}
+    for parent_asin, document in values.items():
+        if type(parent_asin) is not str or not parent_asin.strip():
+            raise ValueError("replacement_documents contains an invalid product ID")
+        if type(document) is not ProductDocument:
+            raise TypeError("replacement_documents must contain exact ProductDocument values")
+        if document.parent_asin != parent_asin:
+            raise ValueError("replacement document ID differs from its mapping key")
+        if parent_asin not in allowed:
+            raise KeyError(f"replacement document is outside the base index: {parent_asin}")
+        result[parent_asin] = document
+    return result
 
 
 def _artifact_refs(generation: Path) -> tuple[DenseArtifactRef, ...]:

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import re
+import unicodedata
+
 FACET_LANGUAGE_VERSION = "shopping_facet_language_v1"
 
 CORE_PRODUCT_FACT_FACETS = (
@@ -18,6 +21,115 @@ CORE_PRODUCT_FACT_FACETS = (
 )
 
 CLOSED_GENDER_VALUES = ("men", "women", "unisex", "boys", "girls", "kids", "baby")
+
+_MATERIAL_TOKEN_PATTERN = re.compile(r"[^\W_]+", flags=re.UNICODE)
+_MATERIAL_KEYWORDS = frozenset(
+    {
+        "acetate",
+        "acrylic",
+        "bamboo",
+        "brass",
+        "canvas",
+        "cashmere",
+        "ceramic",
+        "cotton",
+        "copper",
+        "denim",
+        "elastane",
+        "fleece",
+        "fur",
+        "glass",
+        "gold",
+        "hemp",
+        "lace",
+        "latex",
+        "leather",
+        "linen",
+        "lycra",
+        "mesh",
+        "metal",
+        "modal",
+        "nylon",
+        "plastic",
+        "polyamide",
+        "polyester",
+        "polyurethane",
+        "rayon",
+        "resin",
+        "rubber",
+        "satin",
+        "silicone",
+        "silk",
+        "silver",
+        "spandex",
+        "steel",
+        "suede",
+        "tencel",
+        "titanium",
+        "velvet",
+        "viscose",
+        "wood",
+        "wool",
+    }
+)
+_MATERIAL_EQUIVALENTS = {
+    "elastane": ("elastane", "lycra", "spandex"),
+    "gossypium": ("cotton", "gossypium"),
+    "lycra": ("elastane", "lycra", "spandex"),
+    "poly": ("poly", "polyester"),
+    "polyamide": ("nylon", "polyamide"),
+    "spandex": ("elastane", "lycra", "spandex"),
+    "viscose": ("rayon", "viscose"),
+}
+_MATERIAL_QUALIFIERS = frozenset(
+    {
+        "all",
+        "blend",
+        "blended",
+        "faux",
+        "genuine",
+        "made",
+        "of",
+        "organic",
+        "pure",
+        "recycled",
+        "synthetic",
+        "virgin",
+    }
+)
+
+
+def material_keywords(value: str) -> tuple[str, ...]:
+    """Return broad executable material anchors while preserving nuance elsewhere.
+
+    Percentages, purity, provenance and blend qualifiers deliberately do not
+    participate in eligibility.  The caller keeps the complete phrase in the
+    semantic view used by embedding and model ranking.
+    """
+
+    if type(value) is not str:
+        raise TypeError("material value must be a string")
+    normalized = unicodedata.normalize("NFKC", value).casefold()
+    tokens = tuple(_MATERIAL_TOKEN_PATTERN.findall(normalized))
+    if not tokens:
+        raise ValueError("material value must contain searchable text")
+
+    anchors: list[str] = []
+    for token in tokens:
+        if token in _MATERIAL_EQUIVALENTS:
+            anchors.extend(_MATERIAL_EQUIVALENTS[token])
+        elif token in _MATERIAL_KEYWORDS:
+            anchors.append(token)
+    if anchors:
+        return tuple(dict.fromkeys(anchors))
+
+    fallback = tuple(
+        token for token in tokens if not token.isdecimal() and token not in _MATERIAL_QUALIFIERS
+    )
+    if not fallback:
+        raise ValueError("material value contains no executable keyword")
+    return (" ".join(fallback),)
+
 
 SHARED_FACT_EXTRACTION_RULES = """\
 共享的 shopping facet 事实协议：

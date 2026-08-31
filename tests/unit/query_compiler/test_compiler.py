@@ -222,6 +222,34 @@ def test_compiler_produces_lexical_semantic_constraint_and_ranking_views() -> No
     )
 
 
+def test_compiler_uses_keyword_for_execution_and_complete_hybrid_semantics() -> None:
+    resolved = _resolved(
+        _preference(
+            "p_1_0_0",
+            facet="material",
+            operator=Operator.EQ,
+            value="polyester",
+            semantic_text="The material must be pure polyester",
+            semantic_polarity=SemanticPolarity.POSITIVE,
+        )
+    )
+
+    compiled = QueryCompiler(
+        catalog_semantic_release_id=RELEASE_ID,
+        category_registry=_category_registry(),
+    ).compile(resolved)
+
+    assert compiled.q_lex == "commuting shoes polyester"
+    assert "Requirement: The material must be pure polyester." in compiled.q_sem
+    assert compiled.hard_constraints[0].facet == "material"
+    assert compiled.hard_constraints[0].value == "polyester"
+    assert compiled.trace[0].targets == (
+        CompilationTarget.Q_SEM,
+        CompilationTarget.Q_LEX,
+        CompilationTarget.HARD_CONSTRAINT,
+    )
+
+
 def test_root_category_is_an_explainable_noop_and_empty_intent_is_not_searchable() -> None:
     root = _preference(
         "p_1_0_0",

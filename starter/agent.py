@@ -1,78 +1,95 @@
+"""Official Agent entry point with an explicit real-world opt-in."""
+
 from __future__ import annotations
 
-import json
-import re
-import sqlite3
+import sys
 from pathlib import Path
+from typing import Any, cast
 
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
-TOKEN_RE = re.compile(r"[a-z0-9]+", re.IGNORECASE)
-STOPWORDS = {
-    "a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "from",
-    "i", "in", "is", "it", "me", "my", "of", "on", "or", "please", "some",
-    "that", "the", "this", "to", "want", "with", "would", "you", "looking",
-}
+from shopping_copilot.application import (  # noqa: E402
+    AgentDelegate,
+    RealWorldConfig,
+    RuntimeMode,
+    ToySimulatorAgent,
+    build_real_world_agent,
+)
 
-
-def _text(value: object) -> str:
-    if value is None:
-        return ""
-    if isinstance(value, dict):
-        return " ".join(f"{key} {item}" for key, item in value.items())
-    if isinstance(value, list):
-        return " ".join(str(item) for item in value)
-    return str(value)
-
-
-def _terms(text: str) -> list[str]:
-    return [
-        token.lower()
-        for token in TOKEN_RE.findall(text)
-        if len(token) > 1 and token.lower() not in STOPWORDS
-    ]
+_ASK_ATTRIBUTES = frozenset(
+    {
+        "category",
+        "material",
+        "color",
+        "size",
+        "style",
+        "brand",
+        "budget",
+        "feature",
+        "use_case",
+        "other",
+    }
+)
 
 
 class Agent:
-    """Editable weak baseline: stateless BM25 retrieval with no LLM dependency."""
+    """Expose one official API while keeping the two strategies isolated.
 
-    def __init__(self, catalog_path: str | Path = "data/catalog.jsonl") -> None:
-        self.catalog_path = Path(catalog_path)
-        self.connection = sqlite3.connect(":memory:")
-        self._sessions: set[str] = set()
-        self._build_index()
+    ``Agent()`` is deliberately model-free and uses the official-simulator
+    specialist. The API-backed full system is constructed only when the caller
+    explicitly passes ``mode="real_world"`` and DeepSeek configuration.
+    """
 
-    def _build_index(self) -> None:
-        cursor = self.connection.cursor()
-        cursor.execute(
-            "CREATE VIRTUAL TABLE products USING fts5("
-            "parent_asin UNINDEXED, title, categories, features, details, store, description, "
-            "tokenize='unicode61 remove_diacritics 2')"
-        )
-        batch: list[tuple[str, str, str, str, str, str, str]] = []
-        with self.catalog_path.open(encoding="utf-8") as handle:
-            for line in handle:
-                product = json.loads(line)
-                batch.append(
-                    (
-                        str(product["parent_asin"]),
-                        _text(product.get("title")),
-                        _text(product.get("categories")),
-                        _text(product.get("features")),
-                        _text(product.get("details")),
-                        _text(product.get("store")),
-                        _text(product.get("description")),
+    def __init__(
+        self,
+        catalog_path: str | Path = "data/catalog.jsonl",
+        question_mode: str | None = None,
+        *,
+        mode: RuntimeMode | str = RuntimeMode.OFFICIAL_SIMULATOR,
+        deepseek_api_key: str | None = None,
+        real_world_config: RealWorldConfig | None = None,
+    ) -> None:
+        try:
+            runtime_mode = RuntimeMode(mode)
+        except ValueError as error:
+            allowed = ", ".join(item.value for item in RuntimeMode)
+            raise ValueError(f"mode must be one of: {allowed}") from error
+
+        if runtime_mode is RuntimeMode.OFFICIAL_SIMULATOR:
+            if deepseek_api_key is not None or real_world_config is not None:
+                raise ValueError("DeepSeek configuration is only valid with mode='real_world'")
+            delegate: AgentDelegate = ToySimulatorAgent(
+                catalog_path,
+                question_mode=question_mode,
+            )
+        else:
+            if question_mode is not None:
+                raise ValueError("question_mode is only valid in official_simulator mode")
+            if deepseek_api_key is not None and real_world_config is not None:
+                raise ValueError("pass either deepseek_api_key or real_world_config, not both")
+            config = real_world_config
+            if config is None:
+                if deepseek_api_key is None:
+                    raise ValueError(
+                        "mode='real_world' requires deepseek_api_key or real_world_config"
                     )
-                )
-                if len(batch) >= 1000:
-                    cursor.executemany("INSERT INTO products VALUES (?, ?, ?, ?, ?, ?, ?)", batch)
-                    batch.clear()
-        if batch:
-            cursor.executemany("INSERT INTO products VALUES (?, ?, ?, ?, ?, ?, ?)", batch)
-        self.connection.commit()
+                config = RealWorldConfig(api_key=deepseek_api_key)
+            delegate = build_real_world_agent(catalog_path, config)
 
-    def reset(self, session_id: str, user_profile: dict) -> None:
-        # The profile is anonymized and may be used for personalization.
-        self._sessions.add(session_id)
+        self._mode = runtime_mode
+        self._delegate = delegate
+
+    @property
+    def mode(self) -> str:
+        """Return the selected mode for local diagnostics and tests."""
+
+        return self._mode.value
+
+    def reset(self, session_id: str, user_profile: dict[str, object]) -> None:
+        self._delegate.reset(session_id, user_profile)
 
     def respond(
         self,
@@ -80,23 +97,91 @@ class Agent:
         user_message: str,
         turn: int,
         top_k: int,
-    ) -> dict:
-        if session_id not in self._sessions:
-            raise RuntimeError("reset must be called before respond")
-        unique_terms = list(dict.fromkeys(_terms(user_message)))[:40]
-        expression = " OR ".join(f'"{term}"' for term in unique_terms)
-        if not expression:
-            recommendations: list[dict] = []
+    ) -> dict[str, object]:
+        return _official_response(
+            self._delegate.respond(session_id, user_message, turn, top_k),
+            top_k=top_k,
+        )
+
+    def last_audit(self, session_id: str) -> dict[str, object]:
+        """Expose full-pipeline audit data when the selected delegate provides it."""
+
+        method = getattr(self._delegate, "last_audit", None)
+        if not callable(method):
+            raise LookupError(f"{self.mode} mode does not provide turn audits")
+        result = method(session_id)
+        if type(result) is not dict:
+            raise TypeError("delegate last_audit() must return a dict")
+        return cast(dict[str, object], result)
+
+
+def _official_response(response: dict[str, object], *, top_k: int) -> dict[str, object]:
+    """Normalize both delegates to the exact organizer response contract."""
+
+    if type(response) is not dict:
+        raise TypeError("delegate respond() must return a dict")
+    message = response.get("message")
+    ask_attribute = response.get("ask_attribute")
+    raw_recommendations = response.get("recommendations")
+    if type(message) is not str:
+        raise TypeError("delegate response.message must be a string")
+    if ask_attribute is not None and ask_attribute not in _ASK_ATTRIBUTES:
+        raise ValueError("delegate returned an unsupported ask_attribute")
+    if type(raw_recommendations) is not list:
+        raise TypeError("delegate response.recommendations must be a list")
+
+    recommendations: list[dict[str, object]] = []
+    seen: set[str] = set()
+    for raw_item in raw_recommendations:
+        score: object | None = None
+        if type(raw_item) is str:
+            parent_asin_value: object = raw_item
+        elif type(raw_item) is dict:
+            item = cast(dict[str, Any], raw_item)
+            parent_asin_value = item.get("parent_asin")
+            score = item.get("score")
         else:
-            rows = self.connection.execute(
-                "SELECT parent_asin FROM products WHERE products MATCH ? "
-                "ORDER BY bm25(products, 0.0, 6.0, 4.0, 2.5, 2.5, 1.5, 1.0) LIMIT ?",
-                (expression, top_k),
-            ).fetchall()
-            recommendations = [{"parent_asin": str(row[0])} for row in rows]
-        return {
-            "message": "Here are the closest matches I found.",
-            "ask_attribute": None,
-            "recommendations": recommendations,
-            "usage": {"prompt_tokens": 0, "completion_tokens": 0},
-        }
+            raise TypeError("each recommendation must be a string or object")
+        if type(parent_asin_value) is not str or not parent_asin_value:
+            raise ValueError("each recommendation requires a non-empty parent_asin")
+        parent_asin = cast(str, parent_asin_value)
+        if parent_asin in seen:
+            continue
+        normalized: dict[str, object] = {"parent_asin": parent_asin}
+        if score is not None:
+            if type(score) not in (int, float):
+                raise TypeError("recommendation.score must be numeric")
+            normalized["score"] = float(cast(int | float, score))
+        recommendations.append(normalized)
+        seen.add(parent_asin)
+        if len(recommendations) >= min(top_k, 100):
+            break
+
+    raw_usage = response.get("usage")
+    prompt_tokens = 0
+    completion_tokens = 0
+    if raw_usage is not None:
+        if type(raw_usage) is not dict:
+            raise TypeError("delegate response.usage must be an object")
+        usage = cast(dict[str, object], raw_usage)
+        prompt_tokens = _token_count(usage.get("prompt_tokens", 0), "prompt_tokens")
+        completion_tokens = _token_count(
+            usage.get("completion_tokens", 0),
+            "completion_tokens",
+        )
+
+    return {
+        "message": message,
+        "ask_attribute": ask_attribute,
+        "recommendations": recommendations,
+        "usage": {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+        },
+    }
+
+
+def _token_count(value: object, name: str) -> int:
+    if type(value) is not int or value < 0:
+        raise ValueError(f"usage.{name} must be a non-negative integer")
+    return value

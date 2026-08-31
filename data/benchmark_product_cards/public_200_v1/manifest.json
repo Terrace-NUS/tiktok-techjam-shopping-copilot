@@ -1,0 +1,16 @@
+{
+  "schema": "shopping-copilot/benchmark-product-fact-bundle/v1",
+  "dataset": "data/public_set.jsonl",
+  "catalog": "data/catalog.jsonl",
+  "selected_case_count": 200,
+  "unique_product_count": 200,
+  "validated_deepseek_reuse_count": 161,
+  "deterministic_fallback_count": 39,
+  "dropped_ungrounded_existing_fact_count": 0,
+  "api_call_count": 0,
+  "reported_token_usage": 0,
+  "scope": "known_public_benchmark_target_pool",
+  "score_comparability": "diagnostic_only_target_pool_enrichment",
+  "warning": "Only known public benchmark targets are enriched. This bundle is for product-card diagnostics and must not be reported as a comparable 50k retrieval score.",
+  "product_fact_sidecar": "data/benchmark_product_cards/public_200_v1/product-facts.jsonl"
+}

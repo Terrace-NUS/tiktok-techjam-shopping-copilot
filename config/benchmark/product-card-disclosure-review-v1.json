@@ -1,0 +1,86 @@
+{
+  "schema": "shopping-copilot/product-card-disclosure-review-selection/v1",
+  "selection_policy": "five sessions per scenario, all five previously reviewed hard-mask failures, then category-diverse deterministic examples",
+  "samples": [
+    {
+      "sample_id": "public_0045",
+      "reason": "known failure: polyester and button-fastening evidence"
+    },
+    {
+      "sample_id": "public_0154",
+      "reason": "known failure: cotton and hand-wash evidence"
+    },
+    {
+      "sample_id": "public_0199",
+      "reason": "known failure: machine-washable evidence"
+    },
+    {
+      "sample_id": "public_0001",
+      "reason": "buying jewelry example"
+    },
+    {
+      "sample_id": "public_0149",
+      "reason": "buying bag example"
+    },
+    {
+      "sample_id": "public_0098",
+      "reason": "known failure: rubber and polyester evidence"
+    },
+    {
+      "sample_id": "public_0016",
+      "reason": "browsing footwear example"
+    },
+    {
+      "sample_id": "public_0036",
+      "reason": "browsing jewelry example"
+    },
+    {
+      "sample_id": "public_0070",
+      "reason": "browsing travel-accessory example"
+    },
+    {
+      "sample_id": "public_0137",
+      "reason": "browsing apparel example"
+    },
+    {
+      "sample_id": "public_0002",
+      "reason": "intent-override belt example"
+    },
+    {
+      "sample_id": "public_0038",
+      "reason": "intent-override sneaker example"
+    },
+    {
+      "sample_id": "public_0072",
+      "reason": "intent-override winter-coat example"
+    },
+    {
+      "sample_id": "public_0123",
+      "reason": "intent-override hat example"
+    },
+    {
+      "sample_id": "public_0198",
+      "reason": "intent-override bag example"
+    },
+    {
+      "sample_id": "public_0041",
+      "reason": "known failure: imported-product evidence; boundary scenario"
+    },
+    {
+      "sample_id": "public_0050",
+      "reason": "boundary work-boot example"
+    },
+    {
+      "sample_id": "public_0104",
+      "reason": "boundary hair-accessory example"
+    },
+    {
+      "sample_id": "public_0131",
+      "reason": "boundary cold-weather accessory example"
+    },
+    {
+      "sample_id": "public_0169",
+      "reason": "boundary apparel example"
+    }
+  ]
+}

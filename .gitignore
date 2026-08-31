@@ -13,6 +13,8 @@ venv/
 *.egg-info/
 build/
 dist/
+tmp/
+*.zip
 *.pem
 *.key
 *.p12

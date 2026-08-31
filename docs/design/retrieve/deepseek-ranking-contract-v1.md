@@ -142,5 +142,7 @@ never included.
 - repair/fallback and fusion: `service.py`
 - BGE-to-DeepSeek pipeline: `pipeline.py`
 - final DPP: `slate.py`
+- real-world orchestration and fallbacks:
+  `src/shopping_copilot/application/quality_ranking.py`
 - real-catalog runner: `scripts/retrieval/evaluate_deepseek_ranking_v1.py`
 - unit tests: `tests/unit/retrieval/test_deepseek_ranking.py`

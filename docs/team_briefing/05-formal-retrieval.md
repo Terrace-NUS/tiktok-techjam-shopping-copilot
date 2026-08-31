@@ -44,6 +44,31 @@ or another condition compiled as hard evidence.
 
 `T_t` cannot override these rules.
 
+### One preference, two retrieval views
+
+A structured preference can carry both an executable keyword and its complete
+semantic meaning. They remain one state object, so deletion and replacement cannot
+leave two copies out of sync.
+
+```json
+{
+  "facet": "material",
+  "operator": "eq",
+  "value": "polyester",
+  "semantic_text": "The material should be pure polyester.",
+  "evidence_text": "pure polyester"
+}
+```
+
+- `value` feeds the hard mask, Facet route, and `q_lex`.
+- `semantic_text` feeds `q_sem`, BGE, and the optional DeepSeek ranker.
+- `evidence_text` preserves what the user actually said.
+
+Material eligibility checks presence only. Purity, percentages, blends, and
+provenance affect semantic relevance instead of deleting candidates. Therefore
+both `100% Polyester` and `95% Polyester, 5% Spandex` pass a polyester requirement,
+while the complete phrase determines which should rank higher.
+
 ## 4. The three recall routes
 
 ### Dense
@@ -189,3 +214,26 @@ Detailed contract and complete numbers:
 
 - [Transparency-aware recall design](../design/retrieve/transparency-aware-recall-v1.md)
 - [50k evaluation report](../../artifacts/retrieval/transparency-recall-evaluation-v1.md)
+
+## 11. Public benchmark product-card mode
+
+The public 200-session benchmark has richer cards for its 200 possible target
+products. A card contains a readable summary plus grounded facts, aliases, polarity,
+and exact catalog evidence. In full replacement mode, these cards replace the old
+search document in Lexical, hard/facet matching, BGE, and Dense.
+
+This cost no new DeepSeek tokens: 161 previous cards were reused, 39 were filled
+deterministically, and every card was checked against the raw source row. The other
+49,800 products still use their old raw cards and their exact old Dense vectors.
+
+The Dense index does not need a 50k rebuild: it copies the old matrix and re-embeds
+only the 200 changed rows. Measured on the saved public-200 final queries, candidate
+recall Top 300 changed from 88.0% to 91.0%. The main gain came from Lexical
+(71.5% to 82.5%); Dense route recall changed from 76.5% to 78.5%.
+
+Because the enriched set is the known target pool, resulting benchmark scores are
+for diagnosis only. Use `--raw-product-cards` to run the previous unbiased baseline.
+The card contract and regression checks are in
+[public-benchmark-product-cards-v1.md](../design/catalog_semantic/public-benchmark-product-cards-v1.md);
+the complete replacement method and A/B are in
+[public-200-full-replacement-experiment-v1.md](../design/catalog_semantic/public-200-full-replacement-experiment-v1.md).

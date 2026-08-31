@@ -9,6 +9,9 @@ import pytest
 
 from shopping_copilot.retrieval.evidence import (
     RETRIEVAL_EVIDENCE_POLICY_ID,
+    RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID,
+    RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID,
+    SUPPORTED_FACETS,
     RetrievalEvidenceError,
     RetrievalEvidenceIndex,
     build_retrieval_evidence_index,
@@ -163,6 +166,51 @@ def test_local_negation_is_not_positive_feature_or_use_case_evidence(tmp_path: P
     assert index.match("use_case", "beach") == frozenset({"A"})
     assert index.match("use_case", "trail running") == frozenset({"A"})
     assert index.match("use_case", "hiking") == frozenset()
+
+
+def test_grounded_fact_overrides_add_to_only_touched_facets(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.jsonl"
+    _write_rows(catalog, _rich_rows())
+
+    index = build_retrieval_evidence_index(
+        catalog,
+        catalog_id=_catalog_id(catalog),
+        catalog_semantic_release_id=RELEASE_ID,
+        expected_parent_asins={"A", "B"},
+        facet_text_overrides={
+            "A": {
+                "material": ("cotton",),
+                "feature": ("button fastening",),
+            }
+        },
+    )
+
+    assert index.policy_id == RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID
+    assert index.match("material", "cotton") == frozenset({"A"})
+    assert index.match("material", "leather") == frozenset({"A"})
+    assert index.match("feature", "button fastening") == frozenset({"A"})
+    assert index.match("brand", "north star") == frozenset({"A"})
+
+
+def test_grounded_fact_replacement_clears_old_covered_facet_text(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.jsonl"
+    _write_rows(catalog, _rich_rows())
+    replacement: dict[str, tuple[str, ...]] = {facet: () for facet in SUPPORTED_FACETS}
+    replacement["material"] = ("cotton",)
+
+    index = build_retrieval_evidence_index(
+        catalog,
+        catalog_id=_catalog_id(catalog),
+        catalog_semantic_release_id=RELEASE_ID,
+        expected_parent_asins={"A", "B"},
+        facet_text_overrides={"A": replacement},
+        facet_text_override_mode="replace",
+    )
+
+    assert index.policy_id == RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID
+    assert index.match("material", "cotton") == frozenset({"A"})
+    assert index.match("material", "leather") == frozenset()
+    assert index.match("brand", "north star") == frozenset()
 
 
 def test_size_rejects_dimensions_and_title_numbers_without_size_context(tmp_path: Path) -> None:

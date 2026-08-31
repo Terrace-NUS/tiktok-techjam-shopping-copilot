@@ -414,7 +414,7 @@ def _markdown(payload: dict[str, object]) -> str:
             metadata = cast(dict[str, object], hit["metadata"])
             title = metadata.get("title", "")
             lines.append(
-                f"- #{hit['rank']} `{hit['parent_asin']}` ({hit['quality']:.3f}, "
+                f"- #{hit['rank']} `{hit['parent_asin']}` ({hit['relevance']:.3f}, "
                 f"{hit['verdict']}): {title} — {hit['reason']}"
             )
         lines.append("")

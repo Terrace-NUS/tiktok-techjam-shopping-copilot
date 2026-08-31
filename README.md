@@ -144,14 +144,24 @@ Python 3.10 or later is recommended. The starter uses only the Python standard l
 python3 -m evaluator.local_evaluator
 ```
 
-Keep product and domain logic under the planned `src/shopping_copilot/`
-package. `starter/agent.py` is the official API adapter and composition root;
-keep it thin. Do not edit the evaluator or public labels when reporting your
-local score.
+Product and domain logic lives under `src/shopping_copilot/`. `starter/agent.py`
+is the thin official API adapter and composition root. Do not edit the evaluator
+or public labels when reporting a local score.
 The command writes per-session results and aggregate metrics to `results.json`.
 
-The included weak BM25 starter scores Hit Rate@10 `0.125`, MRR `0.068034`, and
-MTTC `9.81` on the released public set. See `docs/baseline_results.json`.
+The default `Agent()` is the offline, model-free official-simulator strategy. The
+API-backed real system is an explicit opt-in:
+
+```python
+from starter.agent import Agent
+
+toy_agent = Agent()
+real_agent = Agent(mode="real_world", deepseek_api_key="...")
+```
+
+Real-world mode uses the raw 50k catalog by default and fails fast if its API or
+runtime artifacts are missing. It never silently falls back to the toy strategy.
+See [`docs/design/runtime-routing-v1.md`](docs/design/runtime-routing-v1.md).
 
 ## Agent Interface
 

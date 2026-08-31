@@ -9,7 +9,7 @@ from shopping_copilot.facet_language import SHARED_FACT_EXTRACTION_RULES
 from .models import ReconcileRequest
 from .views import request_payload
 
-PROMPT_VERSION = "query_understanding_v1_4"
+PROMPT_VERSION = "query_understanding_v1_5"
 
 SYSTEM_PROMPT = f"""\
 你是购物对话中的 Query Understanding 状态编辑器。你必须只调用
@@ -86,6 +86,22 @@ base_intent_version 必须从 turn_input.base_intent_version 原样复制；绝�
 没有状态变化时，同一个 version 会合法地连续出现多轮。不要计算意图透明度 C_t，不要做检索，也不要假设
 目录中某商品一定具有某属性；这些步骤在本工具调用之后由本地系统完成。
 """
+
+_HYBRID_STRUCTURED_RULES = """\
+Hybrid structured preference rule (this supersedes any earlier instruction to
+put the complete material phrase in values):
+- values are short executable facet anchors used for lexical retrieval and
+  eligibility; meaning retains the complete normalized semantics; evidence
+  remains the shortest faithful quote from the user.
+- For material, values contain only base material names. Purity, percentages,
+  blends, provenance and other qualifiers stay in meaning and evidence.
+- Example: "pure polyester" => values=["polyester"], meaning keeps the pure
+  polyester requirement, and evidence keeps "pure polyester".
+- Example: "95% polyester, 5% spandex" => values=["polyester", "spandex"],
+  while meaning and evidence preserve the complete composition.
+"""
+
+SYSTEM_PROMPT = f"{SYSTEM_PROMPT}\n\n{_HYBRID_STRUCTURED_RULES}"
 
 
 def build_messages(

@@ -298,6 +298,62 @@ def test_materializer_commits_wide_structured_facet_and_canonicalizes_value(
     assert result.final_intent.preferences[0].id == "p_1_0_0"
     assert result.final_intent.preferences[0].value == "silk"
     assert result.final_intent.preferences[0].commitment is Commitment.HARD
+    assert result.final_intent.preferences[0].semantic_text == "explicit condition"
+    assert result.final_intent.preferences[0].semantic_polarity is SemanticPolarity.POSITIVE
+
+
+def test_materializer_splits_material_keyword_from_complete_semantics(
+    materializer: IntentMaterializer,
+) -> None:
+    current = _current()
+    result = materializer.materialize(
+        current=current,
+        request=_request(current, turn=1, utterance="It must be pure polyester."),
+        frame=_frame(
+            current,
+            new=(
+                _new_preference(
+                    facet="material",
+                    relation=PreferenceRelation.EQ,
+                    values=("pure polyester",),
+                    meaning="The material must be pure polyester.",
+                ),
+            ),
+        ),
+    )
+
+    preference = result.final_intent.preferences[0]
+    assert preference.facet == "material"
+    assert preference.operator is Operator.EQ
+    assert preference.value == "polyester"
+    assert preference.semantic_text == "The material must be pure polyester."
+    assert preference.semantic_polarity is SemanticPolarity.POSITIVE
+
+
+def test_materializer_keeps_composition_in_semantics_and_uses_broad_anchors(
+    materializer: IntentMaterializer,
+) -> None:
+    current = _current()
+    result = materializer.materialize(
+        current=current,
+        request=_request(current, turn=1),
+        frame=_frame(
+            current,
+            new=(
+                _new_preference(
+                    facet="material",
+                    relation=PreferenceRelation.EQ,
+                    values=("95% polyester, 5% spandex",),
+                    meaning="The preferred composition is 95% polyester and 5% spandex.",
+                ),
+            ),
+        ),
+    )
+
+    preference = result.final_intent.preferences[0]
+    assert preference.operator is Operator.IN
+    assert preference.value == ("elastane", "lycra", "polyester", "spandex")
+    assert preference.semantic_text == "The preferred composition is 95% polyester and 5% spandex."
 
 
 def test_complete_frame_distinguishes_removing_black_from_excluding_black(

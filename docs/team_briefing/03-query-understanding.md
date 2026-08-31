@@ -351,7 +351,8 @@ QU 不要求用户必须说成 `material: cotton`。普通描述同样可以一�
 
 ```text
 “100% Cotton cups. Colors: White and Black.”
-→ material = 100% Cotton
+→ material keyword = cotton
+→ material meaning = 100% Cotton cups
 → color IN [White, Black]
 ```
 
@@ -363,10 +364,25 @@ QU 不要求用户必须说成 `material: cotton`。普通描述同样可以一�
 → 不是 color = red
 ```
 
-系统把两个东西分开保存：
+对于可以结构化的偏好，系统在同一条 Preference 里保存三个视图：
 
-- `meaning`：整理后的完整意思；
-- `values/evidence`：尽量保留用户原话，供 catalog evidence 匹配。
+- `values`：短小、可执行的关键词，供硬筛、Facet 和 Lexical 使用；
+- `meaning`：整理后的完整意思，供 `q_sem`、BGE 和 DeepSeek 使用；
+- `evidence`：尽量保留的用户原话，用于解释和审计。
+
+例如 `pure polyester` 会成为同一条偏好中的：
+
+```json
+{
+  "facet": "material",
+  "value": "polyester",
+  "semantic_text": "The material should be pure polyester.",
+  "evidence_text": "pure polyester"
+}
+```
+
+材质比例、纯度、混纺和来源不参与硬资格判断。`95% polyester, 5% spandex` 的关键词是
+`polyester/spandex`，完整配比仍保留在 meaning 和 evidence 中，由语义排名判断匹配程度。
 
 因此 `95% gossypium, 5% spandex` 不会被随手改成 `cotton blend`，`Heel measures approximately
 1.57 inches` 也不会变成 catalog 中从未出现的 `heel height ~1.57 inches`。gender 是封闭枚举，
@@ -412,7 +428,7 @@ Materializer 是模型输出和 Session Context operation 之间的翻译器。
 3. 把 category 映射到当前 catalog release 的 scope；
 4. 用 Decimal 把 USD 精确转换成整数 cents；
 5. 让 catalog-verified facet 经过 release-bound grounder；
-6. 用本地 registry 规范化 retrieval-derived facet；
+6. 用本地 registry 规范化 retrieval-derived facet；material 额外抽取基础材质关键词，同时保留完整 meaning；
 7. 把未知或无法可靠 grounding 的内容保留成 semantic-only；
 8. 拒绝 `inferred + hard` 这种不允许的组合；
 9. 检查 dont-care 和 active preference 是否冲突；

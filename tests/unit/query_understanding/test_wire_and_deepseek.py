@@ -253,11 +253,12 @@ def test_tool_schema_is_closed_complete_and_strict_flag_is_explicit() -> None:
 
 
 def test_v1_4_prompt_and_native_schema_expose_fact_extraction_policy() -> None:
-    assert PROMPT_VERSION == "query_understanding_v1_4"
+    assert PROMPT_VERSION == "query_understanding_v1_5"
     assert "nose won't get red and irritated" in SYSTEM_PROMPT
     assert "95% gossypium, 5% spandex" in SYSTEM_PROMPT
     assert "For that, what matters is: ..." in SYSTEM_PROMPT
     assert "Boots Rain" in SYSTEM_PROMPT
+    assert '"pure polyester" => values=["polyester"]' in SYSTEM_PROMPT
 
     tool = reconcile_session_intent_tool(strict=False)
     function = cast(dict[str, object], tool["function"])

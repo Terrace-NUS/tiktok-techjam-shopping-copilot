@@ -44,6 +44,17 @@ from evaluator.local_evaluator import (  # noqa: E402
     metric_summary,
     normalize_recommendations,
 )
+from shopping_copilot.application.quality_ranking import (  # noqa: E402
+    RealWorldRankingCoordinator,
+    RealWorldRankingResult,
+)
+from shopping_copilot.application.response_generation import (  # noqa: E402
+    DeterministicResponseComposer,
+    ResponseNarrative,
+)
+from shopping_copilot.catalog.product_facts import (  # noqa: E402
+    load_product_fact_sidecar,
+)
 from shopping_copilot.catalog.semantic import CatalogSemanticGateway  # noqa: E402
 from shopping_copilot.catalog.semantic.release import (  # noqa: E402
     load_catalog_semantic_release,
@@ -75,12 +86,14 @@ from shopping_copilot.retrieval import (  # noqa: E402
     IntentTransparencyEstimate,
     IntentVolumeEstimator,
     IntentVolumePolicy,
+    ProductCardMode,
     SentenceTransformerCrossEncoderScorer,
     VectorCandidate,
     create_retrieval_controller,
     load_catalog_density,
     load_product_documents,
     normalized_fusion_relevance,
+    project_product_documents,
 )
 from shopping_copilot.session_context import (  # noqa: E402
     InteractionContext,
@@ -94,6 +107,9 @@ from shopping_copilot.session_context.models import IntentState  # noqa: E402
 from shopping_copilot.simulator import DeepSeekSurfaceRealizer  # noqa: E402
 
 REPORT_SCHEMA = "shopping-copilot/official-simulator-full-pipeline/v0"
+DEFAULT_PRODUCT_CARD_SIDECAR = (
+    ROOT / "data/benchmark_product_cards/public_200_v1/product-facts.jsonl"
+)
 TURN_SCHEMA = "shopping-copilot/official-simulator-turn-audit/v0"
 SESSION_SCHEMA = "shopping-copilot/official-simulator-session-result/v0"
 BGE_MODEL = "BAAI/bge-reranker-v2-m3"
@@ -117,8 +133,19 @@ class _SessionRuntime:
     last_response: dict[str, object] | None = None
     last_turn_audit: dict[str, object] | None = None
     last_pipeline: dict[str, object] | None = None
+    last_question: str | None = None
     reusable_key: tuple[str, int] | None = None
     reusable_from_turn: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ScriptedUserTurn:
+    turn: int
+    kind: str
+    message: str
+    disclosed_fact_ids: tuple[str, ...]
+    disclosed_facts: tuple[dict[str, object], ...]
+    withdrawn_fact_ids: tuple[str, ...]
 
 
 class FullPipelineOtherAgent:
@@ -140,6 +167,8 @@ class FullPipelineOtherAgent:
         facet_registry: Any,
         qu_retry_count: int,
         repeat_noop_cache: bool,
+        ranking_coordinator: RealWorldRankingCoordinator | None = None,
+        response_composer: DeterministicResponseComposer | None = None,
     ) -> None:
         self._service = service
         self._compiler = compiler
@@ -154,6 +183,8 @@ class FullPipelineOtherAgent:
         self._facet_registry = facet_registry
         self._qu_retry_count = qu_retry_count
         self._repeat_noop_cache = repeat_noop_cache
+        self._ranking_coordinator = ranking_coordinator
+        self._response_composer = response_composer
         self._sessions: dict[str, _SessionRuntime] = {}
         self._local_model_lock = threading.Lock()
 
@@ -210,7 +241,7 @@ class FullPipelineOtherAgent:
                 if session.last_response is None
                 else cast(str, session.last_response["message"])
             ),
-            last_question=(None if session.last_response is None else ASSISTANT_QUESTION),
+            last_question=session.last_question,
             allowed_dont_care_facets=self._allowed_dont_care_facets,
         )
         exact_request = request_payload(request)
@@ -328,7 +359,25 @@ class FullPipelineOtherAgent:
         ranking_error: dict[str, object] | None = None
         bge_result: Any | None = None
         dpp_result: Any | None = None
-        if self._reranker is not None and retrieval.fused_candidates:
+        coordinated_ranking: RealWorldRankingResult | None = None
+        if self._ranking_coordinator is not None:
+            try:
+                coordinated_ranking = self._ranking_coordinator.rank(
+                    request_id=(
+                        f"{session.context.session_id}:turn:{turn}:"
+                        f"intent:{resolved.final_intent.version}"
+                    ),
+                    intent=resolved.final_intent,
+                    compiled_query=compiled,
+                    retrieval=retrieval,
+                    top_k=top_k,
+                )
+            except Exception as error:
+                ranking_error = _error_payload(error)
+        if coordinated_ranking is not None:
+            recommendations = list(coordinated_ranking.recommendations)
+            ranking_mode = coordinated_ranking.mode
+        elif self._reranker is not None and retrieval.fused_candidates:
             try:
                 relevance = normalized_fusion_relevance(retrieval.fused_candidates)
                 candidates = tuple(
@@ -367,18 +416,44 @@ class FullPipelineOtherAgent:
             ranking_mode = "formal_mmr"
         timings["ranking_ms"] = _elapsed_ms(ranking_started)
 
-        response = _agent_response(recommendations, resolved=resolved)
+        response_narrative: ResponseNarrative | None = None
+        if self._response_composer is not None:
+            previous_transparency = (
+                None
+                if session.previous_transparency is None
+                or session.previous_transparency.transparency is None
+                else float(session.previous_transparency.transparency)
+            )
+            response_narrative = self._response_composer.compose(
+                recommendations=tuple(recommendations),
+                transparency=float(applied_transparency),
+                previous_transparency=previous_transparency,
+                ranking=coordinated_ranking,
+                intent=resolved.final_intent,
+                product_metadata=self._metadata,
+            )
+        question = (
+            ASSISTANT_QUESTION if response_narrative is None else response_narrative.follow_up
+        )
+        response = _agent_response(
+            recommendations,
+            resolved=resolved,
+            ranking=coordinated_ranking,
+            message=(None if response_narrative is None else response_narrative.message),
+        )
         session.context = _advance_context(
             session.context,
             turn=turn,
             user_message=user_message,
             resolved=resolved,
             response=response,
+            question=question,
         )
         context_after = _context_payload(session.context, self._facet_registry)
         if transparency is not None:
             session.previous_transparency = transparency
         session.last_response = response
+        session.last_question = question
         session.reusable_key = (
             (_normalized_message(user_message), session.context.state.intent.version)
             if resolved.update is None
@@ -400,7 +475,9 @@ class FullPipelineOtherAgent:
                 dpp_result=dpp_result,
                 fallback_hits=retrieval.hits,
                 error=ranking_error,
+                coordinated=coordinated_ranking,
             ),
+            "response_narrative": _json_value(response_narrative),
             "recommendation_products": _recommendation_products(
                 recommendations,
                 self._metadata,
@@ -480,6 +557,7 @@ class FullPipelineOtherAgent:
             user_message=user_message,
             resolved=None,
             response=response,
+            question=session.last_question or ASSISTANT_QUESTION,
         )
         context_after = _context_payload(session.context, self._facet_registry)
         session.last_response = response
@@ -532,15 +610,18 @@ class FullPipelineOtherAgent:
             else [str(item) for item in cast(list[object], previous["recommendations"])]
         )
         response = _agent_response(recommendations, resolved=resolved)
+        question = ASSISTANT_QUESTION
         session.context = _advance_context(
             session.context,
             turn=turn,
             user_message=user_message,
             resolved=resolved,
             response=response,
+            question=question,
         )
         context_after = _context_payload(session.context, self._facet_registry)
         session.last_response = response
+        session.last_question = question
         session.reusable_key = None
         session.reusable_from_turn = None
         timings["total_agent_ms"] = _elapsed_ms(started)
@@ -589,8 +670,32 @@ def main() -> int:
         )
 
     samples = load_jsonl(args.dataset)
+    scripted_conversations = (
+        {}
+        if args.scripted_conversations is None
+        else _load_scripted_conversations(args.scripted_conversations)
+    )
+    if scripted_conversations and not args.sample_id:
+        scripted_ids = set(scripted_conversations)
+        samples = [item for item in samples if str(item["sample_id"]) in scripted_ids]
+    if args.sample_id:
+        requested_ids = set(args.sample_id)
+        available_ids = {str(item["sample_id"]) for item in samples}
+        missing_ids = sorted(requested_ids - available_ids)
+        if missing_ids:
+            raise SystemExit(f"unknown --sample-id values: {', '.join(missing_ids)}")
+        samples = [item for item in samples if str(item["sample_id"]) in requested_ids]
     if args.limit is not None:
         samples = samples[: args.limit]
+    missing_scripts = sorted(
+        str(item["sample_id"])
+        for item in samples
+        if scripted_conversations and str(item["sample_id"]) not in scripted_conversations
+    )
+    if missing_scripts:
+        raise SystemExit(
+            "scripted conversations are missing selected samples: " + ", ".join(missing_scripts)
+        )
     catalog_ids, categories, products = catalog_index(args.catalog)
     completed_rows = _load_existing_jsonl(sessions_path) if args.resume else []
     completed_ids = {str(item["sample_id"]) for item in completed_rows}
@@ -612,11 +717,19 @@ def main() -> int:
             base_url=args.base_url,
             timeout_seconds=args.timeout_seconds,
         )
-        surface_requests = _fixed_other_surface_requests(
-            samples=selected,
-            categories=categories,
-            products=products,
-            max_turns=args.max_turns,
+        surface_requests = (
+            [
+                (turn.message, "scripted product-card customer reply")
+                for turns in scripted_conversations.values()
+                for turn in turns[: args.max_turns]
+            ]
+            if scripted_conversations
+            else _fixed_other_surface_requests(
+                samples=selected,
+                categories=categories,
+                products=products,
+                max_turns=args.max_turns,
+            )
         )
         print(
             f"prewarming {len(set(surface_requests))} unique DeepSeek customer messages...",
@@ -647,12 +760,23 @@ def main() -> int:
         category_registry=release.category_registry,
     )
     print("initializing formal retrieval and intent-volume runtime...", flush=True)
+    product_fact_cards = (
+        None
+        if args.product_card_sidecar is None
+        else load_product_fact_sidecar(
+            args.product_card_sidecar,
+            catalog_path=args.catalog,
+        )
+    )
+    product_card_mode = ProductCardMode(args.product_card_mode)
     controller = create_retrieval_controller(
         index_path=args.dense_index,
         release_dir=args.semantic_release,
         catalog_path=args.catalog,
         device=args.device,
         local_files_only=True,
+        product_fact_cards=product_fact_cards,
+        product_card_mode=product_card_mode,
     )
     policy = IntentVolumePolicy()
     density = load_catalog_density(
@@ -672,6 +796,12 @@ def main() -> int:
         args.catalog,
         expected_parent_asins=set(controller.retriever.index.parent_asins),
     )
+    if product_fact_cards is not None:
+        loaded_documents = project_product_documents(
+            loaded_documents,
+            product_fact_cards,
+            mode=product_card_mode,
+        )
     documents = {item.parent_asin: _compact_document(item.text) for item in loaded_documents}
     metadata = _product_metadata(products)
     reranker = None
@@ -714,6 +844,18 @@ def main() -> int:
             "semantic_release": str(args.semantic_release.resolve()),
             "dense_index": str(args.dense_index.resolve()),
             "density_cache": str(args.density_cache.resolve()),
+            "scripted_conversations": (
+                None
+                if args.scripted_conversations is None
+                else str(args.scripted_conversations.resolve())
+            ),
+            "product_card_sidecar": (
+                None
+                if args.product_card_sidecar is None
+                else str(args.product_card_sidecar.resolve())
+            ),
+            "product_card_count": (0 if product_fact_cards is None else len(product_fact_cards)),
+            "product_card_mode": args.product_card_mode,
             "selected_sample_count": len(samples),
             "remaining_sample_count": len(selected),
         },
@@ -725,7 +867,18 @@ def main() -> int:
             "surface_workers": args.reply_workers,
             "continue_after_hit": args.continue_after_hit,
             "target_visible_to_agent": False,
+            "known_benchmark_target_pool_enriched": product_fact_cards is not None,
+            "score_comparability": (
+                "standard"
+                if product_fact_cards is None
+                else "diagnostic_only_target_pool_enrichment"
+            ),
             "repeat_noop_cache": not args.disable_repeat_noop_cache,
+            "customer_protocol": (
+                "official_legacy"
+                if not scripted_conversations
+                else "grounded_product_card_script_v1"
+            ),
         },
         "models": {
             "query_understanding": args.model,
@@ -758,6 +911,7 @@ def main() -> int:
                     turn_log=turn_log,
                     turn_log_lock=turn_log_lock,
                     surface_realizer=surface_realizer,
+                    scripted_turns=scripted_conversations.get(str(sample["sample_id"])),
                 ): sample
                 for sample in selected
             }
@@ -781,9 +935,7 @@ def main() -> int:
     )
     summary["simulator_reply_model"] = {
         "mode": args.reply_model,
-        "usage": (
-            None if surface_realizer is None else surface_realizer.usage.as_payload()
-        ),
+        "usage": (None if surface_realizer is None else surface_realizer.usage.as_payload()),
     }
     _write_json(output_dir / "summary.json", summary)
     (output_dir / "summary.md").write_text(_render_summary(summary), encoding="utf-8")
@@ -804,6 +956,7 @@ def _run_session(
     turn_log: Any,
     turn_log_lock: threading.Lock,
     surface_realizer: DeepSeekSurfaceRealizer | None,
+    scripted_turns: tuple[ScriptedUserTurn, ...] | None,
 ) -> dict[str, object]:
     sample_id = str(sample["sample_id"])
     session_id = f"official-public/{sample_id}"
@@ -814,14 +967,23 @@ def _run_session(
     intent_card, behavior = materialize_hidden_fields(sample, products)
     effective_sample = {**sample, "intent_card": intent_card, "behavior": behavior}
     disclosed: set[str] = set()
+    withdrawn: set[str] = set()
     boundary_used = False
     scenario = str(sample["scenario_type"])
     override_applied = scenario != "intent_override"
-    canonical_user_message = initial_message(
-        effective_sample,
-        coarse_category(categories.get(target, [])),
-        disclosed,
-    )
+    scripted_turn: ScriptedUserTurn | None = None
+    if scripted_turns:
+        scripted_turn = scripted_turns[0]
+        _apply_scripted_disclosure(scripted_turn, disclosed=disclosed, withdrawn=withdrawn)
+        if scripted_turn.kind == "intent_override":
+            override_applied = True
+        canonical_user_message = scripted_turn.message
+    else:
+        canonical_user_message = initial_message(
+            effective_sample,
+            coarse_category(categories.get(target, [])),
+            disclosed,
+        )
     user_message = _surface_message(
         surface_realizer,
         canonical_user_message,
@@ -862,6 +1024,12 @@ def _run_session(
             "target_rank": target_rank,
             "scored_hit": scored_hit,
             "simulator_disclosed_before": disclosed_before,
+            "simulator_withdrawn_before": sorted(withdrawn),
+            "simulator_user_message": canonical_user_message,
+            "simulator_user_turn_kind": (None if scripted_turn is None else scripted_turn.kind),
+            "simulator_disclosed_facts_this_turn": (
+                [] if scripted_turn is None else list(scripted_turn.disclosed_facts)
+            ),
         }
         with turn_log_lock:
             turn_log.write(_json_line(audit))
@@ -875,36 +1043,50 @@ def _run_session(
         if turn == max_turns:
             break
 
-        override = cast(dict[str, object], effective_sample.get("behavior", {})).get("override")
-        override_object = cast(dict[str, object], override) if type(override) is dict else {}
-        if not override_applied and turn + 1 == int(override_object.get("turn", 3)):
-            override_applied = True
-            new_value = str(override_object.get("new_value", ""))
-            if new_value:
-                disclosed.add(new_value)
-            canonical_user_message = str(
-                override_object.get(
-                    "message",
-                    "Actually, please ignore my earlier preference.",
-                )
-            )
+        if scripted_turns is not None:
+            if turn >= len(scripted_turns):
+                break
+            scripted_turn = scripted_turns[turn]
+            _apply_scripted_disclosure(scripted_turn, disclosed=disclosed, withdrawn=withdrawn)
+            if scripted_turn.kind == "intent_override":
+                override_applied = True
+            canonical_user_message = scripted_turn.message
             user_message = _surface_message(
                 surface_realizer,
                 canonical_user_message,
-                "intent-override customer reply",
+                "scripted product-card customer reply",
             )
         else:
-            canonical_user_message, boundary_used = customer_reply(
-                effective_sample,
-                ASK_ATTRIBUTE,
-                disclosed,
-                boundary_used,
-            )
-            user_message = _surface_message(
-                surface_realizer,
-                canonical_user_message,
-                "follow-up customer reply",
-            )
+            override = cast(dict[str, object], effective_sample.get("behavior", {})).get("override")
+            override_object = cast(dict[str, object], override) if type(override) is dict else {}
+            if not override_applied and turn + 1 == int(override_object.get("turn", 3)):
+                override_applied = True
+                new_value = str(override_object.get("new_value", ""))
+                if new_value:
+                    disclosed.add(new_value)
+                canonical_user_message = str(
+                    override_object.get(
+                        "message",
+                        "Actually, please ignore my earlier preference.",
+                    )
+                )
+                user_message = _surface_message(
+                    surface_realizer,
+                    canonical_user_message,
+                    "intent-override customer reply",
+                )
+            else:
+                canonical_user_message, boundary_used = customer_reply(
+                    effective_sample,
+                    ASK_ATTRIBUTE,
+                    disclosed,
+                    boundary_used,
+                )
+                user_message = _surface_message(
+                    surface_realizer,
+                    canonical_user_message,
+                    "follow-up customer reply",
+                )
 
     return {
         "schema": SESSION_SCHEMA,
@@ -916,6 +1098,9 @@ def _run_session(
         "best_rank": best_rank,
         "reciprocal_rank": 0.0 if best_rank is None else 1.0 / best_rank,
         "turns_executed": turn,
+        "scripted_disclosure_turns_consumed": (
+            None if scripted_turns is None else min(turn, len(scripted_turns))
+        ),
         "error_turn_count": error_turns,
         "reported_token_usage": {
             "prompt_tokens": prompt_tokens,
@@ -982,6 +1167,7 @@ def _advance_context(
     user_message: str,
     resolved: ResolvedTurnIntent | None,
     response: dict[str, object],
+    question: str,
 ) -> SessionContext:
     before = context.state.intent
     after = before if resolved is None else resolved.final_intent
@@ -992,7 +1178,7 @@ def _advance_context(
         accepted_update=None if resolved is None else resolved.update,
         intent_version_after=after.version,
         assistant_message=str(response["message"]),
-        question=ASSISTANT_QUESTION,
+        question=question,
         question_key=f"ask_attribute:{ASK_ATTRIBUTE}",
         ask_attribute=ASK_ATTRIBUTE,
         shown_product_ids=tuple(
@@ -1016,14 +1202,21 @@ def _agent_response(
     recommendations: list[str],
     *,
     resolved: ResolvedTurnIntent | None,
+    ranking: RealWorldRankingResult | None = None,
+    message: str | None = None,
 ) -> dict[str, object]:
     traces = () if resolved is None else resolved.trace.attempts
     prompt_tokens = sum(item.prompt_tokens or 0 for item in traces)
     completion_tokens = sum(item.completion_tokens or 0 for item in traces)
+    if ranking is not None:
+        prompt_tokens += ranking.prompt_tokens
+        completion_tokens += ranking.completion_tokens
     return {
         "message": (
             "Here are my current best options. "
             "What other requirements or preferences matter to you?"
+            if message is None
+            else message
         ),
         "ask_attribute": ASK_ATTRIBUTE,
         "recommendations": recommendations[:TOP_K],
@@ -1113,7 +1306,21 @@ def _ranking_payload(
     dpp_result: Any | None,
     fallback_hits: tuple[Any, ...],
     error: dict[str, object] | None,
+    coordinated: RealWorldRankingResult | None = None,
 ) -> dict[str, object]:
+    if coordinated is not None:
+        return {
+            "mode": coordinated.mode,
+            "quality_pipeline": _json_value(coordinated.quality_pipeline),
+            "quality_slate": _json_value(coordinated.quality_slate),
+            "quality_failure": _json_value(coordinated.quality_failure),
+            "fallback_cross_encoder": _json_value(coordinated.fallback_cross_encoder),
+            "fallback_dpp": _json_value(coordinated.fallback_slate),
+            "fallback_failure": _json_value(coordinated.fallback_failure),
+            "formal_mmr_fallback_hits": [
+                _json_value(item) for item in coordinated.formal_mmr_fallback_hits
+            ],
+        }
     return {
         "mode": mode,
         "error": error,
@@ -1267,6 +1474,38 @@ def _parse_args() -> argparse.Namespace:
         type=Path,
         default=ROOT / "artifacts/retrieval/intent-volume-density-v0.npz",
     )
+    product_cards = parser.add_mutually_exclusive_group()
+    product_cards.add_argument(
+        "--product-card-sidecar",
+        type=Path,
+        default=DEFAULT_PRODUCT_CARD_SIDECAR,
+        help=(
+            "source-grounded product-fact JSONL (defaults to the public 200-target "
+            "diagnostic bundle)"
+        ),
+    )
+    product_cards.add_argument(
+        "--raw-product-cards",
+        action="store_const",
+        const=None,
+        dest="product_card_sidecar",
+        help="disable the public target-card sidecar and use raw 50k catalog cards",
+    )
+    parser.add_argument(
+        "--product-card-mode",
+        choices=tuple(item.value for item in ProductCardMode),
+        default=ProductCardMode.REPLACE.value,
+        help="augment covered old cards or completely replace them with sidecar views",
+    )
+    parser.add_argument(
+        "--scripted-conversations",
+        type=Path,
+        default=None,
+        help=(
+            "replay grounded product-card user turns from conversations.jsonl; "
+            "when --sample-id is omitted, only samples present in this file run"
+        ),
+    )
     parser.add_argument("--api-key-file", type=Path, default=ROOT / "dpskapi")
     parser.add_argument("--model", default="deepseek-v4-flash")
     parser.add_argument("--base-url", default="https://api.deepseek.com")
@@ -1294,6 +1533,12 @@ def _parse_args() -> argparse.Namespace:
         help="concurrent sessions; local CUDA model calls remain serialized",
     )
     parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument(
+        "--sample-id",
+        action="append",
+        default=[],
+        help="evaluate one sample ID; repeat to select multiple sessions",
+    )
     parser.add_argument("--max-turns", type=int, default=MAX_TURNS)
     parser.add_argument("--disable-cross-encoder", action="store_true")
     parser.add_argument("--disable-repeat-noop-cache", action="store_true")
@@ -1357,9 +1602,7 @@ def _fixed_other_surface_requests(
         )
         requests.append((canonical, "initial message"))
         for turn in range(1, max_turns):
-            override = cast(dict[str, object], effective_sample.get("behavior", {})).get(
-                "override"
-            )
+            override = cast(dict[str, object], effective_sample.get("behavior", {})).get("override")
             override_object = cast(dict[str, object], override) if type(override) is dict else {}
             if not override_applied and turn + 1 == int(override_object.get("turn", 3)):
                 override_applied = True
@@ -1388,6 +1631,80 @@ def _load_existing_jsonl(path: Path) -> list[dict[str, object]]:
     if not path.exists():
         return []
     return [cast(dict[str, object], item) for item in load_jsonl(path)]
+
+
+def _load_scripted_conversations(
+    path: Path,
+) -> dict[str, tuple[ScriptedUserTurn, ...]]:
+    result: dict[str, tuple[ScriptedUserTurn, ...]] = {}
+    for row in load_jsonl(path):
+        sample_id = str(row.get("sample_id", "")).strip()
+        if not sample_id:
+            raise ValueError("scripted conversation sample_id must be non-empty")
+        if sample_id in result:
+            raise ValueError(f"duplicate scripted conversation: {sample_id}")
+        transcript = row.get("transcript")
+        if type(transcript) is not list:
+            raise ValueError(f"scripted conversation {sample_id} has no transcript list")
+        user_turns: list[ScriptedUserTurn] = []
+        for event in transcript:
+            if type(event) is not dict or event.get("role") != "user":
+                continue
+            turn = event.get("turn")
+            kind = event.get("kind")
+            message = event.get("message")
+            if type(turn) is not int or turn < 1:
+                raise ValueError(f"scripted conversation {sample_id} has an invalid turn")
+            if type(kind) is not str or not kind.strip():
+                raise ValueError(f"scripted conversation {sample_id} has an invalid kind")
+            if type(message) is not str or not message.strip():
+                raise ValueError(f"scripted conversation {sample_id} has an empty message")
+            disclosed_ids = _string_list_field(event, "disclosed_fact_ids", sample_id)
+            withdrawn_ids = _string_list_field(event, "withdrawn_fact_ids", sample_id)
+            facts = event.get("disclosed_facts", [])
+            if type(facts) is not list or any(type(item) is not dict for item in facts):
+                raise ValueError(f"scripted conversation {sample_id} has invalid disclosed_facts")
+            user_turns.append(
+                ScriptedUserTurn(
+                    turn=turn,
+                    kind=kind.strip(),
+                    message=message.strip(),
+                    disclosed_fact_ids=tuple(disclosed_ids),
+                    disclosed_facts=tuple(cast(dict[str, object], item) for item in facts),
+                    withdrawn_fact_ids=tuple(withdrawn_ids),
+                )
+            )
+        observed_turns = [item.turn for item in user_turns]
+        expected_turns = list(range(1, len(user_turns) + 1))
+        if not user_turns or observed_turns != expected_turns:
+            raise ValueError(
+                f"scripted conversation {sample_id} must have consecutive user turns from 1"
+            )
+        result[sample_id] = tuple(user_turns)
+    if not result:
+        raise ValueError("scripted conversation file is empty")
+    return result
+
+
+def _string_list_field(
+    event: dict[str, object],
+    field: str,
+    sample_id: str,
+) -> list[str]:
+    value = event.get(field, [])
+    if type(value) is not list or any(type(item) is not str or not item for item in value):
+        raise ValueError(f"scripted conversation {sample_id} has invalid {field}")
+    return cast(list[str], value)
+
+
+def _apply_scripted_disclosure(
+    turn: ScriptedUserTurn,
+    *,
+    disclosed: set[str],
+    withdrawn: set[str],
+) -> None:
+    disclosed.update(turn.disclosed_fact_ids)
+    withdrawn.update(turn.withdrawn_fact_ids)
 
 
 def _write_json(path: Path, payload: dict[str, object]) -> None:

@@ -12,11 +12,17 @@ from .models import (
     ProductSourceItem,
 )
 from .prompt import PRODUCT_FACT_PROMPT_VERSION
+from .sidecar import (
+    PRODUCT_FACT_SIDECAR_SCHEMA,
+    VerifiedProductFactCard,
+    load_product_fact_sidecar,
+)
 from .source import product_fact_request_from_raw_line
 from .wire import TOOL_NAME, decode_product_fact_card, product_fact_card_tool
 
 __all__ = (
     "PRODUCT_FACT_PROMPT_VERSION",
+    "PRODUCT_FACT_SIDECAR_SCHEMA",
     "TOOL_NAME",
     "DeepSeekProductFactConfig",
     "DeepSeekProductFactProvider",
@@ -29,7 +35,9 @@ __all__ = (
     "ProductFactError",
     "ProductFactErrorCode",
     "ProductSourceItem",
+    "VerifiedProductFactCard",
     "decode_product_fact_card",
     "product_fact_card_tool",
     "product_fact_request_from_raw_line",
+    "load_product_fact_sidecar",
 )

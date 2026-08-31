@@ -25,7 +25,20 @@ from shopping_copilot.session_context.models import ScalarValue
 
 from .dense import DenseEligibilityMask, DenseIndex
 from .errors import CompiledQueryBindingError
-from .evidence import RETRIEVAL_EVIDENCE_POLICY_ID, RetrievalEvidenceIndex
+from .evidence import (
+    RETRIEVAL_EVIDENCE_POLICY_ID,
+    RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID,
+    RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID,
+    RetrievalEvidenceIndex,
+)
+
+_SUPPORTED_EVIDENCE_POLICIES = frozenset(
+    {
+        RETRIEVAL_EVIDENCE_POLICY_ID,
+        RETRIEVAL_EVIDENCE_PRODUCT_FACT_POLICY_ID,
+        RETRIEVAL_EVIDENCE_PRODUCT_FACT_REPLACEMENT_POLICY_ID,
+    }
+)
 
 _EXCLUSION_OPERATORS = frozenset({Operator.NEQ, Operator.NOT_IN})
 _INCLUSION_OPERATORS = frozenset(
@@ -226,7 +239,7 @@ class HardMaskResolver:
             or dense.manifest.catalog_semantic_release_id != release_id
         ):
             raise CompiledQueryBindingError("hard-mask artifacts use different semantic releases")
-        if evidence.policy_id != RETRIEVAL_EVIDENCE_POLICY_ID:
+        if evidence.policy_id not in _SUPPORTED_EVIDENCE_POLICIES:
             raise CompiledQueryBindingError("hard-mask evidence uses an unsupported policy")
 
         release_products = tuple(

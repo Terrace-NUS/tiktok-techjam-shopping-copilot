@@ -170,6 +170,7 @@ Implemented now:
 - one repair attempt and BGE fallback;
 - 80/20 individual quality fusion;
 - separate T-aware DPP finalizer;
+- real-world runtime orchestration with BGE-DPP and formal-retrieval fallbacks;
 - complete request, judgement, token, and timing logs.
 
 Still intentionally separate from this module:
@@ -181,3 +182,7 @@ Still intentionally separate from this module:
 
 The normative design is in
 [`deepseek-ranking-contract-v1.md`](../design/retrieve/deepseek-ranking-contract-v1.md).
+
+The live `real_world` path now uses this full chain. It does not change the dedicated
+toy-simulator branch. Natural-language answer generation remains the next separate
+stage.
