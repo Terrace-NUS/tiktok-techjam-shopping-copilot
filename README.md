@@ -79,38 +79,6 @@ python -m evaluator.local_evaluator \
 The output contains Hit@10, MRR, MTTC, the recommended Technical Score, scenario-level
 metrics, and per-session evidence. This offline path reports zero model-token usage.
 
-### 4. Call the official Agent interface directly
-
-The competition entry point is `starter/agent.py`. Select `official_simulator`
-explicitly and call the required `reset(...)` and `respond(...)` methods:
-
-```python
-from starter.agent import Agent
-
-agent = Agent(
-    catalog_path="data/catalog.jsonl",
-    mode="official_simulator",
-)
-agent.reset("demo-session", {})
-response = agent.respond(
-    "demo-session",
-    "I need something understated for commuting.",
-    turn=1,
-    top_k=10,
-)
-```
-
-The response follows the organizer contract:
-
-```text
-message
-ask_attribute
-recommendations[].parent_asin
-recommendations[].score
-usage.prompt_tokens
-usage.completion_tokens
-```
-
 ## Unlock the full APERTURE pipeline
 
 The offline mode reproduces the competition boundary. The full mode additionally
