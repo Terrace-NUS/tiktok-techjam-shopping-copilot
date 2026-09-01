@@ -53,12 +53,9 @@ _ATTRIBUTE_CAPS: dict[AskAttribute, int] = {
 _EXCLUDED_FACETS = frozenset(
     {
         "average_rating",
-        "category",
         "date_first_available",
-        "department",
         "dimensions",
         "discontinued",
-        "gender",
         "manufacturer",
         "model",
         "model_name",
@@ -130,6 +127,7 @@ def project_product_card_disclosures(
     card: ProductFactCard,
     *,
     scenario_type: ScenarioType,
+    minimum_facts: int = 0,
     maximum_facts: int = 10,
 ) -> DisclosurePlan:
     """Select shopping-meaningful facts without the legacy four-string cap."""
@@ -138,8 +136,12 @@ def project_product_card_disclosures(
         raise TypeError("card must be an exact ProductFactCard")
     if scenario_type not in {"buying", "browsing", "intent_override", "boundary"}:
         raise ValueError("scenario_type is invalid")
+    if type(minimum_facts) is not int or not 0 <= minimum_facts <= 20:
+        raise ValueError("minimum_facts must be an integer between zero and 20")
     if type(maximum_facts) is not int or not 1 <= maximum_facts <= 20:
         raise ValueError("maximum_facts must be an integer between 1 and 20")
+    if minimum_facts > maximum_facts:
+        raise ValueError("minimum_facts cannot exceed maximum_facts")
 
     grouped_candidates: dict[tuple[str, str, str], list[tuple[ProductFact, DisclosureFact]]] = {}
     decisions: list[FactDecision] = []
@@ -187,7 +189,16 @@ def project_product_card_disclosures(
                 continue
             decisions.append(_decision(fact, selected=False, reason="semantic_duplicate"))
 
-    selected = _diverse_selection(candidates, maximum_facts=maximum_facts)
+    selected = _diverse_selection(
+        candidates,
+        minimum_facts=minimum_facts,
+        maximum_facts=maximum_facts,
+    )
+    if len(selected) < minimum_facts:
+        raise ValueError(
+            f"product card has only {len(selected)} eligible grounded facts; "
+            f"minimum_facts={minimum_facts}"
+        )
     hard_count = {
         "buying": min(2, len(selected)),
         "browsing": 0,
@@ -269,7 +280,7 @@ def _ask_attribute(facet: str) -> AskAttribute:
         return "brand"
     if facet == "price":
         return "budget"
-    if facet in {"gender", "department"}:
+    if facet in {"category", "product_type", "gender", "department"}:
         return "category"
     if facet == "material" or facet.endswith("_material"):
         return "material"
@@ -328,6 +339,7 @@ def _fact_score(fact: ProductFact, *, ask_attribute: AskAttribute) -> float:
 def _diverse_selection(
     candidates: list[DisclosureFact],
     *,
+    minimum_facts: int,
     maximum_facts: int,
 ) -> tuple[DisclosureFact, ...]:
     ordered = sorted(candidates, key=lambda item: (-item.score, item.id))
@@ -361,6 +373,16 @@ def _diverse_selection(
         selected_ids.add(item.id)
         counts[item.ask_attribute] += 1
         facet_group_counts[facet_group] += 1
+    # A released journey may require a fixed minimum amount of auditable evidence.
+    # Backfill with the best remaining grounded facts only after the diversity-first
+    # pass. The maximum still bounds disclosure, and duplicate facts remain excluded.
+    for item in ordered:
+        if len(selected) >= minimum_facts:
+            break
+        if item.id in selected_ids:
+            continue
+        selected.append(item)
+        selected_ids.add(item.id)
     return tuple(selected)
 
 

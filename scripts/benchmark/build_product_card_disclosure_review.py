@@ -64,6 +64,7 @@ def main() -> int:
         plan = project_product_card_disclosures(
             cards[target].card,
             scenario_type=cast(Any, scenario),
+            minimum_facts=args.minimum_facts,
             maximum_facts=args.maximum_facts,
         )
         transcript = _simulate_other_only(plan)
@@ -86,8 +87,16 @@ def main() -> int:
         reviews,
         expected_sample_count=len(selected),
         expected_scenario_counts=Counter(str(item["scenario_type"]) for item in selected),
+        minimum_facts=args.minimum_facts,
+        maximum_facts=args.maximum_facts,
     )
-    _publish(args.output, reviews=reviews, raw_cards=raw_cards)
+    _publish(
+        args.output,
+        reviews=reviews,
+        raw_cards=raw_cards,
+        minimum_facts=args.minimum_facts,
+        maximum_facts=args.maximum_facts,
+    )
     print(json.dumps(_summary(reviews), ensure_ascii=False, indent=2), flush=True)
     print(args.output.resolve(), flush=True)
     return 0
@@ -256,6 +265,8 @@ def _publish(
     *,
     reviews: list[dict[str, Any]],
     raw_cards: dict[str, dict[str, object]],
+    minimum_facts: int,
+    maximum_facts: int,
 ) -> None:
     if output.exists() and not output.is_dir():
         raise FileExistsError(f"review output exists and is not a directory: {output}")
@@ -298,6 +309,10 @@ def _publish(
             "known_previous_failure_count": sum(
                 bool(item["known_previous_failure"]) for item in reviews
             ),
+            "disclosure_policy": {
+                "minimum_facts": minimum_facts,
+                "maximum_facts": maximum_facts,
+            },
             "api_calls": 0,
             "model_tokens": 0,
             "files": _file_manifest(staging),
@@ -424,6 +439,8 @@ def _validate_reviews(
     *,
     expected_sample_count: int,
     expected_scenario_counts: Counter[str],
+    minimum_facts: int,
+    maximum_facts: int,
 ) -> None:
     if len(reviews) != expected_sample_count:
         raise ValueError(f"review packet must contain exactly {expected_sample_count} sessions")
@@ -438,8 +455,11 @@ def _validate_reviews(
         raise ValueError("review slice is missing a known previous failure")
     for review in reviews:
         disclosures = cast(dict[str, list[dict[str, object]]], review["plan"])["disclosures"]
-        if len(disclosures) < 4:
-            raise ValueError(f"review plan has fewer than four disclosures: {review['sample_id']}")
+        if not minimum_facts <= len(disclosures) <= maximum_facts:
+            raise ValueError(
+                "review plan is outside the requested disclosure bounds: "
+                f"{review['sample_id']} has {len(disclosures)}"
+            )
         if len({str(item["id"]) for item in disclosures}) != len(disclosures):
             raise ValueError(f"review plan has duplicate fact IDs: {review['sample_id']}")
     _validate_known_failure_focus(reviews)
@@ -614,6 +634,7 @@ def _parse_args() -> argparse.Namespace:
         default=ROOT / "artifacts/benchmark/product-card-disclosure-review-v1",
     )
     parser.add_argument("--maximum-facts", type=int, default=10)
+    parser.add_argument("--minimum-facts", type=int, default=4)
     parser.add_argument(
         "--all-samples",
         action="store_true",

@@ -25,8 +25,48 @@ control multi-route retrieval and final-set composition.
 | Intent Transparency ablation lift | **+36.5 pp Recall@10** |
 
 The 2,000-session suite is an internal public-like stress test, not organizer ground
-truth or an independent holdout. Full methodology and interpretation are provided in
-the project submission; this README focuses on running and verifying the repository.
+truth or an independent holdout. The complementary 200-journey dataset, benchmark
+contract, deterministic scorer, and frozen aggregate results are checked in under
+`benchmarks/catalogue_grounded_200/`.
+
+## Included benchmarks
+
+The repository ships both evaluation layers used in the submission:
+
+| Benchmark | Checked-in data | Evaluator |
+|---|---|---|
+| Official released 200 | `data/public_set.jsonl` | `evaluator/local_evaluator.py` |
+| Catalogue-Grounded 200 | `benchmarks/catalogue_grounded_200/journeys.jsonl` | `evaluator/catalogue_grounded_evaluator.py` |
+
+The second suite contains 200 fixed multi-turn journeys with **6–8 grounded preference
+dimensions per listing**, including refinements, exclusions, boundary replies, and
+intent overrides. Ground-truth ASINs remain evaluator-only and are never passed to the
+Agent. Its manifest pins every source file by SHA-256; `reported-results.json` contains
+the three reported comparison rows and the controlled Intent Transparency ablation.
+
+Run the checked-in suite against any organizer-compatible Agent factory:
+
+```bash
+python -m evaluator.catalogue_grounded_evaluator \
+  --catalog data/catalog.jsonl \
+  --agent-factory starter.agent:Agent \
+  --output catalogue-grounded-results.json
+```
+
+Rebuild the semantic journey layer from the checked-in source-grounded cards with zero
+API calls:
+
+```bash
+python scripts/benchmark/build_product_card_disclosure_review.py \
+  --all-samples \
+  --minimum-facts 6 \
+  --maximum-facts 8 \
+  --output artifacts/benchmark/catalogue-grounded-200
+```
+
+The committed JSONL is the fixed semantic benchmark. The full-pipeline runner can apply
+the checked-in DeepSeek surface realizer for varied natural wording while deterministic
+code continues to own disclosure, withdrawal, override, and scoring state.
 
 ## One Agent, two execution profiles
 
@@ -260,6 +300,7 @@ checking across 172 source files.
 | `src/shopping_copilot/application/full.py` | Builder for the dependency-enabled APERTURE profile |
 | `starter/agent.py` | Unified APERTURE entry point for the organizer Agent API |
 | `evaluator/` | Frozen local compatibility evaluator |
+| `benchmarks/catalogue_grounded_200/` | Released 200-journey dataset, pinned manifest, and reported results |
 | `scripts/` | Reproducible builders, evaluations, and benchmark runners |
 | `config/` | Frozen runtime policies and prompt/evaluation fixtures |
 | `data/public_set.jsonl` | 200 released development sessions |

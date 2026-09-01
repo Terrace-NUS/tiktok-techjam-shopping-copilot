@@ -1,0 +1,48 @@
+{
+  "schema": "aperture/catalogue-grounded-benchmark-manifest/v1",
+  "name": "APERTURE Catalogue-Grounded 200",
+  "sample_count": 200,
+  "scenario_counts": {
+    "buying": 80,
+    "browsing": 80,
+    "intent_override": 30,
+    "boundary": 10
+  },
+  "journey_policy": {
+    "minimum_grounded_dimensions": 6,
+    "maximum_grounded_dimensions": 8,
+    "total_grounded_dimensions": 1565,
+    "user_turn_count": 1193,
+    "assistant_question_policy": "ask_attribute=other",
+    "surface_language": "Committed journeys are the canonical semantic layer; the full runner may apply the checked-in DeepSeek surface realizer without changing hidden state."
+  },
+  "inputs": {
+    "journeys": {
+      "path": "benchmarks/catalogue_grounded_200/journeys.jsonl",
+      "sha256": "3b1103c6965ce48a98ba4a32b2b4c7ccf8df858e4fef2eddc6de4ba361c129ce"
+    },
+    "profiles_and_public_labels": {
+      "path": "data/public_set.jsonl",
+      "sha256": "857259f7a438e6188ac63e18995b6ff4489bfcfc4a716a798b9a2aa0ee8f7579"
+    },
+    "source_grounded_product_cards": {
+      "path": "data/benchmark_product_cards/public_200_v1/product-facts.jsonl",
+      "sha256": "c5b042df11cd5473735b55d7c5a7fff0a9b24f9f7b1ed84f55f1a84aec4f6d2f"
+    }
+  },
+  "construction": {
+    "builder": "scripts/benchmark/build_product_card_disclosure_review.py",
+    "disclosure_policy": "src/shopping_copilot/benchmark/disclosure.py",
+    "api_calls_required": 0,
+    "catalogue_mutated": false
+  },
+  "reported_results": "benchmarks/catalogue_grounded_200/reported-results.json",
+  "evaluation": {
+    "entry_point": "python -m evaluator.catalogue_grounded_evaluator",
+    "target_boundary": "The evaluator owns target_parent_asin; reset/respond receive only profile, shopper message, turn number, and top_k.",
+    "recall_at_10": "Fraction of journeys whose target appears in the Top-10 after any required intent override.",
+    "turns_to_recall": "Mean first-hit turn among recalled journeys.",
+    "exploration_satisfaction": "Mean pre-disclosure slate score: 60% grounded relevance coverage plus 40% meaningful product-direction diversity."
+  },
+  "scope_note": "The target pool comes from the released 200 development products. This is a complementary representation-and-interaction benchmark, not an organizer holdout."
+}

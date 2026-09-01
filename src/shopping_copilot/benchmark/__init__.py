@@ -1,4 +1,4 @@
-"""Internal benchmark construction helpers."""
+"""Catalogue-grounded benchmark construction helpers."""
 
 from .disclosure import (
     DisclosureFact,

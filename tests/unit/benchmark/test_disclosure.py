@@ -104,3 +104,54 @@ def test_projection_is_deterministic() -> None:
     )
 
     assert first == second
+
+
+def test_projection_can_backfill_a_release_minimum_without_duplicates() -> None:
+    card = ProductFactCard(
+        parent_asin="B",
+        summary="A feature-rich watch.",
+        facts=(
+            _fact("product_type", "Wrist Watch"),
+            _fact("material", "stainless steel"),
+            _fact("feature", "alarm"),
+            _fact("feature", "chronograph"),
+            _fact("feature", "day indicator"),
+            _fact("feature", "date indicator"),
+            _fact("feature", "water resistant"),
+            _fact("brand", "Example"),
+            _fact("price", "47.95"),
+        ),
+    )
+
+    plan = project_product_card_disclosures(
+        card,
+        scenario_type="buying",
+        minimum_facts=6,
+        maximum_facts=8,
+    )
+
+    assert 6 <= len(plan.disclosures) <= 8
+    assert len({item.id for item in plan.disclosures}) == len(plan.disclosures)
+
+
+def test_projection_rejects_impossible_release_minimum() -> None:
+    card = ProductFactCard(
+        parent_asin="C",
+        summary="A sparse card.",
+        facts=(
+            _fact("product_type", "Scarf"),
+            _fact("material", "wool"),
+        ),
+    )
+
+    try:
+        project_product_card_disclosures(
+            card,
+            scenario_type="browsing",
+            minimum_facts=6,
+            maximum_facts=8,
+        )
+    except ValueError as error:
+        assert "eligible grounded facts" in str(error)
+    else:
+        raise AssertionError("an impossible minimum must fail")
