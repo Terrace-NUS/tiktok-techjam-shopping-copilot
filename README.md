@@ -79,8 +79,8 @@ request, model download, or GPU.
 Clone the repository and create an isolated environment:
 
 ```bash
-git clone https://github.com/Terrace-NUS/tiktok-techjam-shopping-copilot.git
-cd tiktok-techjam-shopping-copilot
+git clone https://github.com/Terrace-NUS/APERTURE.git
+cd APERTURE
 python -m venv .venv
 source .venv/bin/activate  # macOS/Linux
 # Windows PowerShell: .\.venv\Scripts\Activate.ps1
