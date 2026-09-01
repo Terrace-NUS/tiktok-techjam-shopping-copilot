@@ -79,6 +79,45 @@ python -m evaluator.local_evaluator \
 The output contains Hit@10, MRR, MTTC, the recommended Technical Score, scenario-level
 metrics, and per-session evidence. This offline path reports zero model-token usage.
 
+### 4. Hidden-set integration for organizers
+
+`starter/agent.py` is the APERTURE submission entry point—not the official starter
+baseline. Instantiate it once in the evaluator process with the organizer catalogue,
+reset it once for each hidden session, and call `respond(...)` for every shopper turn:
+
+```python
+from starter.agent import Agent
+
+agent = Agent(
+    catalog_path=organizer_catalog_path,
+    mode="official_simulator",
+)
+
+agent.reset(session_id, user_profile)
+
+response = agent.respond(
+    session_id=session_id,
+    user_message=user_message,
+    turn=turn_number,
+    top_k=10,
+)
+```
+
+State is isolated by `session_id`, so one process may evaluate multiple hidden sessions.
+The returned object follows the organizer contract:
+
+```text
+message
+ask_attribute
+recommendations[].parent_asin
+recommendations[].score
+usage.prompt_tokens
+usage.completion_tokens
+```
+
+This evaluation path is fully offline: it requires no API key, network request, GPU,
+or model download.
+
 ## Unlock the full APERTURE pipeline
 
 The offline mode reproduces the competition boundary. The full mode additionally
