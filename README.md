@@ -28,21 +28,13 @@ The 2,000-session suite is an internal public-like stress test, not organizer gr
 truth or an independent holdout. Full methodology and interpretation are provided in
 the project submission; this README focuses on running and verifying the repository.
 
-## Reproduce the repository
+## Reproduce the official benchmark offline
 
-### 1. Requirements
+This is the path intended for organizer evaluation. It implements the official Agent
+interface without API calls, model downloads, or GPU dependencies. You need only
+Python 3.10+ and the organizer's 50K catalogue.
 
-- Python 3.10 or later
-- the official 50K catalogue at `data/catalog.jsonl`
-- a CUDA-capable GPU for the full retrieval pipeline
-- a DeepSeek API key for Query Understanding and product judgement
-- locally available BGE embedding and reranking model weights
-
-The default `Agent()` path is model-free and implements the official simulator
-interface. The complete APERTURE runtime is an explicit opt-in and never silently
-falls back to the simulator path.
-
-### 2. Install
+### 1. Install
 
 Clone the repository and create an isolated environment:
 
@@ -54,7 +46,7 @@ source .venv/bin/activate  # macOS/Linux
 # Windows PowerShell: .\.venv\Scripts\Activate.ps1
 ```
 
-Install the locked runtime and development dependencies:
+Install the locked runtime and evaluation dependencies:
 
 ```bash
 python -m pip install --upgrade pip
@@ -62,14 +54,7 @@ python -m pip install --require-hashes -r requirements/runtime.lock
 python -m pip install -e ".[dev]"
 ```
 
-For the full APERTURE retrieval pipeline, also install the locked local-model stack:
-
-```bash
-python -m pip install --require-hashes -r requirements/retrieval.lock
-python -m pip install -e ".[dev,retrieval]"
-```
-
-### 3. Add the competition catalogue
+### 2. Add the competition catalogue
 
 Place the immutable organizer catalogue here:
 
@@ -77,21 +62,12 @@ Place the immutable organizer catalogue here:
 data/catalog.jsonl
 ```
 
-The expected file contains 50,000 product rows. APERTURE never rewrites it; product
-facts, embeddings, semantic facets, indexes, and density caches are separate sidecar
-assets under the ignored `artifacts/` tree.
+The expected file contains 50,000 product rows. APERTURE never rewrites it.
 
-### 4. Run the official compatibility evaluator
+### 3. Run all 200 released sessions
 
 The released 200-session development set is checked in at `data/public_set.jsonl`.
-Run the organizer-compatible, model-free path with:
-
-```bash
-python -m evaluator.local_evaluator
-```
-
-The evaluator writes `results.json` in the repository root. Override paths when
-needed:
+Run the complete organizer-compatible evaluation with:
 
 ```bash
 python -m evaluator.local_evaluator \
@@ -100,17 +76,21 @@ python -m evaluator.local_evaluator \
   --output results.json
 ```
 
-## Official Agent interface
+The output contains Hit@10, MRR, MTTC, the recommended Technical Score, scenario-level
+metrics, and per-session evidence. This offline path reports zero model-token usage.
 
-The competition entry point is `starter/agent.py` and exposes the required
-`reset(...)` and `respond(...)` methods.
+### 4. Call the official Agent interface directly
 
-### Model-free official-simulator path
+The competition entry point is `starter/agent.py`. Select `official_simulator`
+explicitly and call the required `reset(...)` and `respond(...)` methods:
 
 ```python
 from starter.agent import Agent
 
-agent = Agent()
+agent = Agent(
+    catalog_path="data/catalog.jsonl",
+    mode="official_simulator",
+)
 agent.reset("demo-session", {})
 response = agent.respond(
     "demo-session",
@@ -120,29 +100,7 @@ response = agent.respond(
 )
 ```
 
-### Full APERTURE path
-
-```python
-import os
-
-from starter.agent import Agent
-
-agent = Agent(
-    mode="real_world",
-    deepseek_api_key=os.environ["DEEPSEEK_API_KEY"],
-)
-
-agent.reset("demo-session", {})
-response = agent.respond(
-    "demo-session",
-    "I need something understated for commuting with a 15-inch laptop.",
-    turn=1,
-    top_k=10,
-)
-audit = agent.last_audit("demo-session")
-```
-
-Both modes return the organizer response contract:
+The response follows the organizer contract:
 
 ```text
 message
@@ -153,21 +111,74 @@ usage.prompt_tokens
 usage.completion_tokens
 ```
 
-## Full-pipeline assets
+## Unlock the full APERTURE pipeline
 
-The real-world constructor validates every dependency before serving a turn. Its
-default paths are:
+The offline mode reproduces the competition boundary. The full mode additionally
+enables:
 
-| Asset | Default path |
-|---|---|
-| Immutable catalogue | `data/catalog.jsonl` |
-| Semantic catalogue release | `artifacts/catalog-semantic/release-v0/` |
-| Dense BGE index | `artifacts/retrieval/dense-v0/` |
-| Intent-volume density cache | `artifacts/retrieval/intent-volume-density-v0.npz` |
-| Optional product cards | `data/product_fact_cards/deepseek_7011_v1/product-facts.jsonl.gz` |
+- DeepSeek native-tool Query Understanding;
+- explicit, validated Session Context transitions;
+- the 50K-product Catalogue Probe and Intent Transparency;
+- adaptive semantic, lexical, and structured-facet recall;
+- local BGE embeddings and cross-encoder reranking;
+- evidence-grounded DeepSeek product judgement;
+- transparency-aware final-set selection; and
+- a replayable audit record for every turn.
 
-To rerun the complete multi-turn public-simulator protocol after preparing those
-assets:
+### 1. Install the retrieval stack
+
+```bash
+python -m pip install --require-hashes -r requirements/retrieval.lock
+python -m pip install -e ".[dev,retrieval]"
+```
+
+The full mode requires a CUDA-capable GPU, a DeepSeek API key, local BGE model weights,
+and the generated semantic release, dense index, and intent-volume density cache.
+
+### 2. Configure and run the Agent
+
+Pass every full-pipeline dependency explicitly:
+
+```python
+import os
+from pathlib import Path
+
+from shopping_copilot.application import RealWorldConfig
+from starter.agent import Agent
+
+config = RealWorldConfig(
+    api_key=os.environ["DEEPSEEK_API_KEY"],
+    semantic_release=Path("artifacts/catalog-semantic/release-v0"),
+    dense_index=Path("artifacts/retrieval/dense-v0"),
+    density_cache=Path("artifacts/retrieval/intent-volume-density-v0.npz"),
+    product_card_sidecar=Path(
+        "data/product_fact_cards/deepseek_7011_v1/product-facts.jsonl.gz"
+    ),
+    device="cuda",
+)
+
+agent = Agent(
+    catalog_path="data/catalog.jsonl",
+    mode="real_world",
+    real_world_config=config,
+)
+agent.reset("demo-session", {})
+response = agent.respond(
+    "demo-session",
+    "I need something understated for commuting with a 15-inch laptop.",
+    turn=1,
+    top_k=10,
+)
+audit = agent.last_audit("demo-session")
+```
+
+The constructor validates every asset before accepting a turn. Product facts,
+embeddings, semantic facets, indexes, and density caches remain sidecars; the organizer
+catalogue stays immutable.
+
+### 3. Run the complete multi-turn protocol
+
+After preparing the same sidecar assets, run:
 
 ```bash
 python scripts/simulator/evaluate_full_pipeline_other.py \
