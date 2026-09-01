@@ -97,9 +97,7 @@ class CatalogFactLinker:
                     continue
                 candidates.append(
                     CatalogFactMatch(
-                        text=message[
-                            token_matches[start].start() : token_matches[end - 1].end()
-                        ],
+                        text=message[token_matches[start].start() : token_matches[end - 1].end()],
                         token_start=start,
                         token_end=end,
                         posting_size=entry.posting_size,

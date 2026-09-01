@@ -53,8 +53,7 @@ class FakeQualityFinalizer:
         return SimpleNamespace(
             result=SimpleNamespace(
                 hits=tuple(
-                    SimpleNamespace(parent_asin=parent_asin)
-                    for parent_asin in self.recommendations
+                    SimpleNamespace(parent_asin=parent_asin) for parent_asin in self.recommendations
                 )
             )
         )

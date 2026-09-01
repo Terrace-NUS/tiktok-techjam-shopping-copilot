@@ -78,9 +78,7 @@ class DeepSeekRankingProvider:
             raise DeepSeekRankingError(DeepSeekRankingErrorCode.MISSING_API_KEY)
         payload: dict[str, object] = {
             "model": self._config.model,
-            "messages": list(
-                build_messages(request, repair_instruction=repair_instruction)
-            ),
+            "messages": list(build_messages(request, repair_instruction=repair_instruction)),
             "stream": False,
             "temperature": self._config.temperature,
             "max_tokens": self._config.max_tokens,
@@ -110,13 +108,9 @@ class DeepSeekRankingProvider:
                 timeout_seconds=float(self._config.timeout_seconds),
             )
         except TimeoutError as error:
-            raise DeepSeekRankingError(
-                DeepSeekRankingErrorCode.PROVIDER_TIMEOUT
-            ) from error
+            raise DeepSeekRankingError(DeepSeekRankingErrorCode.PROVIDER_TIMEOUT) from error
         except OSError as error:
-            raise DeepSeekRankingError(
-                DeepSeekRankingErrorCode.PROVIDER_UNAVAILABLE
-            ) from error
+            raise DeepSeekRankingError(DeepSeekRankingErrorCode.PROVIDER_UNAVAILABLE) from error
         self._raise_for_status(response.status)
         decoded = _decode_response_json(response.body)
         arguments, trace = _extract_tool_call(decoded)
@@ -154,13 +148,9 @@ def _decode_response_json(body: bytes) -> dict[str, object]:
             parse_constant=_reject_json_constant,
         )
     except (UnicodeDecodeError, ValueError, json.JSONDecodeError) as error:
-        raise DeepSeekRankingError(
-            DeepSeekRankingErrorCode.INVALID_PROVIDER_RESPONSE
-        ) from error
+        raise DeepSeekRankingError(DeepSeekRankingErrorCode.INVALID_PROVIDER_RESPONSE) from error
     if type(decoded) is not dict:
-        raise DeepSeekRankingError(
-            DeepSeekRankingErrorCode.INVALID_PROVIDER_RESPONSE
-        )
+        raise DeepSeekRankingError(DeepSeekRankingErrorCode.INVALID_PROVIDER_RESPONSE)
     return cast(dict[str, object], decoded)
 
 
@@ -196,9 +186,7 @@ def _provider_trace(response: dict[str, object]) -> DeepSeekRankingTrace:
         response_id=_optional_string(response.get("id")),
         model=_optional_string(response.get("model")),
         prompt_tokens=_optional_nonnegative_int(usage_object.get("prompt_tokens")),
-        completion_tokens=_optional_nonnegative_int(
-            usage_object.get("completion_tokens")
-        ),
+        completion_tokens=_optional_nonnegative_int(usage_object.get("completion_tokens")),
         total_tokens=_optional_nonnegative_int(usage_object.get("total_tokens")),
     )
 

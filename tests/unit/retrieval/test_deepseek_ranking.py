@@ -386,9 +386,7 @@ def test_quality_ranker_repairs_once_then_blends_80_20() -> None:
 
 
 def test_quality_ranker_falls_back_to_bge_on_provider_failure() -> None:
-    judge = _SequenceJudge(
-        DeepSeekRankingError(DeepSeekRankingErrorCode.PROVIDER_RATE_LIMIT)
-    )
+    judge = _SequenceJudge(DeepSeekRankingError(DeepSeekRankingErrorCode.PROVIDER_RATE_LIMIT))
 
     result = DeepSeekQualityRanker(provider=judge).rank(_request())
 

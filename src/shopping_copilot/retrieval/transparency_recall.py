@@ -313,9 +313,9 @@ class TransparencyAwareDenseRecall:
                 break
 
             novelty = _min_max(np.asarray(1.0 - maximum_similarity, dtype=np.float32))
-            center_scores = relevance_weight * normalized_relevance + (
-                1.0 - relevance_weight
-            ) * novelty
+            center_scores = (
+                relevance_weight * normalized_relevance + (1.0 - relevance_weight) * novelty
+            )
             center_scores = np.where(allowed, center_scores, -np.inf)
             selected = int(np.argmax(center_scores))
             if not math.isfinite(float(center_scores[selected])):

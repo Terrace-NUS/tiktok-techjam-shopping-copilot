@@ -64,8 +64,7 @@ class DeepSeekSurfaceRealizer:
                 {
                     "reply_type": "initial message",
                     "canonical_message": (
-                        "I'm looking for Jewelry Necklaces. "
-                        "A key requirement is: Material:alloy."
+                        "I'm looking for Jewelry Necklaces. A key requirement is: Material:alloy."
                     ),
                 },
                 ensure_ascii=False,
@@ -80,18 +79,14 @@ class DeepSeekSurfaceRealizer:
             "content": json.dumps(
                 {
                     "reply_type": "follow-up customer reply",
-                    "canonical_message": (
-                        "For that, what matters is: polyester; 100% Polyester."
-                    ),
+                    "canonical_message": ("For that, what matters is: polyester; 100% Polyester."),
                 },
                 ensure_ascii=False,
             ),
         },
         {
             "role": "assistant",
-            "content": (
-                '{"message":"The material matters most to me, ideally pure polyester."}'
-            ),
+            "content": ('{"message":"The material matters most to me, ideally pure polyester."}'),
         },
         {
             "role": "user",
@@ -107,9 +102,7 @@ class DeepSeekSurfaceRealizer:
         },
         {
             "role": "assistant",
-            "content": (
-                '{"message":"Style is up to you; I do not have a preference there."}'
-            ),
+            "content": ('{"message":"Style is up to you; I do not have a preference there."}'),
         },
         {
             "role": "user",
@@ -127,8 +120,7 @@ class DeepSeekSurfaceRealizer:
         {
             "role": "assistant",
             "content": (
-                '{"message":"I have changed my mind: an airy, ventilated upper is '
-                'required now."}'
+                '{"message":"I have changed my mind: an airy, ventilated upper is required now."}'
             ),
         },
     )
@@ -297,14 +289,14 @@ class DeepSeekSurfaceRealizer:
         return (
             message.strip(),
             prompt_tokens if type(prompt_tokens) is int and prompt_tokens >= 0 else 0,
-            completion_tokens
-            if type(completion_tokens) is int and completion_tokens >= 0
-            else 0,
+            completion_tokens if type(completion_tokens) is int and completion_tokens >= 0 else 0,
         )
 
     @staticmethod
     def _key(canonical_message: str, reply_type: str) -> str:
-        return json.dumps([reply_type, canonical_message], ensure_ascii=False, separators=(",", ":"))
+        return json.dumps(
+            [reply_type, canonical_message], ensure_ascii=False, separators=(",", ":")
+        )
 
     @staticmethod
     def _load_cache(path: Path) -> dict[str, str]:

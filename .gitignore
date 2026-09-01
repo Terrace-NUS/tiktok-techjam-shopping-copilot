@@ -42,10 +42,11 @@ data/releases/
 # Organizer-only code, private evaluation data, manifests, and build reports.
 organizer/
 secure/
-# Internal provenance and release-audit working documents.
-docs/audits/
-docs/data_selection_audit.md
-docs/participant_release_checklist.md
+# Internal design notes, writing drafts, review packets, and generated visuals.
+# Kept locally; the public repository has one curated root README instead.
+/docs/
+/scripts/retrieval/build_probe_review_bundle.py
+/config/**/README.md
 # Organizer-only pipeline tests.
 tests/test_5core_builder.py
 tests/test_organizer_pipeline.py

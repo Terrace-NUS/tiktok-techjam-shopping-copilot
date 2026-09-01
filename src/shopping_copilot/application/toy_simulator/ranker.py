@@ -151,9 +151,7 @@ class ProductRanker:
             return ranked
 
         limit = (
-            len(ranked)
-            if prior.reorder_depth is None
-            else min(prior.reorder_depth, len(ranked))
+            len(ranked) if prior.reorder_depth is None else min(prior.reorder_depth, len(ranked))
         )
         reorderable = ranked[:limit]
         result: list[int] = []

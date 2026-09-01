@@ -104,9 +104,7 @@ def _preference_payload(preference: Preference) -> dict[str, object]:
         "value": value,
         "semantic_text": preference.semantic_text,
         "semantic_polarity": (
-            None
-            if preference.semantic_polarity is None
-            else preference.semantic_polarity.value
+            None if preference.semantic_polarity is None else preference.semantic_polarity.value
         ),
         "commitment": preference.commitment.value,
         "source": preference.source.value,

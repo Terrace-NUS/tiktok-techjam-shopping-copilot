@@ -16,9 +16,9 @@ from shopping_copilot.session_context import IntentState
 from ..vector_diversity import VectorCandidate
 
 JsonScalar: TypeAlias = str | int | float | bool | None
-FrozenJsonValue: TypeAlias = JsonScalar | tuple["FrozenJsonValue", ...] | Mapping[
-    str, "FrozenJsonValue"
-]
+FrozenJsonValue: TypeAlias = (
+    JsonScalar | tuple["FrozenJsonValue", ...] | Mapping[str, "FrozenJsonValue"]
+)
 
 RANKING_CONTRACT_VERSION = "deepseek_candidate_judgement_v1"
 
@@ -179,7 +179,10 @@ class CandidateJudgement:
             set(self.unsupported_preference_ids),
             set(self.conflict_preference_ids),
         )
-        if any(preference_groups[left] & preference_groups[right] for left, right in ((0, 1), (0, 2), (1, 2))):
+        if any(
+            preference_groups[left] & preference_groups[right]
+            for left, right in ((0, 1), (0, 2), (1, 2))
+        ):
             raise ValueError("preference judgement groups must be disjoint")
         _require_text(self.reason, name="judgement reason")
         if len(self.reason) > 400:

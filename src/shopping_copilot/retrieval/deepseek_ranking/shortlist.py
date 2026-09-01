@@ -119,10 +119,7 @@ class DirectionAwareShortlister:
         if trace is None or not trace.directions or not ranking.hits:
             return {}
         center_rows = np.fromiter(
-            (
-                self.index.row_index(direction.center_parent_asin)
-                for direction in trace.directions
-            ),
+            (self.index.row_index(direction.center_parent_asin) for direction in trace.directions),
             dtype=np.int64,
             count=len(trace.directions),
         )

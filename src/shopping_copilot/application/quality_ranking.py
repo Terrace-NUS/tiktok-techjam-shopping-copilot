@@ -137,9 +137,7 @@ class RealWorldRankingCoordinator:
                 )
                 return RealWorldRankingResult(
                     mode=mode,
-                    recommendations=tuple(
-                        hit.parent_asin for hit in quality_slate.result.hits
-                    ),
+                    recommendations=tuple(hit.parent_asin for hit in quality_slate.result.hits),
                     quality_pipeline=quality,
                     quality_slate=quality_slate,
                     fallback_cross_encoder=None,

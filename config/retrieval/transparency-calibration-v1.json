@@ -8,7 +8,7 @@
   "catalog_semantic_release_id": "sha256:325af3fea978f34116ffec7ea13a1cbf1edd654ee3457c5877b51a3ec92a8907",
   "dense_index_id": "sha256:af5b074e3889eebae00402c22cea717c18cde37ba6e81aba19ef4c7b48f647c2",
   "prompt_suite_id": "sha256:9094210614d22694419dc7e7ffc8661cc44f4022c09ebc1bab353d7956cc3f13",
-  "evaluation_report": "docs/design/retrieve/transparency-evaluation-v1.md",
+  "evaluation_report": "README.md",
   "low_anchor": 0.256963026520931,
   "high_anchor": 0.4483984914520624,
   "approved": true

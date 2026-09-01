@@ -153,9 +153,7 @@ class RetrievalController:
             else transparency_recall_policy
         )
         if type(resolved_recall_policy) is not TransparencyRecallPolicy:
-            raise TypeError(
-                "transparency_recall_policy must be an exact TransparencyRecallPolicy"
-            )
+            raise TypeError("transparency_recall_policy must be an exact TransparencyRecallPolicy")
         expected = retriever.index.parent_asins
         if lexical_route.parent_asins != frozenset(expected):
             raise ValueError("lexical route and dense index contain different products")

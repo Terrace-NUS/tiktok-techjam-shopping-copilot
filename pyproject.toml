@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "shopping-copilot"
 version = "0.1.0"
-description = "Conversational shopping copilot for TikTok TechJam 2026."
+description = "APERTURE: a catalogue-grounded shopping copilot powered by Intent Transparency."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
