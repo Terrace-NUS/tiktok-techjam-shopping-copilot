@@ -68,26 +68,11 @@ The committed JSONL is the fixed semantic benchmark. The full-pipeline runner ca
 the checked-in DeepSeek surface realizer for varied natural wording while deterministic
 code continues to own disclosure, withdrawal, override, and scoring state.
 
-## One Agent, two execution profiles
+## Reproduce the official benchmark
 
-APERTURE exposes one `reset(...)` / `respond(...)` interface throughout the repository.
-The execution profile changes the available dependencies, not the integration contract:
-
-| Profile | Intended use | External requirements |
-|---|---|---|
-| **Offline** (default) | Official public and hidden-set evaluation | Python and the competition catalogue |
-| **Full** | Complete interactive shopping pipeline | DeepSeek, local BGE models, generated sidecar assets, and CUDA |
-
-The offline profile is the submission-ready APERTURE configuration. The full profile
-extends the same entry point with native-tool Query Understanding, Catalogue Probe,
-Intent Transparency, semantic recall, evidence-grounded judgement, and final-set
-selection.
-
-## Reproduce the official benchmark offline
-
-This is APERTURE's default, submission-ready profile. It implements the organizer Agent
-contract without API calls, model downloads, or GPU dependencies. You need only Python
-3.10+ and the organizer's 50K catalogue.
+The submitted APERTURE Agent runs locally with Python 3.10+ and the organizer's 50K
+catalogue. Official public and hidden-set evaluation requires no API key, network
+request, model download, or GPU.
 
 ### 1. Install
 
@@ -132,13 +117,13 @@ python -m evaluator.local_evaluator \
 ```
 
 The output contains Hit@10, MRR, MTTC, the recommended Technical Score, scenario-level
-metrics, and per-session evidence. This offline path reports zero model-token usage.
+metrics, and per-session evidence. This run reports zero model-token usage.
 
 ### 4. Instantiate APERTURE for hidden-set evaluation
 
-`starter/agent.py` is the organizer-compatible APERTURE entry point. Instantiate it
-once in the evaluator process with the organizer catalogue, reset it once for each
-hidden session, and call `respond(...)` for every shopper turn:
+`starter/agent.py` exports the exact class loaded by the official evaluator. Instantiate
+it once with the organizer catalogue, reset it once for each hidden session, and call
+`respond(...)` for every shopper turn:
 
 ```python
 from starter.agent import Agent
@@ -167,14 +152,16 @@ usage.prompt_tokens
 usage.completion_tokens
 ```
 
-`Agent(...)` selects APERTURE's offline profile by default. This evaluation path
-requires no API key, network request, GPU, or model download. The organizer's weak BM25
-starter is a comparison baseline and is not selected by this entry point.
+The evaluator's existing `from starter.agent import Agent` import therefore loads
+APERTURE directly; the organizer's original BM25 implementation is only the comparison
+baseline and is not run by this repository. Conformance is checked against the
+[published Agent interface](https://github.com/TechJam2026/techjam-conversational-search#agent-interface),
+[machine-readable response contract](https://github.com/TechJam2026/techjam-conversational-search/blob/main/docs/agent_api_contract.json),
+and [official evaluator](https://github.com/TechJam2026/techjam-conversational-search/blob/main/evaluator/local_evaluator.py).
 
-## Unlock the full APERTURE pipeline
+## Full APERTURE
 
-The offline profile reproduces the competition boundary. The full profile additionally
-enables:
+The complete model-backed pipeline enables:
 
 - DeepSeek native-tool Query Understanding;
 - explicit, validated Session Context transitions;
@@ -192,7 +179,7 @@ python -m pip install --require-hashes -r requirements/retrieval.lock
 python -m pip install -e ".[dev,retrieval]"
 ```
 
-The full profile requires a CUDA-capable GPU, a DeepSeek API key, local BGE model weights,
+Full APERTURE requires a CUDA-capable GPU, a DeepSeek API key, local BGE model weights,
 and the generated semantic release, dense index, and intent-volume density cache.
 
 ### 2. Configure and run the Agent
@@ -229,7 +216,6 @@ response = agent.respond(
     turn=1,
     top_k=10,
 )
-audit = agent.last_audit("demo-session")
 ```
 
 The constructor validates every asset before accepting a turn. Product facts,
@@ -279,7 +265,7 @@ python scripts/query_understanding/evaluate_prompts.py \
 
 ## Test and verify
 
-Run the complete offline verification suite:
+Run the complete verification suite:
 
 ```bash
 python -m pytest
@@ -288,7 +274,7 @@ python -m ruff format --check src tests/unit
 python -m mypy
 ```
 
-The release commit passes **1,139 tests**, Ruff linting and formatting, and strict mypy
+The release commit passes **1,145 tests**, Ruff linting and formatting, and strict mypy
 checking across 172 source files.
 
 ## Repository layout
@@ -296,9 +282,7 @@ checking across 172 source files.
 | Path | Purpose |
 |---|---|
 | `src/shopping_copilot/` | Session state, Query Understanding, catalogue semantics, Probe, retrieval, ranking, response, and benchmark logic |
-| `src/shopping_copilot/application/offline/` | Default model-free APERTURE profile for organizer evaluation |
-| `src/shopping_copilot/application/full.py` | Builder for the dependency-enabled APERTURE profile |
-| `starter/agent.py` | Unified APERTURE entry point for the organizer Agent API |
+| `starter/agent.py` | APERTURE entry point matching the organizer Agent API |
 | `evaluator/` | Frozen local compatibility evaluator |
 | `benchmarks/catalogue_grounded_200/` | Released 200-journey dataset, pinned manifest, and reported results |
 | `scripts/` | Reproducible builders, evaluations, and benchmark runners |

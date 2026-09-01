@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from inspect import signature
 from pathlib import Path
 from unittest.mock import patch
 
@@ -72,6 +73,22 @@ def catalog_path(tmp_path: Path) -> Path:
         encoding="utf-8",
     )
     return path
+
+
+def test_public_agent_matches_organizer_call_signatures() -> None:
+    assert "catalog_path" in signature(Agent).parameters
+    assert tuple(signature(Agent.reset).parameters) == (
+        "self",
+        "session_id",
+        "user_profile",
+    )
+    assert tuple(signature(Agent.respond).parameters) == (
+        "self",
+        "session_id",
+        "user_message",
+        "turn",
+        "top_k",
+    )
 
 
 def test_default_mode_is_model_free_offline_aperture(catalog_path: Path) -> None:
