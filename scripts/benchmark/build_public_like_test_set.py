@@ -656,7 +656,10 @@ def _render_report(payload: dict[str, object]) -> str:
             "",
             "## Boundary",
             "",
-            "The hidden 800 are unavailable, so this suite tests one explicit hypothesis: organizer targets resemble the visible public targets. Improvements should also be checked on the uniform control before using the selection prior in the toy ranker.",
+            "The hidden 800 are unavailable, so this suite tests one explicit hypothesis: "
+            "organizer targets resemble the visible public targets. Improvements should also "
+            "be checked on the uniform control before using the selection prior in the "
+            "offline ranker.",
             "",
         ]
     )

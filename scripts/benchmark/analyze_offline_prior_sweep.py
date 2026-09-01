@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import cast
 
 ROOT = Path(__file__).resolve().parents[2]
-SWEEP = ROOT / "artifacts/benchmark/toy-prior-sweep-v1"
+SWEEP = ROOT / "artifacts/benchmark/offline-prior-sweep-v1"
 GRADIENT = ROOT / "artifacts/benchmark/public-like-gradient-v1"
 
 
@@ -27,9 +27,7 @@ def main() -> int:
         "other + review 0.05": SWEEP / "other-review-005.json",
         "public 0.10 frozen Top10": SWEEP / "public-like-010-depth10-public.json",
     }
-    public_screen = {
-        name: _metric(_load(path)) for name, path in public_screen_paths.items()
-    }
+    public_screen = {name: _metric(_load(path)) for name, path in public_screen_paths.items()}
 
     baseline_top = _load(GRADIENT / "baseline-top-4000.json")
     full_variants = {
@@ -60,7 +58,7 @@ def main() -> int:
         for name, values in full_variants.items()
     }
     payload = {
-        "schema": "shopping-copilot/toy-prior-sweep/v1",
+        "schema": "shopping-copilot/offline-prior-sweep/v1",
         "public_screen": public_screen,
         "full_gradient": full,
         "selected_for_official_like_distribution": {
@@ -100,7 +98,7 @@ def _render(payload: dict[str, object]) -> str:
     public = cast(dict[str, dict[str, object]], payload["public_screen"])
     full = cast(dict[str, dict[str, dict[str, object]]], payload["full_gradient"])
     lines = [
-        "# Toy ranking-prior sweep v1",
+        "# APERTURE offline ranking-prior sweep v1",
         "",
         "## Public-200 screening",
         "",

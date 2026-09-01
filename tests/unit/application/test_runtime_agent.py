@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from shopping_copilot.application import RealWorldConfig
+from shopping_copilot.application import FullApertureConfig
 from starter.agent import Agent
 
 PRODUCTS = (
@@ -35,7 +35,7 @@ PRODUCTS = (
 )
 
 
-class FakeRealWorldAgent:
+class FakeFullApertureAgent:
     def __init__(self) -> None:
         self.reset_calls: list[tuple[str, dict[str, object]]] = []
 
@@ -61,7 +61,7 @@ class FakeRealWorldAgent:
         }
 
     def last_audit(self, session_id: str) -> dict[str, object]:
-        return {"session_id": session_id, "mode": "real_world"}
+        return {"session_id": session_id, "mode": "full"}
 
 
 @pytest.fixture
@@ -74,10 +74,10 @@ def catalog_path(tmp_path: Path) -> Path:
     return path
 
 
-def test_default_mode_is_model_free_official_simulator(catalog_path: Path) -> None:
+def test_default_mode_is_model_free_offline_aperture(catalog_path: Path) -> None:
     agent = Agent(catalog_path)
 
-    assert agent.mode == "official_simulator"
+    assert agent.mode == "offline"
     agent.reset("session", {})
     response = agent.respond(
         "session",
@@ -92,28 +92,28 @@ def test_default_mode_is_model_free_official_simulator(catalog_path: Path) -> No
     assert set(response) == {"message", "ask_attribute", "recommendations", "usage"}
 
 
-def test_real_world_mode_requires_explicit_api_configuration(catalog_path: Path) -> None:
+def test_full_mode_requires_explicit_api_configuration(catalog_path: Path) -> None:
     with pytest.raises(ValueError, match="requires deepseek_api_key"):
-        Agent(catalog_path, mode="real_world")
+        Agent(catalog_path, mode="full")
 
 
 def test_default_mode_rejects_unused_api_configuration(catalog_path: Path) -> None:
-    with pytest.raises(ValueError, match="only valid with mode='real_world'"):
+    with pytest.raises(ValueError, match="only valid with mode='full'"):
         Agent(catalog_path, deepseek_api_key="secret")
 
 
-def test_real_world_mode_builds_delegate_and_normalizes_contract(catalog_path: Path) -> None:
-    delegate = FakeRealWorldAgent()
-    config = RealWorldConfig(api_key="secret")
-    with patch("starter.agent.build_real_world_agent", return_value=delegate) as build:
+def test_full_mode_builds_delegate_and_normalizes_contract(catalog_path: Path) -> None:
+    delegate = FakeFullApertureAgent()
+    config = FullApertureConfig(api_key="secret")
+    with patch("starter.agent.build_full_aperture_agent", return_value=delegate) as build:
         agent = Agent(
             catalog_path,
-            mode="real_world",
-            real_world_config=config,
+            mode="full",
+            full_config=config,
         )
 
     build.assert_called_once_with(catalog_path, config)
-    assert agent.mode == "real_world"
+    assert agent.mode == "full"
     agent.reset("session", {"summary": "profile"})
     response = agent.respond("session", "show me shoes", 1, 10)
 
@@ -126,17 +126,17 @@ def test_real_world_mode_builds_delegate_and_normalizes_contract(catalog_path: P
     }
     assert agent.last_audit("session") == {
         "session_id": "session",
-        "mode": "real_world",
+        "mode": "full",
     }
 
 
-def test_real_world_shorthand_builds_config_from_api_key(catalog_path: Path) -> None:
-    delegate = FakeRealWorldAgent()
-    with patch("starter.agent.build_real_world_agent", return_value=delegate) as build:
-        Agent(catalog_path, mode="real_world", deepseek_api_key="secret")
+def test_full_shorthand_builds_config_from_api_key(catalog_path: Path) -> None:
+    delegate = FakeFullApertureAgent()
+    with patch("starter.agent.build_full_aperture_agent", return_value=delegate) as build:
+        Agent(catalog_path, mode="full", deepseek_api_key="secret")
 
     built_config = build.call_args.args[1]
-    assert isinstance(built_config, RealWorldConfig)
+    assert isinstance(built_config, FullApertureConfig)
     assert built_config.api_key == "secret"
     assert built_config.product_card_sidecar is None
 

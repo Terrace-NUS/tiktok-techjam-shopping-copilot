@@ -7,10 +7,10 @@ from typing import Protocol
 
 
 class RuntimeMode(str, Enum):
-    """Explicit execution modes supported by the repository entry point."""
+    """Execution profiles exposed by the unified APERTURE entry point."""
 
-    OFFICIAL_SIMULATOR = "official_simulator"
-    REAL_WORLD = "real_world"
+    OFFLINE = "offline"
+    FULL = "full"
 
 
 class AgentDelegate(Protocol):

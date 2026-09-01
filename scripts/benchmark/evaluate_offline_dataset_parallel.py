@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluate the offline toy strategy with independent session shards in parallel."""
+"""Evaluate APERTURE's offline profile with independent session shards in parallel."""
 
 from __future__ import annotations
 
@@ -25,8 +25,8 @@ from evaluator.local_evaluator import (  # noqa: E402
     load_jsonl,
     metric_summary,
 )
-from shopping_copilot.application import ToySimulatorAgent  # noqa: E402
-from shopping_copilot.application.toy_simulator.ranker import (  # noqa: E402
+from shopping_copilot.application import OfflineApertureAgent  # noqa: E402
+from shopping_copilot.application.offline.ranker import (  # noqa: E402
     AmbiguityPrior,
     ProductRanker,
 )
@@ -42,7 +42,7 @@ def main() -> int:
     shards = [shard for shard in shards if shard]
 
     def run_shard(shard: list[tuple[int, dict]]) -> tuple[list[tuple[int, dict]], dict]:
-        agent = ToySimulatorAgent(args.catalog, question_mode=args.question_mode)
+        agent = OfflineApertureAgent(args.catalog, question_mode=args.question_mode)
         prior_scores = _prior_scores(
             source=args.prior,
             asins=agent.catalog.asins,

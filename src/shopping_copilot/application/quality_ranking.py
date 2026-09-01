@@ -37,7 +37,7 @@ class RankingFailure:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class RealWorldRankingResult:
+class ApertureRankingResult:
     """One final recommendation slate plus every ranking stage used to produce it."""
 
     mode: str
@@ -64,7 +64,7 @@ class RealWorldRankingResult:
         return self.quality_pipeline.quality_ranking.traces
 
 
-class RealWorldRankingCoordinator:
+class ApertureRankingCoordinator:
     """Run quality ranking, then degrade through BGE and formal retrieval safely."""
 
     def __init__(
@@ -95,7 +95,7 @@ class RealWorldRankingCoordinator:
         retrieval: FormalRetrievalResult,
         top_k: int,
         user_profile: RankingUserProfile | None = None,
-    ) -> RealWorldRankingResult:
+    ) -> ApertureRankingResult:
         """Produce a final Top-K without ever reintroducing hard-mask rejects."""
 
         if type(request_id) is not str or not request_id.strip():
@@ -135,7 +135,7 @@ class RealWorldRankingCoordinator:
                     if quality.quality_ranking.mode is QualityRankingMode.DEEPSEEK
                     else "deepseek_bge_fallback_dpp"
                 )
-                return RealWorldRankingResult(
+                return ApertureRankingResult(
                     mode=mode,
                     recommendations=tuple(hit.parent_asin for hit in quality_slate.result.hits),
                     quality_pipeline=quality,
@@ -163,7 +163,7 @@ class RealWorldRankingCoordinator:
                     top_k=top_k,
                     relevance_weight=float(retrieval.relevance_weight),
                 )
-                return RealWorldRankingResult(
+                return ApertureRankingResult(
                     mode=("bge_dpp" if quality_failure is None else "bge_dpp_after_failure"),
                     recommendations=tuple(hit.parent_asin for hit in fallback_slate.hits),
                     quality_pipeline=None,
@@ -180,7 +180,7 @@ class RealWorldRankingCoordinator:
             fallback_failure = None
 
         recommendations = tuple(hit.parent_asin for hit in retrieval.hits[:top_k])
-        return RealWorldRankingResult(
+        return ApertureRankingResult(
             mode=(
                 "formal_mmr"
                 if quality_failure is None and fallback_failure is None

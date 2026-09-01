@@ -2,7 +2,7 @@
   "schema": "shopping-copilot/query-understanding-natural-suite/v0",
   "suite_id": "fact-extraction-prompts-v1",
   "language": "English catalog-like descriptions embedded in shopping dialogue",
-  "authorship": "Hand-authored from failure shapes observed in target-blind toy-simulator runs; no target identifiers or hidden state are included.",
+  "authorship": "Hand-authored from failure shapes observed in target-blind competition-simulator runs; no target identifiers or hidden state are included.",
   "oracle_policy": "Assertions check subject and negation scope, structured-fact extraction, lexical-anchor preservation, category non-duplication, and explicitly marked hard versus soft strength.",
   "conversations": [
     {

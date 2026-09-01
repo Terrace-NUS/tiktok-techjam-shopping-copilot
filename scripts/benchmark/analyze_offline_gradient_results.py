@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize toy-strategy results across public-likeness gradient tiers."""
+"""Summarize offline-profile results across public-likeness gradient tiers."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def main() -> int:
         "likeness_rank_1801_3800": gradient_sessions[2_000:4_000],
     }
     summary = {
-        "schema": "shopping-copilot/toy-gradient-baseline/v1",
+        "schema": "shopping-copilot/offline-gradient-baseline/v1",
         "groups": {
             name: {
                 **metric_summary(sessions),
@@ -62,9 +62,9 @@ def main() -> int:
 def _render(payload: dict[str, object]) -> str:
     groups = cast(dict[str, dict[str, object]], payload["groups"])
     lines = [
-        "# Toy specialist baseline on public-likeness gradients",
+        "# APERTURE offline profile on public-likeness gradients",
         "",
-        "The selection prior was not used in these runs. The table measures the current model-free toy strategy as-is.",
+        "The selection prior was not used in these runs. The table measures the model-free offline profile as-is.",
         "",
         "| Cohort | n | Hit@10 | MRR | MTTC | misses |",
         "|---|---:|---:|---:|---:|---:|",

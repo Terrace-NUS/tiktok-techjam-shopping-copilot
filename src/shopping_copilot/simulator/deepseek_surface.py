@@ -1,4 +1,4 @@
-"""Cached DeepSeek surface realization for the official toy simulator.
+"""Cached DeepSeek surface realization for the official conversation simulator.
 
 The simulator remains deterministic: evaluator code decides which facts are
 revealed.  DeepSeek only rewrites the resulting canonical sentence.  A

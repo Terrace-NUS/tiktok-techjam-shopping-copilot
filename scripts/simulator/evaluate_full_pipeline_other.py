@@ -1,4 +1,4 @@
-"""Run the real shopping pipeline against the official public toy simulator.
+"""Run APERTURE's full profile against the official public conversation simulator.
 
 This file is deliberately an adapter, not a second retrieval implementation.  It
 replays the organizer's public evaluator protocol while keeping the target ASIN on
@@ -45,8 +45,8 @@ from evaluator.local_evaluator import (  # noqa: E402
     normalize_recommendations,
 )
 from shopping_copilot.application.quality_ranking import (  # noqa: E402
-    RealWorldRankingCoordinator,
-    RealWorldRankingResult,
+    ApertureRankingCoordinator,
+    ApertureRankingResult,
 )
 from shopping_copilot.application.response_generation import (  # noqa: E402
     DeterministicResponseComposer,
@@ -167,7 +167,7 @@ class FullPipelineOtherAgent:
         facet_registry: Any,
         qu_retry_count: int,
         repeat_noop_cache: bool,
-        ranking_coordinator: RealWorldRankingCoordinator | None = None,
+        ranking_coordinator: ApertureRankingCoordinator | None = None,
         response_composer: DeterministicResponseComposer | None = None,
     ) -> None:
         self._service = service
@@ -359,7 +359,7 @@ class FullPipelineOtherAgent:
         ranking_error: dict[str, object] | None = None
         bge_result: Any | None = None
         dpp_result: Any | None = None
-        coordinated_ranking: RealWorldRankingResult | None = None
+        coordinated_ranking: ApertureRankingResult | None = None
         if self._ranking_coordinator is not None:
             try:
                 coordinated_ranking = self._ranking_coordinator.rank(
@@ -1202,7 +1202,7 @@ def _agent_response(
     recommendations: list[str],
     *,
     resolved: ResolvedTurnIntent | None,
-    ranking: RealWorldRankingResult | None = None,
+    ranking: ApertureRankingResult | None = None,
     message: str | None = None,
 ) -> dict[str, object]:
     traces = () if resolved is None else resolved.trace.attempts
@@ -1306,7 +1306,7 @@ def _ranking_payload(
     dpp_result: Any | None,
     fallback_hits: tuple[Any, ...],
     error: dict[str, object] | None,
-    coordinated: RealWorldRankingResult | None = None,
+    coordinated: ApertureRankingResult | None = None,
 ) -> dict[str, object]:
     if coordinated is not None:
         return {

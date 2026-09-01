@@ -1,4 +1,4 @@
-"""Adapters used only to exercise the real system against toy simulators."""
+"""Adapters used to exercise APERTURE against competition simulators."""
 
 from .deepseek_surface import DeepSeekSurfaceRealizer, SurfaceUsage
 

@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from shopping_copilot.retrieval.deepseek_ranking import QualityRankingHit
 from shopping_copilot.session_context import Commitment, IntentState, Operator, Preference
 
-from .quality_ranking import RealWorldRankingResult
+from .quality_ranking import ApertureRankingResult
 
 RESPONSE_SCHEMA = "shopping-copilot/deterministic-response-narrative/v1"
 TRANSPARENCY_MOVEMENT_THRESHOLD = 0.12
@@ -56,7 +56,7 @@ class DeterministicResponseComposer:
         recommendations: tuple[str, ...],
         transparency: float,
         previous_transparency: float | None,
-        ranking: RealWorldRankingResult | None,
+        ranking: ApertureRankingResult | None,
         intent: IntentState,
         product_metadata: Mapping[str, Mapping[str, object]],
     ) -> ResponseNarrative:
@@ -136,7 +136,7 @@ def _movement(current: float, previous: float | None) -> str:
 
 
 def _quality_hits(
-    ranking: RealWorldRankingResult | None,
+    ranking: ApertureRankingResult | None,
 ) -> dict[str, QualityRankingHit]:
     if ranking is None or ranking.quality_pipeline is None:
         return {}

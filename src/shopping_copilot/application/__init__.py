@@ -1,29 +1,29 @@
-"""Composition helpers for official-simulator and real-world execution."""
+"""Composition helpers for APERTURE's offline and full execution profiles."""
 
 from .contracts import AgentDelegate, RuntimeMode
+from .full import FullApertureConfig, build_full_aperture_agent
+from .offline import OfflineApertureAgent
 from .quality_ranking import (
+    ApertureRankingCoordinator,
+    ApertureRankingResult,
     RankingFailure,
-    RealWorldRankingCoordinator,
-    RealWorldRankingResult,
 )
-from .real_world import RealWorldConfig, build_real_world_agent
 from .response_generation import (
     DeterministicResponseComposer,
     ProductNarrative,
     ResponseNarrative,
 )
-from .toy_simulator import Agent as ToySimulatorAgent
 
 __all__ = [
     "AgentDelegate",
+    "ApertureRankingCoordinator",
+    "ApertureRankingResult",
     "DeterministicResponseComposer",
+    "FullApertureConfig",
+    "OfflineApertureAgent",
     "ProductNarrative",
     "RankingFailure",
-    "RealWorldConfig",
-    "RealWorldRankingCoordinator",
-    "RealWorldRankingResult",
     "ResponseNarrative",
     "RuntimeMode",
-    "ToySimulatorAgent",
-    "build_real_world_agent",
+    "build_full_aperture_agent",
 ]

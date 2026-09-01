@@ -25,7 +25,7 @@ from scripts.query_understanding.suites import (  # noqa: E402
 
 SCHEMA = "shopping-copilot/query-understanding-simulator-suite/v0"
 SUITE_VERSION = "v1-other-only"
-SOURCE = "official_toy_simulator"
+SOURCE = "official_conversation_simulator"
 SCENARIOS = ("buying", "browsing")
 VISIBLE_TURNS = 4
 ASK_ATTRIBUTE = "other"
@@ -125,7 +125,7 @@ def build_suite(*, dataset_path: Path, catalog_path: Path) -> dict[str, object]:
         "suite_id": SIMULATOR_OTHER_SUITE_ID,
         "source": SOURCE,
         "description": (
-            "Every public buying and browsing task captured from the official toy simulator; "
+            "Every public buying and browsing task captured from the official conversation simulator; "
             "the agent always returns ask_attribute='other' and stores no evaluator-only state."
         ),
         "generator": {

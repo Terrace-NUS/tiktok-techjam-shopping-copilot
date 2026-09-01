@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Stress-test the toy strategy with paraphrased simulator prompt wrappers.
+"""Stress-test APERTURE's offline profile with paraphrased prompt wrappers.
 
 The disclosed catalog attribute values are left byte-for-byte unchanged. Only
-the surrounding English is rewritten, so this measures whether the toy parser
+the surrounding English is rewritten, so this measures whether the offline parser
 links visible catalog facts or memorizes the public evaluator's sentences.
 """
 
@@ -23,11 +23,11 @@ for source_path in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(source_path))
 
 from evaluator import local_evaluator  # noqa: E402
-from shopping_copilot.application import ToySimulatorAgent  # noqa: E402
+from shopping_copilot.application import OfflineApertureAgent  # noqa: E402
 
 
-class TracingToySimulatorAgent(ToySimulatorAgent):
-    """Capture toy-only parser and recommendation evidence for failed-case review."""
+class TracingOfflineApertureAgent(OfflineApertureAgent):
+    """Capture offline parser and recommendation evidence for failed-case review."""
 
     def __init__(self, catalog_path: str | Path) -> None:
         super().__init__(catalog_path)
@@ -162,11 +162,11 @@ def main() -> int:
     def run_shard(
         shard: list[tuple[int, dict]],
     ) -> tuple[list[tuple[int, dict]], list[tuple[int, list[dict[str, object]]]], dict]:
-        agent: ToySimulatorAgent
+        agent: OfflineApertureAgent
         if args.include_traces:
-            agent = TracingToySimulatorAgent(args.catalog)
+            agent = TracingOfflineApertureAgent(args.catalog)
         else:
-            agent = ToySimulatorAgent(args.catalog)
+            agent = OfflineApertureAgent(args.catalog)
         shard_samples = [sample for _, sample in shard]
         shard_result = local_evaluator.evaluate(
             agent,
@@ -183,7 +183,7 @@ def main() -> int:
             )
         )
         trace_pairs: list[tuple[int, list[dict[str, object]]]] = []
-        if isinstance(agent, TracingToySimulatorAgent):
+        if isinstance(agent, TracingOfflineApertureAgent):
             trace_pairs = list(
                 zip(
                     (index for index, _ in shard),
@@ -218,7 +218,7 @@ def main() -> int:
     payload = {
         **result,
         "diagnostic": {
-            "runtime_mode": "official_simulator",
+            "runtime_mode": "offline",
             "variant": "paraphrased_wrappers_verbatim_catalog_facts_v1",
             "attribute_values_modified": False,
             "workers": len(shards),

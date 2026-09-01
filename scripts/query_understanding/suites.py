@@ -1,4 +1,4 @@
-"""Strict loaders for the hand-authored and toy-simulator QU prompt suites."""
+"""Strict loaders for hand-authored and competition-simulator QU prompt suites."""
 
 from __future__ import annotations
 
@@ -405,8 +405,8 @@ def _load_simulator(root: dict[str, object]) -> PromptSuite:
     if suite_id not in SIMULATOR_SUITE_IDS:
         raise ValueError(f"$.suite_id must be one of {sorted(SIMULATOR_SUITE_IDS)!r}")
     source = _text(root["source"], path="$.source")
-    if source != "official_toy_simulator":
-        raise ValueError("$.source must equal 'official_toy_simulator'")
+    if source != "official_conversation_simulator":
+        raise ValueError("$.source must equal 'official_conversation_simulator'")
     description = _text(root["description"], path="$.description")
     generator = _simulator_generator(root["generator"])
     conversations = _array(root["conversations"], path="$.conversations")

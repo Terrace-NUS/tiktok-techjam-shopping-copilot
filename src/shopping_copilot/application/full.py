@@ -1,4 +1,4 @@
-"""Construction of the API-backed real shopping pipeline."""
+"""Construction of the full APERTURE execution profile."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ DEFAULT_BGE_REVISION = "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e"
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class RealWorldConfig:
+class FullApertureConfig:
     """Explicit dependencies for the full QU-to-ranking system."""
 
     api_key: str
@@ -38,7 +38,7 @@ class RealWorldConfig:
 
     def __post_init__(self) -> None:
         if type(self.api_key) is not str or not self.api_key.strip():
-            raise ValueError("real_world mode requires a non-empty DeepSeek API key")
+            raise ValueError("full mode requires a non-empty DeepSeek API key")
         if type(self.model) is not str or not self.model.strip():
             raise ValueError("model must be non-empty")
         if type(self.base_url) is not str or not self.base_url.startswith("https://"):
@@ -68,13 +68,13 @@ class RealWorldConfig:
             raise TypeError("repeat_noop_cache must be a bool")
 
 
-def build_real_world_agent(
+def build_full_aperture_agent(
     catalog_path: str | Path,
-    config: RealWorldConfig,
+    config: FullApertureConfig,
 ) -> AgentDelegate:
     """Build the already-tested full pipeline only when explicitly requested.
 
-    Imports are intentionally lazy: the default official-simulator mode must not
+    Imports are intentionally lazy: the default offline profile must not
     import Torch, sentence-transformers, CUDA runtimes, or API transports.
     """
 
@@ -109,7 +109,7 @@ def build_real_world_agent(
         TransparencyAwareDPPFinalizer,
     )
 
-    from .quality_ranking import RealWorldRankingCoordinator
+    from .quality_ranking import ApertureRankingCoordinator
     from .response_generation import DeterministicResponseComposer
 
     catalog = Path(catalog_path).resolve()
@@ -226,7 +226,7 @@ def build_real_world_agent(
         quality_finalizer = TransparencyAwareDPPFinalizer(
             index=controller.retriever.index,
         )
-    ranking_coordinator = RealWorldRankingCoordinator(
+    ranking_coordinator = ApertureRankingCoordinator(
         documents=documents,
         quality_pipeline=quality_pipeline,
         quality_finalizer=quality_finalizer,

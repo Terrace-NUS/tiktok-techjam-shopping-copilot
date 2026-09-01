@@ -3,7 +3,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 from typing import Any, cast
 
-from shopping_copilot.application.quality_ranking import RealWorldRankingResult
+from shopping_copilot.application.quality_ranking import ApertureRankingResult
 from shopping_copilot.application.response_generation import DeterministicResponseComposer
 from shopping_copilot.retrieval.deepseek_ranking import (
     CandidateVerdict,
@@ -113,14 +113,14 @@ def test_no_results_has_matching_message_and_recorded_question() -> None:
     assert narrative.message.endswith(narrative.follow_up)
 
 
-def _ranking(*hits: QualityRankingHit) -> RealWorldRankingResult:
+def _ranking(*hits: QualityRankingHit) -> ApertureRankingResult:
     quality_pipeline = SimpleNamespace(
         quality_ranking=SimpleNamespace(
             hits=hits,
             traces=(),
         )
     )
-    return RealWorldRankingResult(
+    return ApertureRankingResult(
         mode="deepseek_quality_dpp",
         recommendations=tuple(item.parent_asin for item in hits),
         quality_pipeline=cast(Any, quality_pipeline),

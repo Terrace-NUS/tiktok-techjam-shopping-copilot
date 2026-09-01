@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from shopping_copilot.application.toy_simulator.catalog import CatalogIndex
-from shopping_copilot.application.toy_simulator.state import SessionState
+from shopping_copilot.application.offline.catalog import CatalogIndex
+from shopping_copilot.application.offline.state import SessionState
 
 PRODUCTS = (
     {

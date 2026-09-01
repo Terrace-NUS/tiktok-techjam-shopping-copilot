@@ -1,4 +1,4 @@
-"""Official Agent entry point with an explicit real-world opt-in."""
+"""Organizer-compatible entry point for both APERTURE execution profiles."""
 
 from __future__ import annotations
 
@@ -13,10 +13,10 @@ if str(SRC) not in sys.path:
 
 from shopping_copilot.application import (  # noqa: E402
     AgentDelegate,
-    RealWorldConfig,
+    FullApertureConfig,
+    OfflineApertureAgent,
     RuntimeMode,
-    ToySimulatorAgent,
-    build_real_world_agent,
+    build_full_aperture_agent,
 )
 
 _ASK_ATTRIBUTES = frozenset(
@@ -36,11 +36,10 @@ _ASK_ATTRIBUTES = frozenset(
 
 
 class Agent:
-    """Expose one official API while keeping the two strategies isolated.
+    """Expose APERTURE through one stable organizer-compatible API.
 
-    ``Agent()`` is deliberately model-free and uses the official-simulator
-    specialist. The API-backed full system is constructed only when the caller
-    explicitly passes ``mode="real_world"`` and DeepSeek configuration.
+    ``Agent()`` selects the model-free offline profile used for official evaluation.
+    Passing ``mode="full"`` enables the same Agent's API-backed retrieval stack.
     """
 
     def __init__(
@@ -48,9 +47,9 @@ class Agent:
         catalog_path: str | Path = "data/catalog.jsonl",
         question_mode: str | None = None,
         *,
-        mode: RuntimeMode | str = RuntimeMode.OFFICIAL_SIMULATOR,
+        mode: RuntimeMode | str = RuntimeMode.OFFLINE,
         deepseek_api_key: str | None = None,
-        real_world_config: RealWorldConfig | None = None,
+        full_config: FullApertureConfig | None = None,
     ) -> None:
         try:
             runtime_mode = RuntimeMode(mode)
@@ -58,26 +57,24 @@ class Agent:
             allowed = ", ".join(item.value for item in RuntimeMode)
             raise ValueError(f"mode must be one of: {allowed}") from error
 
-        if runtime_mode is RuntimeMode.OFFICIAL_SIMULATOR:
-            if deepseek_api_key is not None or real_world_config is not None:
-                raise ValueError("DeepSeek configuration is only valid with mode='real_world'")
-            delegate: AgentDelegate = ToySimulatorAgent(
+        if runtime_mode is RuntimeMode.OFFLINE:
+            if deepseek_api_key is not None or full_config is not None:
+                raise ValueError("DeepSeek configuration is only valid with mode='full'")
+            delegate: AgentDelegate = OfflineApertureAgent(
                 catalog_path,
                 question_mode=question_mode,
             )
         else:
             if question_mode is not None:
-                raise ValueError("question_mode is only valid in official_simulator mode")
-            if deepseek_api_key is not None and real_world_config is not None:
-                raise ValueError("pass either deepseek_api_key or real_world_config, not both")
-            config = real_world_config
+                raise ValueError("question_mode is only valid in offline mode")
+            if deepseek_api_key is not None and full_config is not None:
+                raise ValueError("pass either deepseek_api_key or full_config, not both")
+            config = full_config
             if config is None:
                 if deepseek_api_key is None:
-                    raise ValueError(
-                        "mode='real_world' requires deepseek_api_key or real_world_config"
-                    )
-                config = RealWorldConfig(api_key=deepseek_api_key)
-            delegate = build_real_world_agent(catalog_path, config)
+                    raise ValueError("mode='full' requires deepseek_api_key or full_config")
+                config = FullApertureConfig(api_key=deepseek_api_key)
+            delegate = build_full_aperture_agent(catalog_path, config)
 
         self._mode = runtime_mode
         self._delegate = delegate

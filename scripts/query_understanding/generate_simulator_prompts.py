@@ -20,7 +20,7 @@ from typing import Any, cast
 SCHEMA = "shopping-copilot/query-understanding-simulator-suite/v0"
 SUITE_ID = "official-simulator-prompts-v0"
 SUITE_VERSION = "v0"
-SOURCE = "official_toy_simulator"
+SOURCE = "official_conversation_simulator"
 SCENARIOS = ("buying", "browsing", "intent_override", "boundary")
 SELECTED_PER_SCENARIO = 8
 VISIBLE_TURNS = 4
@@ -243,7 +243,7 @@ def build_suite(*, dataset_path: Path, catalog_path: Path) -> dict[str, object]:
         "suite_id": SUITE_ID,
         "source": SOURCE,
         "description": (
-            "Participant-visible user messages captured by running the official toy simulator; "
+            "Participant-visible user messages captured by running the official conversation simulator; "
             "all evaluator-only state is excluded."
         ),
         "generator": {
@@ -346,7 +346,7 @@ def _encoded_suite(suite: dict[str, object]) -> bytes:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate target-isolated QU prompts by running the official toy simulator."
+        description="Generate target-isolated QU prompts with the official conversation simulator."
     )
     parser.add_argument("--dataset", type=Path, default=Path("data/public_set.jsonl"))
     parser.add_argument("--catalog", type=Path, default=Path("data/catalog.jsonl"))

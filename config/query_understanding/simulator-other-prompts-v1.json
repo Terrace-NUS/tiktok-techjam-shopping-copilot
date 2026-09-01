@@ -1,8 +1,8 @@
 {
   "schema": "shopping-copilot/query-understanding-simulator-suite/v0",
   "suite_id": "official-simulator-other-prompts-v1",
-  "source": "official_toy_simulator",
-  "description": "Every public buying and browsing task captured from the official toy simulator; the agent always returns ask_attribute='other' and stores no evaluator-only state.",
+  "source": "official_conversation_simulator",
+  "description": "Every public buying and browsing task captured from the official conversation simulator; the agent always returns ask_attribute='other' and stores no evaluator-only state.",
   "generator": {
     "script": "scripts/query_understanding/generate_simulator_other_prompts.py",
     "suite_version": "v1-other-only",

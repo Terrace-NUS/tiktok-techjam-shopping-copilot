@@ -55,7 +55,7 @@ INTENT_SPACE_NATURAL_SHA256 = "650dc3b67942704c8ed634299a2ea389dc24331ce74641ba2
 EXPANDED_INTENT_SPACE_NATURAL_SHA256 = (
     "fa092d4977fdd0aa6c158429323a8b06abf46e88f1378ad9fbcb42649d652c3f"
 )
-SIMULATOR_SHA256 = "3ef69b2c602251c3218313312e1defeab12fc2a9980eaa070e314b89c706609c"
+SIMULATOR_SHA256 = "34d6c075dc58638053d0c3079f8bed1cba3becd71e42ef57cc85592c9eda41d3"
 
 
 def _natural_document() -> dict[str, object]:
@@ -101,8 +101,8 @@ def _simulator_document() -> dict[str, object]:
     return {
         "schema": SIMULATOR_SUITE_SCHEMA,
         "suite_id": "official-simulator-prompts-v0",
-        "source": "official_toy_simulator",
-        "description": "Visible toy-simulator messages only.",
+        "source": "official_conversation_simulator",
+        "description": "Visible competition-simulator messages only.",
         "generator": {
             "script": "scripts/query_understanding/generate_simulator_prompts.py",
             "suite_version": "v0",

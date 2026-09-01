@@ -28,11 +28,26 @@ The 2,000-session suite is an internal public-like stress test, not organizer gr
 truth or an independent holdout. Full methodology and interpretation are provided in
 the project submission; this README focuses on running and verifying the repository.
 
+## One Agent, two execution profiles
+
+APERTURE exposes one `reset(...)` / `respond(...)` interface throughout the repository.
+The execution profile changes the available dependencies, not the integration contract:
+
+| Profile | Intended use | External requirements |
+|---|---|---|
+| **Offline** (default) | Official public and hidden-set evaluation | Python and the competition catalogue |
+| **Full** | Complete interactive shopping pipeline | DeepSeek, local BGE models, generated sidecar assets, and CUDA |
+
+The offline profile is the submission-ready APERTURE configuration. The full profile
+extends the same entry point with native-tool Query Understanding, Catalogue Probe,
+Intent Transparency, semantic recall, evidence-grounded judgement, and final-set
+selection.
+
 ## Reproduce the official benchmark offline
 
-This is the path intended for organizer evaluation. It implements the official Agent
-interface without API calls, model downloads, or GPU dependencies. You need only
-Python 3.10+ and the organizer's 50K catalogue.
+This is APERTURE's default, submission-ready profile. It implements the organizer Agent
+contract without API calls, model downloads, or GPU dependencies. You need only Python
+3.10+ and the organizer's 50K catalogue.
 
 ### 1. Install
 
@@ -79,19 +94,16 @@ python -m evaluator.local_evaluator \
 The output contains Hit@10, MRR, MTTC, the recommended Technical Score, scenario-level
 metrics, and per-session evidence. This offline path reports zero model-token usage.
 
-### 4. Hidden-set integration for organizers
+### 4. Instantiate APERTURE for hidden-set evaluation
 
-`starter/agent.py` is the APERTURE submission entry point—not the official starter
-baseline. Instantiate it once in the evaluator process with the organizer catalogue,
-reset it once for each hidden session, and call `respond(...)` for every shopper turn:
+`starter/agent.py` is the organizer-compatible APERTURE entry point. Instantiate it
+once in the evaluator process with the organizer catalogue, reset it once for each
+hidden session, and call `respond(...)` for every shopper turn:
 
 ```python
 from starter.agent import Agent
 
-agent = Agent(
-    catalog_path=organizer_catalog_path,
-    mode="official_simulator",
-)
+agent = Agent(catalog_path=organizer_catalog_path)
 
 agent.reset(session_id, user_profile)
 
@@ -115,12 +127,13 @@ usage.prompt_tokens
 usage.completion_tokens
 ```
 
-This evaluation path is fully offline: it requires no API key, network request, GPU,
-or model download.
+`Agent(...)` selects APERTURE's offline profile by default. This evaluation path
+requires no API key, network request, GPU, or model download. The organizer's weak BM25
+starter is a comparison baseline and is not selected by this entry point.
 
 ## Unlock the full APERTURE pipeline
 
-The offline mode reproduces the competition boundary. The full mode additionally
+The offline profile reproduces the competition boundary. The full profile additionally
 enables:
 
 - DeepSeek native-tool Query Understanding;
@@ -139,7 +152,7 @@ python -m pip install --require-hashes -r requirements/retrieval.lock
 python -m pip install -e ".[dev,retrieval]"
 ```
 
-The full mode requires a CUDA-capable GPU, a DeepSeek API key, local BGE model weights,
+The full profile requires a CUDA-capable GPU, a DeepSeek API key, local BGE model weights,
 and the generated semantic release, dense index, and intent-volume density cache.
 
 ### 2. Configure and run the Agent
@@ -150,10 +163,10 @@ Pass every full-pipeline dependency explicitly:
 import os
 from pathlib import Path
 
-from shopping_copilot.application import RealWorldConfig
+from shopping_copilot.application import FullApertureConfig
 from starter.agent import Agent
 
-config = RealWorldConfig(
+config = FullApertureConfig(
     api_key=os.environ["DEEPSEEK_API_KEY"],
     semantic_release=Path("artifacts/catalog-semantic/release-v0"),
     dense_index=Path("artifacts/retrieval/dense-v0"),
@@ -166,8 +179,8 @@ config = RealWorldConfig(
 
 agent = Agent(
     catalog_path="data/catalog.jsonl",
-    mode="real_world",
-    real_world_config=config,
+    mode="full",
+    full_config=config,
 )
 agent.reset("demo-session", {})
 response = agent.respond(
@@ -243,7 +256,9 @@ checking across 172 source files.
 | Path | Purpose |
 |---|---|
 | `src/shopping_copilot/` | Session state, Query Understanding, catalogue semantics, Probe, retrieval, ranking, response, and benchmark logic |
-| `starter/agent.py` | Thin adapter for the official Agent API |
+| `src/shopping_copilot/application/offline/` | Default model-free APERTURE profile for organizer evaluation |
+| `src/shopping_copilot/application/full.py` | Builder for the dependency-enabled APERTURE profile |
+| `starter/agent.py` | Unified APERTURE entry point for the organizer Agent API |
 | `evaluator/` | Frozen local compatibility evaluator |
 | `scripts/` | Reproducible builders, evaluations, and benchmark runners |
 | `config/` | Frozen runtime policies and prompt/evaluation fixtures |

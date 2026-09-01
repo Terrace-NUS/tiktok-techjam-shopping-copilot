@@ -9,8 +9,8 @@ from .ranker import ProductRanker
 from .state import SessionState
 
 
-class Agent:
-    """Offline, model-free conversational product retrieval agent."""
+class OfflineApertureAgent:
+    """Model-free APERTURE execution profile for the competition boundary."""
 
     def __init__(
         self,

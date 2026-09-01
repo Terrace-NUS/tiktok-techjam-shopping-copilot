@@ -1,8 +1,8 @@
 {
   "schema": "shopping-copilot/query-understanding-simulator-suite/v0",
   "suite_id": "official-simulator-prompts-v0",
-  "source": "official_toy_simulator",
-  "description": "Participant-visible user messages captured by running the official toy simulator; all evaluator-only state is excluded.",
+  "source": "official_conversation_simulator",
+  "description": "Participant-visible user messages captured by running the official conversation simulator; all evaluator-only state is excluded.",
   "generator": {
     "script": "scripts/query_understanding/generate_simulator_prompts.py",
     "suite_version": "v0",

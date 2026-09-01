@@ -3,7 +3,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 from typing import Any, cast
 
-from shopping_copilot.application.quality_ranking import RealWorldRankingCoordinator
+from shopping_copilot.application.quality_ranking import ApertureRankingCoordinator
 from shopping_copilot.query_compiler import DiversityDirective
 from shopping_copilot.retrieval import (
     FusedCandidate,
@@ -87,7 +87,7 @@ class FakeSelector:
 def test_quality_ranking_preserves_routes_and_uses_t_aware_finalizer() -> None:
     pipeline = FakeQualityPipeline(mode=QualityRankingMode.DEEPSEEK)
     finalizer = FakeQualityFinalizer(("C", "A"))
-    coordinator = RealWorldRankingCoordinator(
+    coordinator = ApertureRankingCoordinator(
         documents={"A": "A", "B": "B", "C": "C"},
         quality_pipeline=cast(Any, pipeline),
         quality_finalizer=cast(Any, finalizer),
@@ -125,7 +125,7 @@ def test_quality_ranking_preserves_routes_and_uses_t_aware_finalizer() -> None:
 def test_provider_level_bge_fallback_still_gets_t_aware_dpp() -> None:
     pipeline = FakeQualityPipeline(mode=QualityRankingMode.BGE_FALLBACK)
     finalizer = FakeQualityFinalizer(("B", "C"))
-    coordinator = RealWorldRankingCoordinator(
+    coordinator = ApertureRankingCoordinator(
         documents={"A": "A", "B": "B", "C": "C"},
         quality_pipeline=cast(Any, pipeline),
         quality_finalizer=cast(Any, finalizer),
@@ -151,7 +151,7 @@ def test_unexpected_quality_failure_degrades_to_old_bge_dpp() -> None:
         mode=QualityRankingMode.DEEPSEEK,
         failure=RuntimeError("broken ranking prompt"),
     )
-    coordinator = RealWorldRankingCoordinator(
+    coordinator = ApertureRankingCoordinator(
         documents={"A": "A", "B": "B", "C": "C"},
         quality_pipeline=cast(Any, pipeline),
         quality_finalizer=cast(Any, FakeQualityFinalizer(("C",))),

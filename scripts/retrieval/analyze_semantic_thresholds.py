@@ -236,7 +236,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-turn",
         type=int,
-        help="ignore later turns in each conversation (for example, 3 for toy-simulator runs)",
+        help="ignore later turns in each conversation (for example, 3 for simulator runs)",
     )
     parser.add_argument("--run-merge", action="store_true")
     parser.add_argument("--run-metrics", action="store_true")

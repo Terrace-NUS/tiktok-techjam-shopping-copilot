@@ -25,7 +25,7 @@ from evaluator.local_evaluator import (  # noqa: E402
     intent_card,
     searchable_text,
 )
-from shopping_copilot.application.toy_simulator.catalog import (  # noqa: E402
+from shopping_copilot.application.offline.catalog import (  # noqa: E402
     CatalogIndex,
     normalize_phrase,
 )
@@ -100,7 +100,7 @@ def main() -> int:
     if missing:
         raise ValueError(f"public targets missing from catalog: {missing}")
 
-    print("building toy retrieval evidence index...", flush=True)
+    print("building offline retrieval evidence index...", flush=True)
     retrieval_index = CatalogIndex(args.catalog)
     print("deriving catalog features and simulator intent cards...", flush=True)
     features, categories, leaf_categories = _feature_rows(products, retrieval_index)
@@ -178,7 +178,7 @@ def main() -> int:
                 "category mix."
             ),
             "intent_card": "official evaluator.intent_card()",
-            "posting_sizes": "current default toy specialist CatalogIndex",
+            "posting_sizes": "current default APERTURE offline CatalogIndex",
             "random_seed": RANDOM_SEED,
         },
     }

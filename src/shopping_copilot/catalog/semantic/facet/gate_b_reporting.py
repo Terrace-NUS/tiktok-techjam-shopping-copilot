@@ -54,7 +54,7 @@ def gate_b_price_review_markdown(
         f"{audit.unsafe_satisfied_only_retained_count} 个，会误删价格未知的目标。",
         "",
         "这里使用的是兼容目标价格的合成预算，只验证‘未知值不会被误当作超预算’。",
-        "公共 toy simulator 没有真实用户预算文本，因此它不能证明主动询问预算有收益。",
+        "公共 competition simulator 没有真实用户预算文本，因此它不能证明主动询问预算有收益。",
         "这也是本提案把主动询问保持关闭的原因。",
         "",
         "## 全目录预算安全检查",
